@@ -1,4 +1,4 @@
-package com.larrykin.jepschemistpos;
+package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
