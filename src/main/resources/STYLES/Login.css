@@ -1,3 +1,40 @@
 #mainPane{
 -fx-background-image: url(../IMAGES/pharmacy3.jpg);
 }
+#anchorPaneRight{
+-fx-background-color: #B6E7E3;
+-fx-background-radius:20px;
+-fx-border-radius:20px;
+-fx-border-color: #FFFFFF;
+-fx-border-width:2px;
+-fx-effect: dropshadow(three-pass-box, rgba(1, 0, 0, 0.5), 6, 0, 2, 2);
+
+}
+#anchorPaneLeft{
+-fx-background-color: #B6E7E3;  /*CCFD9 --transparent*/
+-fx-background-radius:20px;
+-fx-border-radius:20px;
+-fx-border-color:#FFFFFF;
+-fx-border-width:2px;
+-fx-effect: dropshadow(three-pass-box, rgba(1, 0, 0, 0.5), 6, 0, 2, 2);
+}
+#imageAnchorPane{
+-fx-background-image: url(../IMAGES/pexels-pixabay-356040.jpg);
+-fx-background-repeat: no-repeat;
+-fx-background-size: cover;
+-fx-background-position: center;
+}
+#loginButton{
+-fx-background-color: #6DE75B;
+}
+#loginButton:hover{
+-fx-background-color: #00FF00;
+-fx-cursor: hand;
+}
+#cancelButton{
+-fx-background-color: #E56F56;
+}
+#cancelButton:hover{
+-fx-background-color: #FF0000;
+-fx-cursor: hand;
+}
