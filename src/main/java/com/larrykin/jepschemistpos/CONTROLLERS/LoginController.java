@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 public class LoginController {
 
@@ -39,5 +40,11 @@ public class LoginController {
 
     @FXML
     private PasswordField passwordField;
+
+
+    public void cancelOnAction() {
+        Stage window = (Stage) cancelButton.getScene().getWindow();
+        window.close();
+    }
 
 }
