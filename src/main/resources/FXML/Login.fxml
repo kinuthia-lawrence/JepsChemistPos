@@ -77,9 +77,10 @@
          </font>
       </TextField>
       <PasswordField fx:id="passwordField" layoutX="81.0" layoutY="214.0" prefWidth="155.0" promptText="*********" AnchorPane.rightAnchor="2.0" />
-      <Button fx:id="loginButton" layoutX="171.0" layoutY="263.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="65.0" text="Login" AnchorPane.rightAnchor="5.0" />
-      <Button fx:id="cancelButton" layoutX="87.0" layoutY="263.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Cancel" AnchorPane.rightAnchor="85.0" />
+      <Button fx:id="loginButton" layoutX="171.0" layoutY="263.0" mnemonicParsing="false" onAction="#loginOnAction" prefHeight="30.0" prefWidth="65.0" text="Login" AnchorPane.rightAnchor="5.0" />
+      <Button fx:id="cancelButton" layoutX="81.0" layoutY="263.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Cancel" AnchorPane.rightAnchor="94.0" />
       <Hyperlink fx:id="forgotPasswordHyperLink" alignment="CENTER" layoutX="91.0" layoutY="331.0" prefHeight="23.0" prefWidth="142.0" text="forgot password?" underline="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Hyperlink fx:id="helpHyperlink" alignment="CENTER" layoutX="2.0" layoutY="354.0" prefHeight="23.0" prefWidth="232.0" text="Help?" underline="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </AnchorPane>
    <effect>
       <DropShadow />

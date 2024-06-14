@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.*;
 
 
 
@@ -17,7 +16,6 @@ public class Main extends Application {
         stage.setTitle("Jeps Chemist POS");
         stage.setResizable(false);
         stage.centerOnScreen();
-        stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
 
 

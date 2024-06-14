@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -30,6 +31,9 @@ public class LoginController {
     private Hyperlink forgotPasswordHyperLink;
 
     @FXML
+    private Hyperlink helpHyperlink;
+
+    @FXML
     private AnchorPane imageAnchorPane;
 
     @FXML
@@ -47,4 +51,11 @@ public class LoginController {
         window.close();
     }
 
+    public void loginOnAction(ActionEvent actionEvent) {
+        if(!emailTextField.getText().isBlank() && !passwordField.getText().isBlank()){
+            System.out.println("Login Successful");
+        }else {
+            errorLabel.setText("Please enter your email and password !!!");
+        }
+    }
 }
