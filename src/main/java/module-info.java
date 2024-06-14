@@ -1,6 +1,7 @@
 module com.larrykin.jepschemistpos {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens com.larrykin.jepschemistpos to javafx.fxml;

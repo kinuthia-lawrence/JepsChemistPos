@@ -71,7 +71,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <TextField fx:id="emailTextField" layoutX="81.0" layoutY="164.0" prefHeight="25.0" prefWidth="155.0" promptText="larrykin@gmail.com" AnchorPane.rightAnchor="2.0">
+      <TextField fx:id="usernameTextField" layoutX="81.0" layoutY="164.0" prefHeight="25.0" prefWidth="155.0" promptText="larrykin@gmail.com" AnchorPane.rightAnchor="2.0">
          <font>
             <Font size="11.0" />
          </font>
