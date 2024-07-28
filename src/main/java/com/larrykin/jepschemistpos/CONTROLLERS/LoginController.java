@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -12,7 +13,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -57,6 +62,59 @@ public class LoginController implements Initializable {
     @FXML
     private PasswordField passwordField;
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        launchImages();
+        helpHyperlink.setOnAction(event -> openHelp());
+        forgotPasswordHyperLink.setOnAction(event -> openForgotPassword());
+    }
+
+    private void openForgotPassword() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Help.fxml"));
+        Stage helpStage = new Stage();
+        try {
+            Scene scene = new Scene(fxmlLoader.load());
+            helpStage.setScene(scene);
+            helpStage.centerOnScreen();
+            helpStage.setTitle("Help");
+            helpStage.show();
+        } catch (Exception e) {
+            System.out.println("Error loading help" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void openHelp() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Help.fxml"));
+        Stage helpStage = new Stage();
+        try {
+            Scene scene = new Scene(fxmlLoader.load());
+            helpStage.setScene(scene);
+            helpStage.centerOnScreen();
+            helpStage.setTitle("Help");
+            helpStage.setWidth(1200);
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            helpStage.setHeight(screenBounds.getHeight());
+            helpStage.show();
+        } catch (Exception e) {
+            System.out.println("Error loading help" + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    private void launchImages() {
+        //? background image for the login page
+        Image backgroundImage = new Image(getClass().getResourceAsStream("/IMAGES/pharmacy3.jpg"));
+        BackgroundImage bgImage = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, null, null, null);
+        mainPane.setBackground(new Background(bgImage));
+        //? logo of the login page
+        Image logoImage = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
+        BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, true);
+        BackgroundImage logo = new BackgroundImage(logoImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSize);
+        imageAnchorPane.setBackground(new Background(logo));
+    }
+
 
     public void cancelOnAction() {
         Stage window = (Stage) cancelButton.getScene().getWindow();
@@ -71,6 +129,9 @@ public class LoginController implements Initializable {
         } else {
             errorLabel.setText("Please enter your email and password !!!");
         }
+        //! Set accelerator for login button (Shift+E)
+        KeyCombination keyCombination = new KeyCodeCombination(KeyCode.E, KeyCombination.SHIFT_DOWN);
+        loginButton.getScene().getAccelerators().put(keyCombination, this::loadDashboard);
     }
 
     private void checkLoginCredentials(String usernameInput, String passwordInput) {
@@ -110,20 +171,5 @@ public class LoginController implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        launchImages();
-    }
 
-    private void launchImages() {
-        //? background image for the login page
-        Image backgroundImage = new Image(getClass().getResourceAsStream("/IMAGES/pharmacy3.jpg"));
-        BackgroundImage bgImage = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, null, null, null);
-        mainPane.setBackground(new Background(bgImage));
-        //? logo of the login page
-        Image logoImage = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
-        BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, true);
-        BackgroundImage logo = new BackgroundImage(logoImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSize);
-        imageAnchorPane.setBackground(new Background(logo));
-    }
 }
