@@ -143,7 +143,7 @@ public class LoginController implements Initializable {
             String passwordInput = passwordField.getText();
             checkLoginCredentials(usernameInput, passwordInput);
         } else {
-            errorLabel.setText("Please enter your email and password !!!");
+            errorLabel.setText("Please enter your username and password !!!");
         }
         //! Set accelerator for login button (Shift+E)
         KeyCombination keyCombination = new KeyCodeCombination(KeyCode.E, KeyCombination.SHIFT_DOWN);
