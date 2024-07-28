@@ -10,7 +10,7 @@ public class DatabaseConn {
         Connection connection = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/DATABASE/jepschemist.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:jepschemist.db");
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

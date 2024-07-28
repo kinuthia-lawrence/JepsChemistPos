@@ -16,10 +16,7 @@ public class Main extends Application {
         stage.setTitle("Jeps Chemist POS");
         stage.setResizable(false);
         stage.centerOnScreen();
+        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         stage.show();
-
-
-
-
     }
 }

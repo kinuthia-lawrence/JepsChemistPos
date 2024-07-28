@@ -4,21 +4,25 @@ import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ResourceBundle;
 
-public class LoginController {
+public class LoginController implements Initializable {
 
     @FXML
     private AnchorPane anchorPaneLeft;
@@ -104,5 +108,22 @@ public class LoginController {
             System.out.println("Error loading dashboard");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        launchImages();
+    }
+
+    private void launchImages() {
+        //? background image for the login page
+        Image backgroundImage = new Image(getClass().getResourceAsStream("/IMAGES/pharmacy3.jpg"));
+        BackgroundImage bgImage = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, null, null, null);
+        mainPane.setBackground(new Background(bgImage));
+        //? logo of the login page
+        Image logoImage = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
+        BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, true);
+        BackgroundImage logo = new BackgroundImage(logoImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSize);
+        imageAnchorPane.setBackground(new Background(logo));
     }
 }

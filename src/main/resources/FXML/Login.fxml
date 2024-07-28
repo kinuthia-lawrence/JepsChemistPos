@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.effect.Glow?>
-<?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@../STYLES/Login.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.LoginController">
+<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" stylesheets="@../STYLES/Login.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.LoginController">
    <AnchorPane fx:id="anchorPaneLeft" layoutX="69.0" layoutY="34.0" prefHeight="400.0" prefWidth="220.0">
       <effect>
          <DropShadow height="32.72" offsetX="2.0" radius="15.1275" spread="0.1" width="29.79" />
@@ -60,27 +54,36 @@
       <ImageView fitHeight="66.0" fitWidth="65.0" layoutX="87.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <Image url="@../IMAGES/lock.png" />
       </ImageView>
-      <Label fx:id="errorLabel" alignment="CENTER" layoutX="2.0" layoutY="126.0" prefHeight="23.0" prefWidth="218.0" textFill="#fc0d0d" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-      <Label alignment="CENTER" layoutX="5.0" layoutY="164.0" prefHeight="25.0" prefWidth="70.0" text="Email" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
+      <Label fx:id="errorLabel" alignment="CENTER" layoutX="21.0" layoutY="119.0" prefHeight="16.0" prefWidth="212.0" textFill="#fc0d0d" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Label alignment="CENTER" layoutY="136.0" prefHeight="25.0" prefWidth="70.0" text="Email" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
          <font>
             <Font size="17.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" layoutX="4.0" layoutY="214.0" prefHeight="25.0" prefWidth="75.0" text="Password" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
+      <Label alignment="CENTER" layoutX="5.0" layoutY="188.0" prefHeight="25.0" prefWidth="75.0" text="Password" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
          <font>
             <Font size="17.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameTextField" layoutX="81.0" layoutY="164.0" prefHeight="25.0" prefWidth="155.0" promptText="larrykin@gmail.com" AnchorPane.rightAnchor="2.0">
+      <TextField fx:id="usernameTextField" layoutX="75.0" layoutY="137.0" prefHeight="25.0" prefWidth="150.0" promptText="larrykin@gmail.com" AnchorPane.rightAnchor="0.0">
          <font>
             <Font size="11.0" />
          </font>
       </TextField>
-      <PasswordField fx:id="passwordField" layoutX="81.0" layoutY="214.0" prefWidth="155.0" promptText="*********" AnchorPane.rightAnchor="2.0" />
-      <Button fx:id="loginButton" layoutX="171.0" layoutY="263.0" mnemonicParsing="false" onAction="#loginOnAction" prefHeight="30.0" prefWidth="65.0" text="Login" AnchorPane.rightAnchor="5.0" />
-      <Button fx:id="cancelButton" layoutX="81.0" layoutY="263.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Cancel" AnchorPane.rightAnchor="94.0" />
-      <Hyperlink fx:id="forgotPasswordHyperLink" alignment="CENTER" layoutX="91.0" layoutY="331.0" prefHeight="23.0" prefWidth="142.0" text="forgot password?" underline="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-      <Hyperlink fx:id="helpHyperlink" alignment="CENTER" layoutX="2.0" layoutY="354.0" prefHeight="23.0" prefWidth="232.0" text="Help?" underline="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <PasswordField fx:id="passwordField" layoutX="75.0" layoutY="188.0" prefWidth="150.0" promptText="*********" AnchorPane.rightAnchor="0.0" />
+      <Button fx:id="loginButton" layoutX="7.0" layoutY="239.0" mnemonicParsing="false" onAction="#loginOnAction" prefHeight="30.0" prefWidth="126.0" text="Login" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Button fx:id="cancelButton" layoutX="7.0" layoutY="282.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Cancel" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Hyperlink fx:id="forgotPasswordHyperLink" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" layoutX="13.0" layoutY="321.0" prefHeight="23.0" prefWidth="142.0" text="forgot password?" underline="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <padding>
+            <Insets right="5.0" />
+         </padding></Hyperlink>
+      <Hyperlink fx:id="helpHyperlink" alignment="CENTER" focusTraversable="false" layoutX="11.0" layoutY="344.0" prefHeight="23.0" prefWidth="232.0" text="Help?" underline="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <padding>
+            <Insets right="5.0" />
+         </padding></Hyperlink>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
    </AnchorPane>
    <effect>
       <DropShadow />
