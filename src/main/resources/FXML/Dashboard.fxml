@@ -1,6 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.DashboardController" />
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="608.0" prefWidth="797.0" stylesheets="@../STYLES/dashboard.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.DashboardController">
+   <bottom>
+      <HBox alignment="CENTER" style="-fx-background-color: #cccccc;" BorderPane.alignment="BOTTOM_CENTER">
+         <children>
+            <Label text="Developed by,  larrykin343 Technologies.  Copyright © 2024. All rights reserved." />
+         </children>
+      </HBox>
+   </bottom>
+   <left>
+      <VBox fx:id="sidebar" prefHeight="520.0" prefWidth="206.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label prefHeight="128.0" prefWidth="221.0" rotate="-18.4" text="Jeps Chemist">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <graphic>
+                  <ImageView fx:id="logoImageView" fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true" rotate="18.4" />
+               </graphic>
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="dashboardButton" defaultButton="true" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" prefWidth="200.0" text="Dashboard">
+               <graphic>
+                  <ImageView fx:id="dashboardIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="salesButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="129.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Sales">
+               <graphic>
+                  <ImageView fx:id="salesIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="stockButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="201.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Stock">
+               <graphic>
+                  <ImageView fx:id="stockIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="servicesButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="254.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Services">
+               <graphic>
+                  <ImageView fx:id="serviceIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="notificationButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="307.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Notification">
+               <graphic>
+                  <ImageView fx:id="notificationIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="inventoryButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="360.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Inventory">
+               <graphic>
+                  <ImageView fx:id="inventoryIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="reportButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="413.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Reports">
+               <graphic>
+                  <ImageView fx:id="reportIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <Label text="Label" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

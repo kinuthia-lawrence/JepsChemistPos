@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
@@ -50,6 +51,8 @@ public class LoginController implements Initializable {
     @FXML
     private AnchorPane imageAnchorPane;
 
+    @FXML
+    private ImageView lockIcon;
     @FXML
     private Button loginButton;
 
@@ -94,8 +97,7 @@ public class LoginController implements Initializable {
                 System.out.println("Error loading forgot Password" + e.getMessage());
                 e.printStackTrace();
             }
-        }
-        else alert.close();
+        } else alert.close();
 
 
     }
@@ -129,6 +131,9 @@ public class LoginController implements Initializable {
         BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, true);
         BackgroundImage logo = new BackgroundImage(logoImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSize);
         imageAnchorPane.setBackground(new Background(logo));
+
+        Image lockImage = new Image(getClass().getResourceAsStream("/IMAGES/lock.png"));
+        lockIcon.setImage(lockImage);
     }
 
 
@@ -180,6 +185,12 @@ public class LoginController implements Initializable {
             Scene dashboardScene = new Scene(fxmlLoader.load());
             Stage dashboardStage = new Stage();
             dashboardStage.setScene(dashboardScene);
+            dashboardStage.initStyle(StageStyle.DECORATED); // Ensure minimize and close buttons are visible
+            // Get the width of the primary screen
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            dashboardStage.setWidth(screenBounds.getWidth());
+            dashboardStage.setHeight(screenBounds.getHeight());
+
             dashboardStage.show();
         } catch (IOException e) {
             System.out.println("Error loading dashboard");
