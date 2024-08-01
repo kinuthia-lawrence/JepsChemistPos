@@ -6,6 +6,7 @@ module com.larrykin.jepschemistpos {
     requires flexmark;
     requires flexmark.util.ast;
     requires jakarta.mail;
+    requires java.desktop;
 
 
     opens com.larrykin.jepschemistpos to javafx.fxml;

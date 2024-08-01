@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,6 +12,10 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -22,6 +27,9 @@ public class DashboardController {
 
     @FXML
     private Button dashboardButton;
+
+    @FXML
+    private Hyperlink companyHyperlink;
 
     @FXML
     private ImageView dashboardIcon;
@@ -101,7 +109,21 @@ public class DashboardController {
         loadImages();
         addDateTimeDisplay();
         setUserDetails();
+        openCompany();
+    }
 
+    private void openCompany() {
+        if (companyHyperlink == null) {
+            System.out.println("companyHyperlink is null");
+            return;
+        }
+        companyHyperlink.setOnAction(event -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com"));
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void setUserDetails() {
@@ -110,13 +132,14 @@ public class DashboardController {
         VBox.setVgrow(spacer, Priority.ALWAYS);
         // Add the spacer to the VBox before the HBox
         sidebar.getChildren().add(sidebar.getChildren().size() - 1, spacer);
+
     }
 
     private void addDateTimeDisplay() {
         // Update the date and time periodically
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM yyyy HH:mm:ss");
             datetimeLabel.setText(now.format(formatter));
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
