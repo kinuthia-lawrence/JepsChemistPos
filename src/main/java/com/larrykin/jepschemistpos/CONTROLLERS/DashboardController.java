@@ -1,11 +1,19 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class DashboardController {
 
@@ -19,6 +27,18 @@ public class DashboardController {
     private ImageView dashboardIcon;
 
     @FXML
+    private Label datetimeLabel;
+
+    @FXML
+    private Label emailLabel;
+
+    @FXML
+    private Button helpButton;
+
+    @FXML
+    private ImageView helpIcon;
+
+    @FXML
     private Button inventoryButton;
 
     @FXML
@@ -28,10 +48,22 @@ public class DashboardController {
     private ImageView logoImageView;
 
     @FXML
+    private Button logoutButton;
+
+    @FXML
+    private ImageView logoutIcon;
+
+    @FXML
     private Button notificationButton;
 
     @FXML
     private ImageView notificationIcon;
+
+    @FXML
+    private HBox profileHBox;
+
+    @FXML
+    private ImageView profilePic;
 
     @FXML
     private Button reportButton;
@@ -60,41 +92,78 @@ public class DashboardController {
     @FXML
     private ImageView stockIcon;
 
+    @FXML
+    private Label usernameLabel;
+
 
     @FXML
     public void initialize() {
         loadImages();
+        addDateTimeDisplay();
+        setUserDetails();
 
     }
 
+    private void setUserDetails() {
+        // create the spacer
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+        // Add the spacer to the VBox before the HBox
+        sidebar.getChildren().add(sidebar.getChildren().size() - 1, spacer);
+    }
+
+    private void addDateTimeDisplay() {
+        // Update the date and time periodically
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            datetimeLabel.setText(now.format(formatter));
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
     private void loadImages() {
-        try {        //? logo of the dashboard page
-            Image logoImage = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
+        try {
+
+
+            //? logo of the dashboard page
+            Image logoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/microscope.jpg")));
             logoImageView.setImage(logoImage);
             Circle circle = new Circle(logoImageView.getFitWidth() / 2, logoImageView.getFitHeight() / 2, Math.min(logoImageView.getFitWidth(), logoImageView.getFitHeight()) / 2);
             logoImageView.setClip(circle);
+            //? profile picture
+            Image profilePicture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/user.png")));
+            profilePic.setImage(profilePicture);
+            Circle avator = new Circle(profilePic.getFitWidth() / 2, profilePic.getFitHeight() / 2, Math.min(profilePic.getFitWidth(), profilePic.getFitHeight()) / 2);
+            profilePic.setClip(avator);
+
             //? buttonIcons
-            Image dashboardImage = new Image(getClass().getResourceAsStream("/IMAGES/dashboard.png"));
+            Image dashboardImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/dashboard.png")));
             dashboardIcon.setImage(dashboardImage);
-            Image salesImage = new Image(getClass().getResourceAsStream("/IMAGES/sales.png"));
+            Image salesImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/sales.png")));
             salesIcon.setImage(salesImage);
-            Image inventoryImage = new Image(getClass().getResourceAsStream("/IMAGES/inventory.png"));
+            Image inventoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/inventory.png")));
             inventoryIcon.setImage(inventoryImage);
-            Image reportImage = new Image(getClass().getResourceAsStream("/IMAGES/reports.png"));
+            Image reportImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/reports.png")));
             reportIcon.setImage(reportImage);
 
-//            Image notificationImage = new Image(getClass().getResourceAsStream("/IMAGES/notify.png"));
-//            notificationIcon.setImage(notificationImage);
-            Image notificationImage = new Image(getClass().getResourceAsStream("/IMAGES/notification.gif"));
+            Image notificationImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/notify.png")));
             notificationIcon.setImage(notificationImage);
+//            Image notificationImage = new Image(getClass().getResourceAsStream("/IMAGES/notification.gif"));
+//            notificationIcon.setImage(notificationImage);
 
-            Image serviceImage = new Image(getClass().getResourceAsStream("/IMAGES/services.gif"));
+            Image serviceImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/services.gif")));
             serviceIcon.setImage(serviceImage);
-            Image stockImage = new Image(getClass().getResourceAsStream("/IMAGES/stock.png"));
+            Image stockImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/stock.png")));
             stockIcon.setImage(stockImage);
-        } catch (Exception e) {
-            System.out.println("Error loading images : " + e.getMessage());
-            e.printStackTrace();
+            Image helpImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/help.gif")));
+            helpIcon.setImage(helpImage);
+            Image logoutImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/power.gif")));
+            logoutIcon.setImage(logoutImage);
+        } catch (Exception ex) {
+            System.out.println("Error loading images : " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
