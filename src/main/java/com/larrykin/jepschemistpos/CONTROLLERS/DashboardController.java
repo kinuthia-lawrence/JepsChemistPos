@@ -27,10 +27,10 @@ public class DashboardController {
     private BorderPane borderPane;
 
     @FXML
-    private Button dashboardButton;
+    private Hyperlink companyHyperlink;
 
     @FXML
-    private Hyperlink companyHyperlink;
+    private Button dashboardButton;
 
     @FXML
     private ImageView dashboardIcon;
@@ -91,6 +91,9 @@ public class DashboardController {
 
     @FXML
     private Button servicesButton;
+
+    @FXML
+    private ImageView settingsIcon;
 
     @FXML
     private VBox sidebar;
@@ -172,6 +175,11 @@ public class DashboardController {
             profilePic.setClip(avator);
 
             //? buttonIcons
+//            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/settings.gif"));
+//            settingsIcon.setImage(settingsImage);
+            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/setting.gif"));
+            settingsIcon.setImage(settingsImage);
+
             Image dashboardImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/dashboard.png")));
             dashboardIcon.setImage(dashboardImage);
             Image salesImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/sales.png")));

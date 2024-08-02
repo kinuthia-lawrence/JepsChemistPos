@@ -43,17 +43,26 @@
                     <Font name="System Bold Italic" size="13.0" />
                 </font>
             </Label>
-            <Label fx:id="datetimeLabel" alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="202.0">
-                <padding>
-                    <Insets right="5.0" />
-                </padding>
-                <font>
-                    <Font name="System Bold Italic" size="12.0" />
-                </font>
-                <VBox.margin>
-                    <Insets />
-                </VBox.margin>
-            </Label>
+         <HBox alignment="CENTER_RIGHT">
+            <children>
+                  <Label fx:id="datetimeLabel" prefHeight="40.0" prefWidth="166.0" HBox.hgrow="ALWAYS">
+                      <font>
+                          <Font name="System Bold Italic" size="8.0" />
+                      </font>
+                  </Label>
+               <ImageView fx:id="settingsIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                  <HBox.margin>
+                     <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                  </HBox.margin>
+               </ImageView>
+            </children>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            <padding>
+               <Insets right="2.0" />
+            </padding>
+         </HBox>
             <Button fx:id="dashboardButton" defaultButton="true" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" prefWidth="200.0" text="Dashboard">
                 <graphic>
                     <ImageView fx:id="dashboardIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
@@ -118,7 +127,7 @@
                     <Font name="System Italic" size="13.0" />
                 </font>
             </Button>
-            <Button fx:id="logoutButton" alignment="BOTTOM_LEFT" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" text="Logout">
+            <Button fx:id="logoutButton" alignment="BOTTOM_LEFT" mnemonicParsing="false" prefHeight="41.0" prefWidth="114.0" text="Logout">
                 <graphic>
                     <ImageView fx:id="logoutIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
                 </graphic>
