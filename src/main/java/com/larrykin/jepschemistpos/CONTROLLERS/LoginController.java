@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.MODELS.User;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -152,37 +153,42 @@ public class LoginController implements Initializable {
         }
         //! Set accelerator for login button (Shift+E)
         KeyCombination keyCombination = new KeyCodeCombination(KeyCode.E, KeyCombination.SHIFT_DOWN);
-        loginButton.getScene().getAccelerators().put(keyCombination, this::loadDashboard);
+        User developerUser = new User("Larrykin343", "larrykin343@gmail.com");
+        loginButton.getScene().getAccelerators().put(keyCombination, () -> loadDashboard(developerUser));
     }
 
     private void checkLoginCredentials(String usernameInput, String passwordInput) {
         DatabaseConn connectNow = new DatabaseConn();
         Connection connectDB = connectNow.getConnection();
 
-        String verifyLogin = "SELECT count(1) FROM users WHERE username = '" + usernameInput + "' AND password = '" + passwordInput + "'";
+        String verifyLogin = "SELECT username, email FROM users WHERE username = '" + usernameInput + "' AND password = '" + passwordInput + "'";
         try {
             Statement statement = connectDB.createStatement();
             ResultSet queryResult = statement.executeQuery(verifyLogin);
-            while (queryResult.next()) {
-                if (queryResult.getInt(1) == 1) {
-                    loadDashboard();
-                    Stage loginWindow = (Stage) loginButton.getScene().getWindow();
-                    loginWindow.close();
-                } else {
-                    passwordField.clear();
-                    usernameTextField.clear();
-                    errorLabel.setText("Invalid Login. Please try again.");
-                }
+            if (queryResult.next()) {
+                String username = queryResult.getString("username");
+                String email = queryResult.getString("email");
+                User loggedInUser = new User(username, email);
+                loadDashboard(loggedInUser);
+                Stage loginWindow = (Stage) loginButton.getScene().getWindow();
+                loginWindow.close();
+            } else {
+                passwordField.clear();
+                usernameTextField.clear();
+                errorLabel.setText("Invalid Login. Please try again.");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void loadDashboard() {
+    private void loadDashboard(User user) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Dashboard.fxml"));
             Scene dashboardScene = new Scene(fxmlLoader.load());
+            DashboardController dashboardController = fxmlLoader.getController();
+            dashboardController.setUser(user);//? Pass the user object to the dashboard controller
             Stage dashboardStage = new Stage();
             dashboardStage.setScene(dashboardScene);
             dashboardStage.initStyle(StageStyle.DECORATED); // Ensure minimize and close buttons are visible

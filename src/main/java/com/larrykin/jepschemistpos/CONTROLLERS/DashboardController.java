@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.MODELS.User;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -103,6 +104,7 @@ public class DashboardController {
     @FXML
     private Label usernameLabel;
 
+    private User user;
 
     @FXML
     public void initialize() {
@@ -119,14 +121,22 @@ public class DashboardController {
         }
         companyHyperlink.setOnAction(event -> {
             try {
-                Desktop.getDesktop().browse(new URI("https://github.com"));
+                Desktop.getDesktop().browse(new URI("https://kinuthia-lawrence.github.io/portfolio/"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         });
     }
 
+    public void setUser(User user) {
+        this.user = user;
+        setUserDetails();
+    }
     private void setUserDetails() {
+        if (user != null) {
+            usernameLabel.setText(user.getUsername());
+            emailLabel.setText(user.getEmail());
+        }
         // create the spacer
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
