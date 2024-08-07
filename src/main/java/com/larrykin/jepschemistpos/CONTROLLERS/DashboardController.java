@@ -1,16 +1,19 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.DashboardOptions;
+import com.larrykin.jepschemistpos.MODELS.Model;
 import com.larrykin.jepschemistpos.MODELS.User;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.awt.*;
@@ -30,10 +33,10 @@ public class DashboardController {
     private Hyperlink companyHyperlink;
 
     @FXML
-    private Button dashboardButton;
+    private Button homeButton;
 
     @FXML
-    private ImageView dashboardIcon;
+    private ImageView homeIcon;
 
     @FXML
     private Label datetimeLabel;
@@ -115,7 +118,12 @@ public class DashboardController {
         addDateTimeDisplay();
         setUserDetails();
         openCompany();
+        loadDashboard();
+        addListeners();
+        otherActions();
+
     }
+
 
     private void openCompany() {
         if (companyHyperlink == null) {
@@ -135,6 +143,7 @@ public class DashboardController {
         this.user = user;
         setUserDetails();
     }
+
     private void setUserDetails() {
         if (user != null) {
             usernameLabel.setText(user.getUsername());
@@ -175,13 +184,28 @@ public class DashboardController {
             profilePic.setClip(avator);
 
             //? buttonIcons
-//            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/settings.gif"));
-//            settingsIcon.setImage(settingsImage);
-            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/setting.gif"));
+//? settings icon
+            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/settings.gif"));
+            Image settingsClicked = new Image(getClass().getResourceAsStream("/IMAGES/setting.gif"));
+
+// Set the initial image
             settingsIcon.setImage(settingsImage);
 
-            Image dashboardImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/dashboard.png")));
-            dashboardIcon.setImage(dashboardImage);
+// Add click listener
+            settingsIcon.setOnMouseClicked(event -> {
+                settingsIcon.setImage(settingsClicked);
+                Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.SETTINGS);
+            });
+
+// Revert image when another view is opened
+            Model.getInstance().getViewFactory().getDashboardSelectedItem().addListener((observable, oldVal, newVal) -> {
+                if (newVal != DashboardOptions.SETTINGS) {
+                    settingsIcon.setImage(settingsImage);
+                }
+            });
+
+            Image homeImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/home.png")));
+            homeIcon.setImage(homeImage);
             Image salesImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/sales.png")));
             salesIcon.setImage(salesImage);
             Image inventoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/inventory.png")));
@@ -206,6 +230,123 @@ public class DashboardController {
             System.out.println("Error loading images : " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    private void loadDashboard() {
+        borderPane.setCenter(Model.getInstance().getViewFactory().getHomeAnchorPane());
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().addListener((observable, oldVal, newVal) -> {
+            switch (newVal) {
+                case HOME -> borderPane.setCenter(Model.getInstance().getViewFactory().getHomeAnchorPane());
+                case SALES -> borderPane.setCenter(Model.getInstance().getViewFactory().getSaleAnchorPane());
+                case STOCK -> borderPane.setCenter(Model.getInstance().getViewFactory().getStockAnchorPane());
+                case SERVICES -> borderPane.setCenter(Model.getInstance().getViewFactory().getServicesAnchorPane());
+                case NOTIFICATIONS ->
+                        borderPane.setCenter(Model.getInstance().getViewFactory().getNotificationAnchorPane());
+                case INVENTORY -> borderPane.setCenter(Model.getInstance().getViewFactory().getInventoryAnchorPane());
+                case REPORTS -> borderPane.setCenter(Model.getInstance().getViewFactory().getReportsAnchorPane());
+                case HELP -> borderPane.setCenter(Model.getInstance().getViewFactory().getHelpAnchorPane());
+            }
+        });
+    }
+
+    private void addListeners() {
+        homeButton.setOnAction(e -> setHome());
+        salesButton.setOnAction(e -> setSales());
+        stockButton.setOnAction(e -> setStock());
+        servicesButton.setOnAction(e -> setServices());
+        notificationButton.setOnAction(e -> setNotification());
+        inventoryButton.setOnAction(e -> setInventory());
+        reportButton.setOnAction(e -> setReport());
+        helpButton.setOnAction(e -> setHelp());
+        logoutButton.setOnAction(e -> logout());
+    }
+
+    private void setHome() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.HOME);
+    }
+
+    private void setSales() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.SALES);
+    }
+
+    private void setStock() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.STOCK);
+    }
+
+    private void setServices() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.SERVICES);
+    }
+
+    private void setNotification() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.NOTIFICATIONS);
+    }
+
+    private void setInventory() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.INVENTORY);
+    }
+
+    private void setReport() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.REPORTS);
+    }
+
+    private void setHelp() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.HELP);
+    }
+
+    private void logout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout");
+        alert.setHeaderText("Are you sure you want to logout?");
+        alert.showAndWait();
+
+
+        if (alert.getResult() == ButtonType.OK) {
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.close();
+        } else {
+            alert.close();
+        }
+
+    }
+
+    private void otherActions() {
+        Tooltip settingsTooltip = new Tooltip("Settings");
+        Tooltip homeTooltip = new Tooltip("View Home");
+        Tooltip salesTooltip = new Tooltip("Manage Sales");
+        Tooltip stockTooltip = new Tooltip("Manage Stock");
+        Tooltip servicesTooltip = new Tooltip("Manage Services");
+        Tooltip notificationTooltip = new Tooltip("View Notifications");
+        Tooltip inventoryTooltip = new Tooltip("Manage Inventory");
+        Tooltip reportTooltip = new Tooltip("View Reports");
+        Tooltip helpTooltip = new Tooltip("Get Help");
+        Tooltip logoutTooltip = new Tooltip("Logout");
+        Tooltip openCompany = new Tooltip("Open Company Website");
+
+        // Set the delay to zero
+        settingsTooltip.setShowDelay(Duration.ZERO);
+        homeTooltip.setShowDelay(Duration.ZERO);
+        salesTooltip.setShowDelay(Duration.ZERO);
+        stockTooltip.setShowDelay(Duration.ZERO);
+        servicesTooltip.setShowDelay(Duration.ZERO);
+        notificationTooltip.setShowDelay(Duration.ZERO);
+        inventoryTooltip.setShowDelay(Duration.ZERO);
+        reportTooltip.setShowDelay(Duration.ZERO);
+        helpTooltip.setShowDelay(Duration.ZERO);
+        logoutTooltip.setShowDelay(Duration.ZERO);
+        openCompany.setShowDelay(Duration.ZERO);
+
+        Tooltip.install(settingsIcon, settingsTooltip);
+        Tooltip.install(homeButton, homeTooltip);
+        Tooltip.install(salesButton, salesTooltip);
+        Tooltip.install(stockButton, stockTooltip);
+        Tooltip.install(servicesButton, servicesTooltip);
+        Tooltip.install(notificationButton, notificationTooltip);
+        Tooltip.install(inventoryButton, inventoryTooltip);
+        Tooltip.install(reportButton, reportTooltip);
+        Tooltip.install(helpButton, helpTooltip);
+        Tooltip.install(logoutButton, logoutTooltip);
+        Tooltip.install(companyHyperlink, openCompany);
+
     }
 
 }

@@ -63,9 +63,9 @@
                <Insets right="2.0" />
             </padding>
          </HBox>
-            <Button fx:id="dashboardButton" defaultButton="true" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" prefWidth="200.0" text="Dashboard">
+            <Button fx:id="homeButton" defaultButton="true" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" prefWidth="200.0" text="Home">
                 <graphic>
-                    <ImageView fx:id="dashboardIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+                    <ImageView fx:id="homeIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
                 </graphic>
                 <font>
                     <Font name="System Italic" size="13.0" />
