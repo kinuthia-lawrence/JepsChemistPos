@@ -59,14 +59,14 @@
       </Label>
       <ImageView fx:id="lockIcon" fitHeight="66.0" fitWidth="65.0" layoutX="87.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
       <Label fx:id="errorLabel" alignment="CENTER" layoutX="21.0" layoutY="119.0" prefHeight="16.0" prefWidth="212.0" textFill="#fc0d0d" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-      <Label alignment="CENTER" layoutY="136.0" prefHeight="25.0" prefWidth="70.0" text="Email" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
+      <Label alignment="CENTER" layoutY="136.0" prefHeight="25.0" prefWidth="70.0" text="Username" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
          <font>
-            <Font size="17.0" />
+            <Font name="System Italic" size="13.0" />
          </font>
       </Label>
       <Label alignment="CENTER" layoutX="5.0" layoutY="188.0" prefHeight="25.0" prefWidth="75.0" text="Password" textFill="#1808f5" AnchorPane.leftAnchor="0.0">
          <font>
-            <Font size="17.0" />
+            <Font name="System Italic" size="13.0" />
          </font>
       </Label>
       <TextField fx:id="usernameTextField" layoutX="75.0" layoutY="137.0" prefHeight="25.0" prefWidth="150.0" promptText="larrykin@gmail.com" AnchorPane.rightAnchor="0.0">
@@ -76,7 +76,7 @@
       </TextField>
       <PasswordField fx:id="passwordField" layoutX="75.0" layoutY="188.0" prefWidth="150.0" promptText="*********" AnchorPane.rightAnchor="0.0" />
       <Button fx:id="loginButton" layoutX="7.0" layoutY="239.0" mnemonicParsing="false" onAction="#loginOnAction" prefHeight="30.0" prefWidth="126.0" text="Login" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-      <Button fx:id="cancelButton" layoutX="7.0" layoutY="282.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Cancel" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Button fx:id="cancelButton" layoutX="7.0" layoutY="282.0" mnemonicParsing="false" onAction="#cancelOnAction" prefHeight="30.0" prefWidth="65.0" text="Close" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
       <Hyperlink fx:id="forgotPasswordHyperLink" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" layoutX="13.0" layoutY="321.0" prefHeight="23.0" prefWidth="142.0" text="forgot password?" underline="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <padding>
             <Insets right="5.0" />

@@ -301,6 +301,7 @@ public class DashboardController {
 
 
         if (alert.getResult() == ButtonType.OK) {
+            Model.getInstance().getViewFactory().loadLogin();
             Stage stage = (Stage) logoutButton.getScene().getWindow();
             stage.close();
         } else {

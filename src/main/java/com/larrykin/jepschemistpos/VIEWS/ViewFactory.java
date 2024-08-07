@@ -4,7 +4,9 @@ import com.larrykin.jepschemistpos.ENUMS.DashboardOptions;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 public class ViewFactory {
     //? Initializing the ObjectProperty and the panes
@@ -121,4 +123,21 @@ public class ViewFactory {
         return notificationAnchorPane;
     }
 
+    //?Loading the login page
+    public void loadLogin(){
+        try{
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Login.fxml"));
+            Scene loginScene = new Scene(fxmlLoader.load());
+            stage.setScene(loginScene);
+            stage.setTitle("Jeps Chemist POS");
+            stage.setResizable(false);
+            stage.centerOnScreen();
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            stage.show();
+        }catch (Exception e ){
+            System.out.println("Error loading the loginAnchorPane"+e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

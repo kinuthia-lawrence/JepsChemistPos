@@ -170,8 +170,6 @@ public class LoginController implements Initializable {
                 String email = queryResult.getString("email");
                 User loggedInUser = new User(username, email);
                 loadDashboard(loggedInUser);
-                Stage loginWindow = (Stage) loginButton.getScene().getWindow();
-                loginWindow.close();
             } else {
                 passwordField.clear();
                 usernameTextField.clear();
@@ -198,6 +196,8 @@ public class LoginController implements Initializable {
             dashboardStage.setHeight(screenBounds.getHeight());
 
             dashboardStage.show();
+            Stage loginStage = (Stage) loginButton.getScene().getWindow();
+            loginStage.close();
         } catch (IOException e) {
             System.out.println("Error loading dashboard");
             e.printStackTrace();
