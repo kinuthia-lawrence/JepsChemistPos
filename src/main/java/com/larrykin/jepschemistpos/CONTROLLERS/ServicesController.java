@@ -110,6 +110,7 @@ public class ServicesController {
             private final Button editButton = new Button("Edit");
 
             {
+                editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Service project = getTableView().getItems().get(getIndex());
                     System.out.println("edit " + project.getServiceName());
@@ -134,6 +135,7 @@ public class ServicesController {
             private final Button deleteButton = new Button("Delete");
 
             {
+                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Service project = getTableView().getItems().get(getIndex());
                     System.out.println("delete " + project.getServiceName());
