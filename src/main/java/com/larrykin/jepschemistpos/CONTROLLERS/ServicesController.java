@@ -60,10 +60,10 @@ public class ServicesController {
                     mpesaPaymentTextField.setText("0");
                 }
 
-                Connection conn = databaseConn.getConnection();
-
                 String sql = "INSERT INTO service_history (date, service_name, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?)";
-                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                try{
+                    Connection conn = databaseConn.getConnection();
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, serviceNameTextField.getText());
                     pstmt.setString(2, descriptionTextArea.getText());
                     pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
@@ -192,8 +192,8 @@ public class ServicesController {
             {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
-                    Service project = getTableView().getItems().get(getIndex());
-                    editRow();
+                    Service service = getTableView().getItems().get(getIndex());
+                    editRow(service);
                 });
             }
 
@@ -217,8 +217,8 @@ public class ServicesController {
             {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
-                    Service project = getTableView().getItems().get(getIndex());
-                    deleteRow();
+                    Service service = getTableView().getItems().get(getIndex());
+                    deleteRow(service);
                 });
             }
 
@@ -239,10 +239,51 @@ public class ServicesController {
         populateTable();
     }
 
-    private void deleteRow() {
+    private void deleteRow(Service service) {
+        Alert deleteConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        deleteConfirmation.setTitle("Delete Service");
+        deleteConfirmation.setHeaderText("Are you sure you want to delete this service?");
+        deleteConfirmation.setContentText("This action cannot be undone");
+        deleteConfirmation.showAndWait();
+
+        if (deleteConfirmation.getResult() != ButtonType.OK) {
+            deleteConfirmation.close();
+            return;
+        }
+
+        String sql = "DELETE FROM service_history WHERE id = ?";
+        try{
+            Connection conn = databaseConn.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            pstmt.setObject(1, service.getServiceID());
+            int rowAffected = pstmt.executeUpdate();
+
+            if (rowAffected > 0) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("Service deleted successfully");
+                alert.setContentText("Service deleted successfully");
+                Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                timeline.setCycleCount(1);
+                timeline.play();
+                alert.showAndWait();
+                populateTable();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error deleting service");
+                alert.setContentText("Error deleting service");
+                alert.showAndWait();
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error(sql) deleting service: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    private void editRow() {
+    private void editRow(Service service) {
     }
 
     private void populateTable() {
