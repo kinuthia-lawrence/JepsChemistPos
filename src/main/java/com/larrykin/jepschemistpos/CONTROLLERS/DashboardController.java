@@ -245,6 +245,7 @@ public class DashboardController {
                 case INVENTORY -> borderPane.setCenter(Model.getInstance().getViewFactory().getInventoryAnchorPane());
                 case REPORTS -> borderPane.setCenter(Model.getInstance().getViewFactory().getReportsAnchorPane());
                 case HELP -> borderPane.setCenter(Model.getInstance().getViewFactory().getHelpAnchorPane());
+                case SETTINGS -> borderPane.setCenter(Model.getInstance().getViewFactory().getSettingsAnchorPane());
             }
         });
     }
