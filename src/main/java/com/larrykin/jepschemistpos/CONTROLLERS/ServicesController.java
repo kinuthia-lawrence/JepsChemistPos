@@ -50,6 +50,11 @@ public class ServicesController {
         });
     }
 
+    //database connection
+    DatabaseConn databaseConn = new DatabaseConn();
+
+    TableView<Service> historyTableView = new TableView<>();
+
     private void saveService() {
         if (!serviceNameTextField.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
             if (!cashPaymentTextField.getText().isBlank() || !mpesaPaymentTextField.getText().isBlank()) {
@@ -61,7 +66,7 @@ public class ServicesController {
                 }
 
                 String sql = "INSERT INTO service_history (date, service_name, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?)";
-                try{
+                try {
                     Connection conn = databaseConn.getConnection();
                     PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, serviceNameTextField.getText());
@@ -124,12 +129,6 @@ public class ServicesController {
         }
     }
 
-    //database connection
-    DatabaseConn databaseConn = new DatabaseConn();
-
-    TableView<Service> historyTableView = new TableView<>();
-
-
     private void initializeTable() {
         // Set TableView properties
         historyTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
@@ -142,7 +141,7 @@ public class ServicesController {
         //date column
         TableColumn<Service, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        dateColumn.setPrefWidth(75);  // Set a fixed width
+        dateColumn.setPrefWidth(125);  // Set a fixed width
 
         //service name column
         TableColumn<Service, String> serviceNameColumn = new TableColumn<>("Service Name");
@@ -152,7 +151,7 @@ public class ServicesController {
         //description column
         TableColumn<Service, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        descriptionColumn.setPrefWidth(400);  // Set an initial preferred width, larger for text
+        descriptionColumn.setPrefWidth(350);  // Set an initial preferred width, larger for text
         descriptionColumn.setMinWidth(200);   // Set a minimum width
         descriptionColumn.setCellFactory(tc -> {
             TableCell<Service, String> cell = new TableCell<>() {
@@ -252,7 +251,7 @@ public class ServicesController {
         }
 
         String sql = "DELETE FROM service_history WHERE id = ?";
-        try{
+        try {
             Connection conn = databaseConn.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
 
@@ -284,6 +283,99 @@ public class ServicesController {
     }
 
     private void editRow(Service service) {
+        if (service != null) {
+            try {
+                String oldServiceName = service.getServiceName();
+                String oldServiceDescription = service.getDescription();
+                double oldCashPayment = service.getCashPayment();
+                double oldMpesaPayment = service.getMpesaPayment();
+
+                serviceNameTextField.setText(oldServiceName);
+                descriptionTextArea.setText(oldServiceDescription);
+                cashPaymentTextField.setText(String.valueOf(oldCashPayment));
+                mpesaPaymentTextField.setText(String.valueOf(oldMpesaPayment));
+
+                saveButton.setText("UPDATE");
+                saveButton.setOnAction(event -> {
+                    if (!serviceNameTextField.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
+                        if (!cashPaymentTextField.getText().isBlank() || !mpesaPaymentTextField.getText().isBlank()) {
+                            if (cashPaymentTextField.getText().isBlank()) {
+                                cashPaymentTextField.setText("0");
+                            }
+                            if (mpesaPaymentTextField.getText().isBlank()) {
+                                mpesaPaymentTextField.setText("0");
+                            }
+
+                            String sql = "UPDATE service_history SET service_name = ?, description = ?, cash_payment = ?, mpesa_payment = ? WHERE id = ?";
+                            try {
+                                Connection conn = databaseConn.getConnection();
+                                PreparedStatement pstmt = conn.prepareStatement(sql);
+                                pstmt.setString(1, serviceNameTextField.getText());
+                                pstmt.setString(2, descriptionTextArea.getText());
+                                pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
+                                pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
+                                pstmt.setObject(5, service.getServiceID());
+
+                                int rowAffected = pstmt.executeUpdate();
+
+
+                                if (rowAffected > 0) {
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                    alert.setTitle("Success");
+                                    alert.setHeaderText("Service Updated successfully");
+                                    alert.setContentText("Service Updated successfully");
+                                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                                    timeline.setCycleCount(1);
+                                    timeline.play();
+                                    alert.showAndWait();
+                                    populateTable();
+
+                                    //clear fields
+                                    serviceNameTextField.clear();
+                                    descriptionTextArea.clear();
+                                    cashPaymentTextField.clear();
+                                    mpesaPaymentTextField.clear();
+                                } else {
+                                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                                    alert.setTitle("Error");
+                                    alert.setHeaderText("Error Updating service");
+                                    alert.setContentText("Error Updating service");
+                                    alert.showAndWait();
+                                }
+
+                            } catch (SQLException e) {
+                                System.out.println("Error(sql) Updating service: " + e.getMessage());
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Error");
+                                alert.setHeaderText("Error Updating service");
+                                alert.setContentText("Error Updating service: " + e.getMessage());
+                                alert.showAndWait();
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText("Error Updating service");
+                            alert.setContentText("Please fill in at least one payment method");
+                            alert.showAndWait();
+                        }
+
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error Updating service");
+                        alert.setContentText("Service name and description cannot be empty!. Please fill in the required fields.");
+                        alert.showAndWait();
+                    }
+                });
+            } catch (Exception e) {
+                System.out.println("Error editing service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void populateTable() {
