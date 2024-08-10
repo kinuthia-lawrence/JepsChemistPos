@@ -3,9 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -13,74 +10,58 @@
 
 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
    <children>
-      <ScrollPane layoutX="28.0" layoutY="79.0" minHeight="500.0">
-         <content>
-            <TableView minHeight="550.0">
-              <columns>
-                <TableColumn fx:id="idColumn" minWidth="70.0" prefWidth="-1.0" text="ID" />
-                  <TableColumn fx:id="dateColumn" minWidth="100.0" prefWidth="-1.0" text="Date" />
-                <TableColumn fx:id="serviceNameColumn" minWidth="150.0" prefWidth="-1.0" text="Name" />
-                  <TableColumn fx:id="cashPaymentColumn" minWidth="70.0" prefWidth="-1.0" text="Cash" />
-                  <TableColumn fx:id="mpesaPaymentColumn" minWidth="70.0" prefWidth="-1.0" text="Mpesa" />
-                  <TableColumn fx:id="descriptionColumn" minWidth="200.0" prefWidth="352.0" text="Description" />
-              </columns>
-            </TableView>
-         </content>
-         <padding>
-            <Insets right="10.0" />
-         </padding>
-      </ScrollPane>
-      <Label layoutX="28.0" layoutY="45.0" text="Services History">
-         <font>
-            <Font name="System Italic" size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="886.0" layoutY="40.0" text="Record A Service">
-         <font>
-            <Font name="System Italic" size="18.0" />
-         </font>
-      </Label>
-      <AnchorPane layoutX="846.0" layoutY="79.0" minHeight="550.0">
+      <AnchorPane fx:id="tableAnchorPane" layoutX="15.0" layoutY="5.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="351.0" AnchorPane.topAnchor="40.0" />
+      <AnchorPane layoutX="846.0" layoutY="26.0" minHeight="550.0" prefHeight="603.0" prefWidth="320.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label layoutX="14.0" layoutY="14.0" text="Service Name">
+            <Label layoutX="3.0" layoutY="84.0" text="Service Name">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="16.0" layoutY="81.0" text="Description">
+            <Label layoutX="9.0" layoutY="141.0" text="Description">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <TextArea fx:id="descriptionTextArea" layoutX="14.0" layoutY="110.0" prefHeight="221.0" prefWidth="303.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
-            <Label layoutX="116.0" layoutY="340.0" text="Payment Options">
+            <TextArea fx:id="descriptionTextArea" layoutX="9.0" layoutY="181.0" prefHeight="221.0" prefWidth="303.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
+            <Label layoutX="114.0" layoutY="409.0" text="Payment Options">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="cashPaymentTextField" layoutX="57.0" layoutY="386.0" prefHeight="25.0" prefWidth="160.0" promptText="0.00" />
-            <TextField fx:id="mpesaPaymentTextField" layoutX="57.0" layoutY="441.0" prefHeight="25.0" prefWidth="160.0" promptText="200" />
-            <Label layoutX="16.0" layoutY="389.0" text="Cash">
+            <TextField fx:id="cashPaymentTextField" layoutX="49.0" layoutY="450.0" prefHeight="25.0" prefWidth="160.0" promptText="0.00" />
+            <TextField fx:id="mpesaPaymentTextField" layoutX="49.0" layoutY="491.0" prefHeight="25.0" prefWidth="160.0" promptText="200" />
+            <Label layoutX="17.0" layoutY="453.0" text="Cash">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="11.0" layoutY="444.0" text="Mpesa">
+            <Label layoutX="12.0" layoutY="494.0" text="Mpesa">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="493.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Save" />
-            <Label layoutX="225.0" layoutY="390.0" text="Ksh." />
-            <Label layoutX="225.0" layoutY="445.0" text="Ksh." />
-            <TextField fx:id="serviceNameTextField" layoutX="11.0" layoutY="42.0" prefHeight="25.0" prefWidth="303.0" promptText="Blood Pressure" />
+            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Save" />
+            <Label layoutX="214.0" layoutY="454.0" text="Ksh." />
+            <Label layoutX="214.0" layoutY="495.0" text="Ksh." />
+            <TextField fx:id="serviceNameTextField" layoutY="116.0" prefHeight="25.0" prefWidth="303.0" promptText="Blood Pressure" />
+            <Label layoutX="87.0" layoutY="20.0" text="Record A Service" AnchorPane.topAnchor="20.0">
+               <font>
+                  <Font name="System Italic" size="18.0" />
+               </font>
+            </Label>
          </children>
          <padding>
             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
          </padding>
       </AnchorPane>
+      <Label layoutX="57.0" layoutY="14.0" text="Service History">
+         <font>
+            <Font name="System Italic" size="18.0" />
+         </font>
+      </Label>
    </children>
    <padding>
-      <Insets right="20.0" />
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
 </AnchorPane>
