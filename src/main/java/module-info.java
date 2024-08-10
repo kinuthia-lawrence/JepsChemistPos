@@ -13,4 +13,5 @@ module com.larrykin.jepschemistpos {
     exports com.larrykin.jepschemistpos;
     exports com.larrykin.jepschemistpos.CONTROLLERS;
     opens com.larrykin.jepschemistpos.CONTROLLERS to javafx.fxml;
+    opens com.larrykin.jepschemistpos.MODELS to javafx.base;
 }
