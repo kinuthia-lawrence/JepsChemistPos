@@ -2,6 +2,8 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import com.larrykin.jepschemistpos.MODELS.Service;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,10 +11,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,14 +45,92 @@ public class ServicesController {
     @FXML
     public void initialize() {
         initializeTable();
+        saveButton.setOnAction(event -> {
+            saveService();
+        });
+    }
+
+    private void saveService() {
+        if (!serviceNameTextField.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
+            if (!cashPaymentTextField.getText().isBlank() || !mpesaPaymentTextField.getText().isBlank()) {
+                if (cashPaymentTextField.getText().isBlank()) {
+                    cashPaymentTextField.setText("0");
+                }
+                if (mpesaPaymentTextField.getText().isBlank()) {
+                    mpesaPaymentTextField.setText("0");
+                }
+
+                Connection conn = databaseConn.getConnection();
+
+                String sql = "INSERT INTO service_history (date, service_name, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, serviceNameTextField.getText());
+                    pstmt.setString(2, descriptionTextArea.getText());
+                    pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
+                    pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
+
+                    int rowAffected = pstmt.executeUpdate();
+
+
+                    if (rowAffected > 0) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Success");
+                        alert.setHeaderText("Service saved successfully");
+                        alert.setContentText("Service saved successfully");
+                        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                        timeline.setCycleCount(1);
+                        timeline.play();
+                        alert.showAndWait();
+                        populateTable();
+
+                        //clear fields
+                        serviceNameTextField.clear();
+                        descriptionTextArea.clear();
+                        cashPaymentTextField.clear();
+                        mpesaPaymentTextField.clear();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error saving service");
+                        alert.setContentText("Error saving service");
+                        alert.showAndWait();
+                    }
+
+                } catch (SQLException e) {
+                    System.out.println("Error(sql) saving service: " + e.getMessage());
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error saving service");
+                    alert.setContentText("Error saving service: " + e.getMessage());
+                    alert.showAndWait();
+                    e.printStackTrace();
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error saving service");
+                alert.setContentText("Please fill in at least one payment method");
+                alert.showAndWait();
+            }
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error saving service");
+            alert.setContentText("Service name and description cannot be empty!. Please fill in the required fields.");
+            alert.showAndWait();
+        }
     }
 
     //database connection
     DatabaseConn databaseConn = new DatabaseConn();
 
-    private void initializeTable() {
-        TableView<Service> historyTableView = new TableView<>();
+    TableView<Service> historyTableView = new TableView<>();
 
+
+    private void initializeTable() {
         // Set TableView properties
         historyTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
@@ -113,7 +193,7 @@ public class ServicesController {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Service project = getTableView().getItems().get(getIndex());
-                    System.out.println("edit " + project.getServiceName());
+                    editRow();
                 });
             }
 
@@ -138,7 +218,7 @@ public class ServicesController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Service project = getTableView().getItems().get(getIndex());
-                    System.out.println("delete " + project.getServiceName());
+                    deleteRow();
                 });
             }
 
@@ -156,10 +236,16 @@ public class ServicesController {
         historyTableView.getColumns().addAll(serviceIDColumn, dateColumn, serviceNameColumn, descriptionColumn, cashPaymentColumn, mpesaPaymentColumn, editColumn, deleteColumn);
 
         scrollPane.setContent(historyTableView);
-        populateTable(historyTableView);
+        populateTable();
     }
 
-    private void populateTable(TableView<Service> historyTableView) {
+    private void deleteRow() {
+    }
+
+    private void editRow() {
+    }
+
+    private void populateTable() {
         ObservableList<Service> services = FXCollections.observableArrayList();
         services.addAll(getServicesFromDatabase());
         historyTableView.setItems(services);
@@ -173,7 +259,7 @@ public class ServicesController {
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery("SELECT * FROM service_history");
 
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 Service service = new Service();
                 service.setServiceID(resultSet.getObject("id"));
                 service.setDate(resultSet.getString("date"));
