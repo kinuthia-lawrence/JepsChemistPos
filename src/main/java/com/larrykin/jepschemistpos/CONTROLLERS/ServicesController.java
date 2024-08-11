@@ -131,7 +131,7 @@ public class ServicesController {
 
     private void initializeTable() {
         // Set TableView properties
-        historyTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+//        historyTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         //id column
         TableColumn<Service, Object> serviceIDColumn = new TableColumn<>("ID");
