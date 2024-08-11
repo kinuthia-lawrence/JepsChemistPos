@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class products {
+public class Products {
     private SimpleObjectProperty<Object> productID;
     private SimpleStringProperty productName;
     private SimpleStringProperty productCategory;
@@ -16,7 +16,7 @@ public class products {
     private SimpleStringProperty expiryDate;
     private SimpleStringProperty productDescription;
 
-    public products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription) {
+    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription) {
         this.productID = productID;
         this.productName = productName;
         this.productCategory = productCategory;
@@ -29,7 +29,7 @@ public class products {
         this.productDescription = productDescription;
     }
 
-    public products() {
+    public Products() {
         this.productID = new SimpleObjectProperty<>();
         this.productName = new SimpleStringProperty("");
         this.productCategory = new SimpleStringProperty("");
