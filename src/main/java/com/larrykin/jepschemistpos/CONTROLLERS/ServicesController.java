@@ -164,7 +164,7 @@ public class ServicesController {
                         setGraphic(null);
                     } else {
                         text.setText(item);
-                        text.wrappingWidthProperty().bind(descriptionColumn.widthProperty().subtract(10));  // Adjust wrapping width
+                        text.wrappingWidthProperty().bind(descriptionColumn.widthProperty().subtract(5));  // Adjust wrapping width
                         setGraphic(text);
                     }
                 }
