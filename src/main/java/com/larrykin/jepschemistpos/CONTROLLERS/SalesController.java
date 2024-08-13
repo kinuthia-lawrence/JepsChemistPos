@@ -67,8 +67,8 @@ public class SalesController {
     @FXML
     public void initialize() {
         loadSpinners();
-        loadStockTable();
-        loadSalesTable();
+        initializeStockTable();
+        initializeSalesTable();
         initializeButtons();
         initializeUIElements();
         initializeCartTable();
@@ -200,23 +200,21 @@ public class SalesController {
         iconSearch.setImage(searchImage);
     }
 
-    private void initializeButtons() {
-        stockButton.setOnAction(event -> {
-            tableScrollPane.setContent(null);
-            loadStockTable();
+  private void initializeButtons() {
+    stockButton.setOnAction(event -> {
+        // Clear the content of the tableScrollPane
+        tableScrollPane.setContent(null);
+        tableScrollPane.setContent(stockTableView);
+    });
 
-        });
+    salesButton.setOnAction(event -> {
+        // Clear the content of the tableScrollPane
+        tableScrollPane.setContent(null);
+        tableScrollPane.setContent(salesTableView);
+    });
+}
 
-        salesButton.setOnAction(event -> {
-            tableScrollPane.setContent(null);
-            loadSalesTable();
-            tableScrollPane.setContent(salesTableView);
-
-        });
-
-    }
-
-    private void loadStockTable() {
+    private void initializeStockTable() {
         //id column
         TableColumn<Products, Object> productsObjectTableColumn = new TableColumn<>("ID");
         productsObjectTableColumn.setCellValueFactory(new PropertyValueFactory<>("productID"));
@@ -340,7 +338,7 @@ public class SalesController {
     expectedAmountLabel.setText(String.format("%.2f", totalAmount));
 }
 
-    private void loadSalesTable() {
+    private void initializeSalesTable() {
         //id
         TableColumn<Sales, Object> salesIDColumn = new TableColumn<>("ID");
         salesIDColumn.setCellValueFactory(new PropertyValueFactory<>("salesID"));
