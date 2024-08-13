@@ -312,6 +312,7 @@ public class SalesController {
                     populateSalesTable();
 
                     updateProductsQuantity(cartTableView);
+                    //TODO update booking
                     // Clear carts, label,spinners and textArea
                     cartTableView.getItems().clear();
                     expectedAmountLabel.setText("0.00");

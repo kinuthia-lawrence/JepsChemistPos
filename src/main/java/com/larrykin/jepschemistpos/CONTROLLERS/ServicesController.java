@@ -42,6 +42,7 @@ public class ServicesController {
     private AnchorPane tableAnchorPane;
 
 
+
     @FXML
     public void initialize() {
         initializeTable();
@@ -49,6 +50,9 @@ public class ServicesController {
             saveService();
         });
     }
+   //? Instantiate the HomeController class
+    @FXML
+    private HomeController homeController;
 
     //database connection
     DatabaseConn databaseConn = new DatabaseConn();
