@@ -346,6 +346,7 @@ public class StockController {
                 try {
                     Connection connection = conn.getConnection();
                     PreparedStatement statement = connection.prepareStatement(sql);
+
                     statement.setString(1, nameValue);
                     statement.setString(2, categoryValue);
                     statement.setDouble(3, quantityValue);

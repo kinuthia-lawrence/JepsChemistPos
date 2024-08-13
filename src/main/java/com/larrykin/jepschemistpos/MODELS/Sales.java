@@ -8,6 +8,7 @@ public class Sales {
     private SimpleObjectProperty<Object> salesID;
     private SimpleStringProperty date;
     private SimpleStringProperty goods;
+    private SimpleDoubleProperty expectedAmount;
     private SimpleDoubleProperty totalAmount;
     private SimpleDoubleProperty discountAmount;
     private SimpleDoubleProperty cash;
@@ -15,7 +16,7 @@ public class Sales {
     private SimpleDoubleProperty credit;
     private SimpleStringProperty description;
 
-    public Sales(SimpleObjectProperty<Object> salesID, SimpleStringProperty date, SimpleStringProperty goods, SimpleDoubleProperty totalAmount, SimpleDoubleProperty discountAmount, SimpleDoubleProperty cash, SimpleDoubleProperty mpesa, SimpleDoubleProperty credit, SimpleStringProperty description) {
+    public Sales(SimpleObjectProperty<Object> salesID, SimpleStringProperty date, SimpleStringProperty goods, SimpleDoubleProperty totalAmount, SimpleDoubleProperty discountAmount, SimpleDoubleProperty cash, SimpleDoubleProperty mpesa, SimpleDoubleProperty credit, SimpleStringProperty description, SimpleDoubleProperty expectedAmount) {
         this.salesID = salesID;
         this.date = date;
         this.goods = goods;
@@ -25,6 +26,7 @@ public class Sales {
         this.mpesa = mpesa;
         this.credit = credit;
         this.description = description;
+        this.expectedAmount = expectedAmount;
     }
 
     public Sales() {
@@ -36,6 +38,8 @@ public class Sales {
         this.mpesa = new SimpleDoubleProperty(0.0);
         this.credit = new SimpleDoubleProperty(0.0);
         this.description = new SimpleStringProperty("");
+        this.expectedAmount = new SimpleDoubleProperty(0.0);
+        this.totalAmount = new SimpleDoubleProperty(0.0);
     }
 
     public Object getSalesID() {
@@ -144,5 +148,17 @@ public class Sales {
 
     public void setDescription(String description) {
         this.description.set(description);
+    }
+
+    public double getExpectedAmount() {
+        return expectedAmount.get();
+    }
+
+    public SimpleDoubleProperty expectedAmountProperty() {
+        return expectedAmount;
+    }
+
+    public void setExpectedAmount(double expectedAmount) {
+        this.expectedAmount.set(expectedAmount);
     }
 }

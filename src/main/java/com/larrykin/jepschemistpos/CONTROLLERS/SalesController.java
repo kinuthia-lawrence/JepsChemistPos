@@ -3,6 +3,8 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,10 +15,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,9 +138,20 @@ public class SalesController {
                 incrementButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 incrementButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    product.setSellingQuantity(product.getSellingQuantity() + 1);
-                    updateTotal(product);
-                    cartTableView.refresh();
+                    double currentSellingQuantity = product.getSellingQuantity();
+                    double availableQuantity = product.getProductQuantity();
+
+                    if (currentSellingQuantity < availableQuantity) {
+                        product.setSellingQuantity(currentSellingQuantity + 1);
+                        updateTotal(product);
+                        cartTableView.refresh();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Quantity Limit Reached");
+                        alert.setHeaderText("Cannot increment quantity");
+                        alert.setContentText("The available quantity in stock is " + availableQuantity + ".");
+                        alert.showAndWait();
+                    }
                 });
             }
 
@@ -200,19 +213,166 @@ public class SalesController {
         iconSearch.setImage(searchImage);
     }
 
-  private void initializeButtons() {
-    stockButton.setOnAction(event -> {
-        // Clear the content of the tableScrollPane
-        tableScrollPane.setContent(null);
-        tableScrollPane.setContent(stockTableView);
-    });
+    private void initializeButtons() {
+        stockButton.setOnAction(event -> {
+            // Clear the content of the tableScrollPane
+            tableScrollPane.setContent(null);
+            tableScrollPane.setContent(stockTableView);
+        });
 
-    salesButton.setOnAction(event -> {
-        // Clear the content of the tableScrollPane
-        tableScrollPane.setContent(null);
-        tableScrollPane.setContent(salesTableView);
-    });
-}
+        salesButton.setOnAction(event -> {
+            // Clear the content of the tableScrollPane
+            tableScrollPane.setContent(null);
+            tableScrollPane.setContent(salesTableView);
+        });
+
+        sellButton.setOnAction(event -> {
+            // Sell the products in the cart
+            sellProducts();
+        });
+    }
+
+    private void sellProducts() {
+        //check if cart is empty
+        if (cartTableView.getItems().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Empty Cart");
+            alert.setHeaderText("Cart is empty");
+            alert.setContentText("Please add products to the cart before selling.");
+            alert.showAndWait();
+            return;
+        }
+
+        StringBuilder goods = new StringBuilder();
+        for (Products product : cartTableView.getItems()) {
+            goods.append(product.getProductName())
+                    .append(" = ")
+                    .append(product.getSellingQuantity())
+                    .append(", ");
+        }
+
+        //get values of the spinners
+        double discount = discoutSpinner.getValue();
+        double mpesa = mpesaSpinner.getValue();
+        double cash = cashSpinner.getValue();
+        double credit = creditSpinner.getValue();
+
+        //get the total expected amount
+        double expectedAmount = Double.parseDouble(expectedAmountLabel.getText());
+
+        //get the Paid amount by summing up the cash, mpesa and credit
+        double paidAmount = cash + mpesa + credit;
+
+        //get description, if empty set to "No description"
+        String description = descriptionTextArea.getText();
+        if (description.isEmpty()) {
+            description = "No description";
+        }
+
+        //Print all the values in terminal( for text)
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Sale");
+        alert.setHeaderText("Confirm the sale");
+        alert.setContentText("Goods: " + goods + "\n" +
+                "Expected Amount: " + expectedAmount + "\n" +
+                "Discount: " + discount + "\n" +
+                "Cash: " + cash + "\n" +
+                "Mpesa: " + mpesa + "\n" +
+                "Credit: " + credit + "\n" +
+                "Description: " + description + "\n" +
+                "Paid Amount: " + paidAmount + "\n");
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.OK) {
+            // Save the sale to the database
+            try {
+                Connection connection = databaseConn.getConnection();
+                String insertQuery = "INSERT INTO sales (date, goods, expected_total, total_amount, discount, cash, mpesa, credit, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+                preparedStatement.setString(2, goods.toString());
+                preparedStatement.setDouble(3, expectedAmount);
+                preparedStatement.setDouble(4, paidAmount);
+                preparedStatement.setDouble(5, discount);
+                preparedStatement.setDouble(6, cash);
+                preparedStatement.setDouble(7, mpesa);
+                preparedStatement.setDouble(8, credit);
+                preparedStatement.setString(9, description);
+                int rowAffected = preparedStatement.executeUpdate();
+
+                if (rowAffected > 0) {
+                    Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                    alert1.setTitle("Success");
+                    alert1.setHeaderText("Sale  success");
+                    alert1.setContentText("Sale saved successfully");
+                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                    timeline.setCycleCount(1);
+                    timeline.play();
+                    alert1.showAndWait();
+
+                    populateSalesTable();
+
+                    updateProductsQuantity(cartTableView);
+                    // Clear carts, label,spinners and textArea
+                    cartTableView.getItems().clear();
+                    expectedAmountLabel.setText("0.00");
+                    discoutSpinner.getValueFactory().setValue(0.0);
+                    mpesaSpinner.getValueFactory().setValue(0.0);
+                    cashSpinner.getValueFactory().setValue(0.0);
+                    creditSpinner.getValueFactory().setValue(0.0);
+                    descriptionTextArea.clear();
+
+                } else {
+                    Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                    alert1.setTitle("Error");
+                    alert1.setHeaderText("Error in saving the sale");
+                    alert1.setContentText("Error in saving the sale");
+                    alert1.showAndWait();
+                }
+
+
+            } catch (Exception e) {
+                Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                alert1.setTitle("Error");
+                alert1.setHeaderText("Error in saving the sale");
+                alert1.setContentText("Error: " + e.getMessage());
+                alert1.showAndWait();
+                System.out.println("Error in saving the sale: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            alert.close();
+        }
+    }
+
+    private void updateProductsQuantity(TableView<Products> cartTableView) {
+        try {
+            Connection connection = databaseConn.getConnection();
+            for (Products product : cartTableView.getItems()) {
+                Object productID = product.getProductID();
+                double sellingQuantity = product.getSellingQuantity();
+                double newQuantity = product.getProductQuantity() - sellingQuantity;
+
+                String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                    preparedStatement.setDouble(1, newQuantity);
+                    preparedStatement.setObject(2, productID);
+                    int rowAffected = preparedStatement.executeUpdate();
+
+                    if (rowAffected > 0) {
+                        System.out.println("Product quantities updated successfully");
+                        salesTableView.refresh();
+                    } else {
+                        System.out.println("Error updating product quantities");
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating product quantities: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     private void initializeStockTable() {
         //id column
@@ -316,9 +476,16 @@ public class SalesController {
         return products;
     }
 
-
     private void addToCart(Products product) {
         // Add product to the cart
+        if (product.getProductQuantity() == 0) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Out of Stock");
+            alert.setHeaderText("Product out of stock");
+            alert.setContentText("The product is out of stock.");
+            alert.showAndWait();
+            return;
+        }
         product.setSellingQuantity(1); // Set initial quantity to 1
         cartTableView.getItems().add(product);
         cartTableView.refresh();
@@ -330,13 +497,14 @@ public class SalesController {
         product.setTotal(total);
         updateExpectedAmount();
     }
-   private void updateExpectedAmount() {
-    double totalAmount = 0.0;
-    for (Products product : cartTableView.getItems()) {
-        totalAmount += product.getSellingPrice() * product.getSellingQuantity();
+
+    private void updateExpectedAmount() {
+        double totalAmount = 0.0;
+        for (Products product : cartTableView.getItems()) {
+            totalAmount += product.getSellingPrice() * product.getSellingQuantity();
+        }
+        expectedAmountLabel.setText(String.format("%.2f", totalAmount));
     }
-    expectedAmountLabel.setText(String.format("%.2f", totalAmount));
-}
 
     private void initializeSalesTable() {
         //id
@@ -369,10 +537,14 @@ public class SalesController {
             };
             return cell;
         });
+        //Total expected
+        TableColumn<Sales, Double> expectedAmountColumn = new TableColumn<>("Expected Amount");
+        expectedAmountColumn.setCellValueFactory(new PropertyValueFactory<>("expectedAmount"));
+        expectedAmountColumn.setPrefWidth(110);
         //Total
-        TableColumn<Sales, Double> totalAmountColumn = new TableColumn<>("Total");
+        TableColumn<Sales, Double> totalAmountColumn = new TableColumn<>("Paid Amount");
         totalAmountColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
-        totalAmountColumn.setPrefWidth(50);
+        totalAmountColumn.setPrefWidth(100);
         //Discount
         TableColumn<Sales, Double> discountAmountColumn = new TableColumn<>("Discount");
         discountAmountColumn.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
@@ -403,7 +575,17 @@ public class SalesController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Sales record = getTableView().getItems().get(getIndex());
-                    deleteRow(record);
+
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Delete Record");
+                    alert.setHeaderText("Are you sure you want to delete this record?");
+                    alert.setContentText("This action cannot be undone.");
+                    alert.showAndWait();
+                    if (alert.getResult() == ButtonType.OK) {
+                        salesTableView.getItems().remove(record);
+                    } else {
+                        alert.close();
+                    }
                 });
             }
 
@@ -418,7 +600,7 @@ public class SalesController {
             }
         });
 
-        salesTableView.getColumns().addAll(salesIDColumn, dateColumn, goodsColumn, totalAmountColumn, discountAmountColumn, cashColumn, mpesaColumn, creditColumn, descriptionColumn, deleteColumn);
+        salesTableView.getColumns().addAll(salesIDColumn, dateColumn, goodsColumn, expectedAmountColumn, totalAmountColumn, discountAmountColumn, cashColumn, mpesaColumn, creditColumn, descriptionColumn, deleteColumn);
         salesTableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         salesTableView.setPrefHeight(520);
 
@@ -426,9 +608,43 @@ public class SalesController {
     }
 
     private void populateSalesTable() {
+        ObservableList<Sales> sales = FXCollections.observableArrayList();
+        sales.addAll(getSalesFromDatabase());
+        salesTableView.setItems(sales);
     }
 
-    private void deleteRow(Sales record) {
+    private List<Sales> getSalesFromDatabase() {
+        List<Sales> sales = new ArrayList<>();
+        try {
+            Connection connection = databaseConn.getConnection();
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM sales");
+
+            while (resultSet.next()) {
+                Sales sale = new Sales();
+                sale.setSalesID(resultSet.getObject("id"));
+                sale.setDate(resultSet.getString("date"));
+                sale.setGoods(resultSet.getString("goods"));
+                sale.setExpectedAmount(resultSet.getDouble("expected_total"));
+                sale.setTotalAmount(resultSet.getDouble("total_amount"));
+                sale.setDiscountAmount(resultSet.getDouble("discount"));
+                sale.setCash(resultSet.getDouble("cash"));
+                sale.setMpesa(resultSet.getDouble("mpesa"));
+                sale.setCredit(resultSet.getDouble("credit"));
+                sale.setDescription(resultSet.getString("description"));
+                sales.add(sale);
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error fetching sales");
+            alert.setContentText("Error fetching sales: " + e.getMessage());
+            alert.showAndWait();
+            System.out.println("Error fetching sales: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return sales;
     }
 
     private void loadSpinners() {
