@@ -287,17 +287,16 @@ public class SalesController {
             // Save the sale to the database
             try {
                 Connection connection = databaseConn.getConnection();
-                String insertQuery = "INSERT INTO sales (date, goods, expected_total, total_amount, discount, cash, mpesa, credit, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                String insertQuery = "INSERT INTO sales (date, goods, expected_total, total_amount, discount, cash, mpesa, credit, description) VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
-                preparedStatement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-                preparedStatement.setString(2, goods.toString());
-                preparedStatement.setDouble(3, expectedAmount);
-                preparedStatement.setDouble(4, paidAmount);
-                preparedStatement.setDouble(5, discount);
-                preparedStatement.setDouble(6, cash);
-                preparedStatement.setDouble(7, mpesa);
-                preparedStatement.setDouble(8, credit);
-                preparedStatement.setString(9, description);
+                preparedStatement.setString(1, goods.toString());
+                preparedStatement.setDouble(2, expectedAmount);
+                preparedStatement.setDouble(3, paidAmount);
+                preparedStatement.setDouble(4, discount);
+                preparedStatement.setDouble(5, cash);
+                preparedStatement.setDouble(6, mpesa);
+                preparedStatement.setDouble(7, credit);
+                preparedStatement.setString(8, description);
                 int rowAffected = preparedStatement.executeUpdate();
 
                 if (rowAffected > 0) {
@@ -360,8 +359,7 @@ public class SalesController {
                     int rowAffected = preparedStatement.executeUpdate();
 
                     if (rowAffected > 0) {
-                        System.out.println("Product quantities updated successfully");
-                        salesTableView.refresh();
+                        populateStockTable();
                     } else {
                         System.out.println("Error updating product quantities");
                     }
@@ -661,6 +659,4 @@ public class SalesController {
         SpinnerValueFactory<Double> valueFactory3 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         creditSpinner.setValueFactory(valueFactory3);
     }
-
-
 }
