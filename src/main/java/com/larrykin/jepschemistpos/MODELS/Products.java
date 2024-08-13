@@ -16,7 +16,11 @@ public class Products {
     private SimpleStringProperty expiryDate;
     private SimpleStringProperty productDescription;
 
-    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription) {
+    //others
+    private SimpleDoubleProperty sellingQuantity;
+    private SimpleDoubleProperty total;
+
+    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
         this.productID = productID;
         this.productName = productName;
         this.productCategory = productCategory;
@@ -27,6 +31,8 @@ public class Products {
         this.dateAdded = dateAdded;
         this.expiryDate = expiryDate;
         this.productDescription = productDescription;
+        this.sellingQuantity = SellingQuantity;
+        this.total = total;
     }
 
     public Products() {
@@ -40,6 +46,8 @@ public class Products {
         this.dateAdded = new SimpleStringProperty("");
         this.expiryDate = new SimpleStringProperty("");
         this.productDescription = new SimpleStringProperty("");
+        this.sellingQuantity = new SimpleDoubleProperty(0.0);
+        this.total = new SimpleDoubleProperty(0.0);
     }
 
     public Object getProductID() {
@@ -160,5 +168,25 @@ public class Products {
 
     public void setProductDescription(String productDescription) {
         this.productDescription.set(productDescription);
+    }
+
+    public double getSellingQuantity() {
+        return sellingQuantity.get();
+    }
+    public SimpleDoubleProperty sellingQuantityProperty() {
+        return sellingQuantity;
+    }
+    public void setSellingQuantity(double sellingQuantity) {
+        this.sellingQuantity.set(sellingQuantity);
+    }
+
+    public double getTotal() {
+        return total.get();
+    }
+    public SimpleDoubleProperty totalProperty() {
+        return total;
+    }
+    public void setTotal(double total) {
+        this.total.set(total);
     }
 }

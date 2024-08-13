@@ -233,6 +233,7 @@ public class ServicesController {
         });
 
         historyTableView.getColumns().addAll(serviceIDColumn, dateColumn, serviceNameColumn, descriptionColumn, cashPaymentColumn, mpesaPaymentColumn, editColumn, deleteColumn);
+        historyTableView.setPrefHeight(520);
 
         scrollPane.setContent(historyTableView);
         populateTable();

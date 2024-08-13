@@ -3,6 +3,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,7 +25,7 @@ public class SalesController {
     @FXML
     public Label expectedAmountLabel;
     @FXML
-    private TableView<Sales> cartTable;
+    private TableView<Products> cartTableView;
 
     @FXML
     private Spinner<Double> cashSpinner;
@@ -71,8 +72,6 @@ public class SalesController {
         initializeButtons();
         initializeUIElements();
     }
-
-
 
 
     //instantiate database
@@ -204,7 +203,123 @@ public class SalesController {
         return products;
     }
 
+
     private void addToCart(Products product) {
+        // Create columns
+        TableColumn<Products, Object> productIDColumn = new TableColumn<>("F.ID");
+        productIDColumn.setCellValueFactory(new PropertyValueFactory<>("productID"));
+        productIDColumn.setPrefWidth(30);
+
+        TableColumn<Products, String> productNameColumn = new TableColumn<>("Name");
+        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        productNameColumn.setPrefWidth(100);
+
+        TableColumn<Products, Double> sellingPriceColumn = new TableColumn<>("S.Price");
+        sellingPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+        sellingPriceColumn.setPrefWidth(55);
+
+        TableColumn<Products, Void> decrementColumn = new TableColumn<>("--");
+        decrementColumn.setPrefWidth(35);
+        decrementColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button decrementButton = new Button("-");
+
+            {
+                decrementButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+                decrementButton.setOnAction(event -> {
+                    Products product = getTableView().getItems().get(getIndex());
+                    Double currentQuantity = product.getSellingQuantity();
+                    if (currentQuantity > 1) {
+                        product.setSellingQuantity(currentQuantity - 1);
+                        updateTotal(product);
+//                        cartTableView.refresh();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(decrementButton);
+                }
+            }
+        });
+
+        TableColumn<Products, Integer> quantityColumn = new TableColumn<>("No.");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("sellingQuantity"));
+        quantityColumn.setPrefWidth(35);
+
+
+        TableColumn<Products, Void> incrementColumn = new TableColumn<>("++");
+        incrementColumn.setPrefWidth(35);
+        incrementColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button incrementButton = new Button("+");
+
+            {
+                incrementButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+                incrementButton.setOnAction(event -> {
+                    Products product = getTableView().getItems().get(getIndex());
+                    product.setSellingQuantity(product.getSellingQuantity() + 1);
+                    updateTotal(product);
+//                    cartTableView.refresh();
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(incrementButton);
+                }
+            }
+        });
+
+        TableColumn<Products, Double> totalColumn = new TableColumn<>("Total");
+        totalColumn.setPrefWidth(50);
+        totalColumn.setCellValueFactory(cellData -> {
+            Products sellingProduct = cellData.getValue();
+            return new SimpleDoubleProperty(sellingProduct.getSellingPrice() * sellingProduct.getSellingQuantity()).asObject();
+        });
+        //delete buttons column
+        TableColumn<Products, String> deleteColumn = new TableColumn<>("Del.");
+        deleteColumn.setPrefWidth(35);  // Set a fixed width
+        deleteColumn.setCellFactory(param -> new TableCell<Products, String>() {
+            private final Button deleteButton = new Button("X");
+
+            {
+                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+                deleteButton.setOnAction(event -> {
+                    Products product = getTableView().getItems().get(getIndex());
+                    cartTableView.getItems().remove(product);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(deleteButton);
+                }
+            }
+        });
+
+        //Add columns to the table
+        cartTableView.getColumns().addAll(productIDColumn, productNameColumn, sellingPriceColumn, decrementColumn, quantityColumn, incrementColumn, totalColumn, deleteColumn);
+
+        // Add product to the cart
+        product.setSellingQuantity(1); // Set initial quantity to 1
+        cartTableView.getItems().add(product);
+    }
+
+    private void updateTotal(Products product) {
+        double total = product.getSellingPrice() * product.getSellingQuantity();
+        product.setTotal(total);
     }
 
     private void loadSalesTable() {
