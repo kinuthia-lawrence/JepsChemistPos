@@ -4,9 +4,13 @@ import com.larrykin.jepschemistpos.MODELS.Service;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -42,17 +46,30 @@ public class ServicesController {
     private AnchorPane tableAnchorPane;
 
 
-
     @FXML
     public void initialize() {
         initializeTable();
+        instantiateHomeLoader();
         saveButton.setOnAction(event -> {
             saveService();
         });
     }
-   //? Instantiate the HomeController class
-    @FXML
+
+
+    //? Instantiate the HomeController class
     private HomeController homeController;
+
+    private void instantiateHomeLoader() {
+        try {
+            //? Instantiate the HomeController class
+            FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/FXML/home.fxml"));
+            Scene homeScene = new Scene(homeLoader.load());
+            homeController = homeLoader.getController();
+        } catch (Exception e) {
+            System.out.println("Error instantiating homeLoader: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     //database connection
     DatabaseConn databaseConn = new DatabaseConn();
@@ -90,6 +107,10 @@ public class ServicesController {
                         timeline.setCycleCount(1);
                         timeline.play();
                         alert.showAndWait();
+
+                        //? On Success methods
+                        Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
+                        updateStats(totalCashFromService);
                         populateTable();
 
                         //clear fields
@@ -130,6 +151,45 @@ public class ServicesController {
             alert.setHeaderText("Error saving service");
             alert.setContentText("Service name and description cannot be empty!. Please fill in the required fields.");
             alert.showAndWait();
+        }
+    }
+
+    private void updateStats(Double totalCashFromService) {
+        try {
+            Connection conn = databaseConn.getConnection();
+            String query = "SELECT * FROM utils";
+
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery(query);
+
+            while (resultSet.next()) {
+                double currentCash = resultSet.getDouble("services_revenue");
+                int numberOfServices = resultSet.getInt("services_number");
+
+                double newServicesRevenue = currentCash + totalCashFromService;
+                int newNumberOfServices = numberOfServices + 1;
+
+                String updateQuery = "UPDATE utils SET services_revenue = ?, services_number = ?";
+                PreparedStatement pstmt = conn.prepareStatement(updateQuery);
+                pstmt.setDouble(1, newServicesRevenue);
+                pstmt.setInt(2, newNumberOfServices);
+
+                int rowAffected = pstmt.executeUpdate();
+
+                if (rowAffected > 0) {
+                    homeController.populateTableView();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error updating stats");
+                    alert.setContentText("Error updating stats");
+                    alert.showAndWait();
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error updating stats: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

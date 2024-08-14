@@ -6,6 +6,8 @@ import com.larrykin.jepschemistpos.MODELS.User;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -264,6 +266,7 @@ public class DashboardController {
 
     private void setHome() {
         Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.HOME);
+
     }
 
     private void setSales() {
