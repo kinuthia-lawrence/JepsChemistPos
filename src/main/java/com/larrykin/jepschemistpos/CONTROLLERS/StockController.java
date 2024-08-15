@@ -8,6 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
@@ -57,15 +59,27 @@ public class StockController {
     public void initialize() {
         initializeTable();
         loadFields();
+        instantiateControllers();
         addStockButton.setOnAction(e -> saveProduct());
     }
-
 
     //database instance
     DatabaseConn conn = new DatabaseConn();
 
-
     private ObservableList<String> productNames = FXCollections.observableArrayList();
+    private SalesController salesController;
+
+    private void instantiateControllers() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/sale.fxml"));
+            loader.load();
+            salesController = loader.getController();
+        } catch (Exception e) {
+            System.out.println("Error instantiating sales controllers: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     private void loadFields() {
         buyingPriceSpinner.setEditable(true);
@@ -366,7 +380,9 @@ public class StockController {
                         timeline.setCycleCount(1);
                         timeline.play();
                         alert.showAndWait();
+
                         populateTable();
+                        salesController.updateCurrentStockWorth();
 
                         //clear fields
                         nameComboBox.setValue(null);

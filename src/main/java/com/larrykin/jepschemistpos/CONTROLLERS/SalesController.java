@@ -18,7 +18,6 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -311,8 +310,7 @@ public class SalesController {
 
                     populateSalesTable();
 
-                    updateProductsQuantity(cartTableView);
-                    //TODO update booking
+                    updateDatabase(cartTableView);
                     // Clear carts, label,spinners and textArea
                     cartTableView.getItems().clear();
                     expectedAmountLabel.setText("0.00");
@@ -345,7 +343,7 @@ public class SalesController {
         }
     }
 
-    private void updateProductsQuantity(TableView<Products> cartTableView) {
+    private void updateDatabase(TableView<Products> cartTableView) {
         try {
             Connection connection = databaseConn.getConnection();
             for (Products product : cartTableView.getItems()) {
@@ -353,6 +351,7 @@ public class SalesController {
                 double sellingQuantity = product.getSellingQuantity();
                 double newQuantity = product.getProductQuantity() - sellingQuantity;
 
+                //? Update the quantity of the product in the database
                 String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                     preparedStatement.setDouble(1, newQuantity);
@@ -361,6 +360,7 @@ public class SalesController {
 
                     if (rowAffected > 0) {
                         populateStockTable();
+                        updateCurrentStockWorth();
                     } else {
                         System.out.println("Error updating product quantities");
                     }
@@ -369,6 +369,48 @@ public class SalesController {
             }
         } catch (Exception e) {
             System.out.println("Error updating product quantities: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void updateCurrentStockWorth() {
+        double stockWorth = 0.0;
+
+        try {
+            Connection connection = databaseConn.getConnection();
+            Statement statement = connection.createStatement();
+            String sql = "SELECT SUM(selling_price * quantity) AS stock_worth FROM products";
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                stockWorth = resultSet.getDouble("stock_worth");
+                //? update current stock worth n utils table
+                try {
+                    String updateSQL = "UPDATE utils SET current_stock_value = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(updateSQL);
+                    preparedStatement.setDouble(1, stockWorth);
+                    int rowAffected = preparedStatement.executeUpdate();
+
+                    if (rowAffected > 0) {
+                      ;
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error updating stock worth");
+                        alert.setContentText("Error updating stock worth");
+                        alert.showAndWait();
+                    }
+                }catch (Exception e){
+                    System.out.println("Error updating stock worth: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println("Error calculating stock worth: " + e.getMessage());
             e.printStackTrace();
         }
     }
