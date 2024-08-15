@@ -56,7 +56,6 @@ public class ServicesController {
     }
 
 
-
     //database connection
     DatabaseConn databaseConn = new DatabaseConn();
 
@@ -95,6 +94,7 @@ public class ServicesController {
                         alert.showAndWait();
 
                         //? On Success methods
+                        conn.close();
                         Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
                         updateStats(totalCashFromService);
                         populateTable();
@@ -110,6 +110,7 @@ public class ServicesController {
                         alert.setHeaderText("Error saving service");
                         alert.setContentText("Error saving service");
                         alert.showAndWait();
+                        conn.close();
                     }
 
                 } catch (SQLException e) {
@@ -163,15 +164,17 @@ public class ServicesController {
                 int rowAffected = pstmt.executeUpdate();
 
                 if (rowAffected > 0) {
-                   ;
+                    ;
                 } else {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error updating stats");
                     alert.setContentText("Error updating stats");
                     alert.showAndWait();
+                    conn.close();
                 }
             }
+            conn.close();
 
         } catch (Exception e) {
             System.out.println("Error updating stats: " + e.getMessage());
@@ -318,6 +321,8 @@ public class ServicesController {
                 timeline.setCycleCount(1);
                 timeline.play();
                 alert.showAndWait();
+
+                conn.close();
                 populateTable();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -325,6 +330,7 @@ public class ServicesController {
                 alert.setHeaderText("Error deleting service");
                 alert.setContentText("Error deleting service");
                 alert.showAndWait();
+                conn.close();
             }
 
         } catch (SQLException e) {
@@ -379,6 +385,10 @@ public class ServicesController {
                                     timeline.setCycleCount(1);
                                     timeline.play();
                                     alert.showAndWait();
+
+                                    conn.close();
+                                    Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText()) - oldCashPayment - oldMpesaPayment;
+                                    updateStats(totalCashFromService);
                                     populateTable();
 
                                     //clear fields
@@ -386,12 +396,18 @@ public class ServicesController {
                                     descriptionTextArea.clear();
                                     cashPaymentTextField.clear();
                                     mpesaPaymentTextField.clear();
+                                    saveButton.setText("SAVE");
+                                    saveButton.setOnAction(e -> {
+                                        saveService();
+                                    });
                                 } else {
                                     Alert alert = new Alert(Alert.AlertType.ERROR);
                                     alert.setTitle("Error");
                                     alert.setHeaderText("Error Updating service");
                                     alert.setContentText("Error Updating service");
                                     alert.showAndWait();
+
+                                    conn.close();
                                 }
 
                             } catch (SQLException e) {
@@ -453,6 +469,7 @@ public class ServicesController {
                 service.setMpesaPayment(resultSet.getDouble("mpesa_payment"));
                 services.add(service);
             }
+            conn.close();
 
         } catch (Exception e) {
             System.out.println("Error fetching services: " + e.getMessage());

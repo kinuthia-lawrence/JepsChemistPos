@@ -117,6 +117,7 @@ public class HomeController {
 
                 utilsData.add(data);
             }
+            conn.close();
 
         }catch (Exception e) {
             System.out.println("Error getting utils data from database: " + e.getMessage());

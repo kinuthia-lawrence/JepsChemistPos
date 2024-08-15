@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import org.sqlite.SQLiteErrorCode;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -231,8 +232,8 @@ public class SalesController {
         });
     }
 
-    private void sellProducts() {
-        //check if cart is empty
+    private  void sellProducts() {
+        // Check if cart is empty
         if (cartTableView.getItems().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Empty Cart");
@@ -245,30 +246,30 @@ public class SalesController {
         StringBuilder goods = new StringBuilder();
         for (Products product : cartTableView.getItems()) {
             goods.append(product.getProductName())
-                    .append(" = ")
+                    .append(" (")
                     .append(product.getSellingQuantity())
-                    .append(", ");
+                    .append("), ");
         }
 
-        //get values of the spinners
+        // Get values of the spinners
         double discount = discoutSpinner.getValue();
         double mpesa = mpesaSpinner.getValue();
         double cash = cashSpinner.getValue();
         double credit = creditSpinner.getValue();
 
-        //get the total expected amount
+        // Get the total expected amount
         double expectedAmount = Double.parseDouble(expectedAmountLabel.getText());
 
-        //get the Paid amount by summing up the cash, mpesa and credit
+        // Get the paid amount by summing up the cash, mpesa, and credit
         double paidAmount = cash + mpesa + credit;
 
-        //get description, if empty set to "No description"
+        // Get description, if empty set to "No description"
         String description = descriptionTextArea.getText();
         if (description.isEmpty()) {
             description = "No description";
         }
 
-        //Print all the values in terminal( for text)
+        // Print all the values in terminal (for text)
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Sale");
         alert.setHeaderText("Confirm the sale");
@@ -284,93 +285,151 @@ public class SalesController {
 
         if (alert.getResult() == ButtonType.OK) {
             // Save the sale to the database
-            try {
-                Connection connection = databaseConn.getConnection();
+            try (Connection connection = databaseConn.getConnection()) {
                 String insertQuery = "INSERT INTO sales (date, goods, expected_total, total_amount, discount, cash, mpesa, credit, description) VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
-                preparedStatement.setString(1, goods.toString());
-                preparedStatement.setDouble(2, expectedAmount);
-                preparedStatement.setDouble(3, paidAmount);
-                preparedStatement.setDouble(4, discount);
-                preparedStatement.setDouble(5, cash);
-                preparedStatement.setDouble(6, mpesa);
-                preparedStatement.setDouble(7, credit);
-                preparedStatement.setString(8, description);
-                int rowAffected = preparedStatement.executeUpdate();
+                try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                    preparedStatement.setString(1, goods.toString());
+                    preparedStatement.setDouble(2, expectedAmount);
+                    preparedStatement.setDouble(3, paidAmount);
+                    preparedStatement.setDouble(4, discount);
+                    preparedStatement.setDouble(5, cash);
+                    preparedStatement.setDouble(6, mpesa);
+                    preparedStatement.setDouble(7, credit);
+                    preparedStatement.setString(8, description);
+                    int rowAffected = preparedStatement.executeUpdate();
 
-                if (rowAffected > 0) {
-                    Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
-                    alert1.setTitle("Success");
-                    alert1.setHeaderText("Sale  success");
-                    alert1.setContentText("Sale saved successfully");
-                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
-                    timeline.setCycleCount(1);
-                    timeline.play();
-                    alert1.showAndWait();
+                    if (rowAffected > 0) {
+                        Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                        alert1.setTitle("Success");
+                        alert1.setHeaderText("Sale success");
+                        alert1.setContentText("Sale saved successfully");
+                        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert1.close()));
+                        timeline.setCycleCount(1);
+                        timeline.play();
+                        alert1.showAndWait();
 
-                    populateSalesTable();
+                        connection.close();
+                        populateSalesTable();
+                        updateDatabase(cartTableView);
+                        updateCashAndMpesa(cash, mpesa);
 
-                    updateDatabase(cartTableView);
-                    // Clear carts, label,spinners and textArea
-                    cartTableView.getItems().clear();
-                    expectedAmountLabel.setText("0.00");
-                    discoutSpinner.getValueFactory().setValue(0.0);
-                    mpesaSpinner.getValueFactory().setValue(0.0);
-                    cashSpinner.getValueFactory().setValue(0.0);
-                    creditSpinner.getValueFactory().setValue(0.0);
-                    descriptionTextArea.clear();
+                        // Clear carts, label, spinners, and textArea
+                        cartTableView.getItems().clear();
+                        expectedAmountLabel.setText("0.00");
+                        discoutSpinner.getValueFactory().setValue(0.0);
+                        mpesaSpinner.getValueFactory().setValue(0.0);
+                        cashSpinner.getValueFactory().setValue(0.0);
+                        creditSpinner.getValueFactory().setValue(0.0);
+                        descriptionTextArea.clear();
 
+                    } else {
+                        Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                        alert1.setTitle("Error");
+                        alert1.setHeaderText("Error in saving the sale");
+                        alert1.setContentText("Error in saving the sale");
+                        alert1.showAndWait();
+                    }
+                }finally {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                if (e.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY.code) {
+                    System.out.println("Database is busy, retrying...");
                 } else {
                     Alert alert1 = new Alert(Alert.AlertType.ERROR);
                     alert1.setTitle("Error");
                     alert1.setHeaderText("Error in saving the sale");
-                    alert1.setContentText("Error in saving the sale");
+                    alert1.setContentText("Error: " + e.getMessage());
                     alert1.showAndWait();
+                    System.out.println("Error in saving the sale: " + e.getMessage());
+                    e.printStackTrace();
                 }
-
-
-            } catch (Exception e) {
-                Alert alert1 = new Alert(Alert.AlertType.ERROR);
-                alert1.setTitle("Error");
-                alert1.setHeaderText("Error in saving the sale");
-                alert1.setContentText("Error: " + e.getMessage());
-                alert1.showAndWait();
-                System.out.println("Error in saving the sale: " + e.getMessage());
-                e.printStackTrace();
             }
+
         } else {
             alert.close();
         }
     }
 
-    private void updateDatabase(TableView<Products> cartTableView) {
-        try {
-            Connection connection = databaseConn.getConnection();
-            for (Products product : cartTableView.getItems()) {
-                Object productID = product.getProductID();
-                double sellingQuantity = product.getSellingQuantity();
-                double newQuantity = product.getProductQuantity() - sellingQuantity;
+    private  void updateDatabase(TableView<Products> cartTableView) {
+        new Thread(() -> {
+            try {
+                Connection connection = databaseConn.getConnection();
+                for (Products product : cartTableView.getItems()) {
+                    Object productID = product.getProductID();
+                    double sellingQuantity = product.getSellingQuantity();
+                    double newQuantity = product.getProductQuantity() - sellingQuantity;
 
-                //? Update the quantity of the product in the database
-                String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
-                try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                    preparedStatement.setDouble(1, newQuantity);
-                    preparedStatement.setObject(2, productID);
+                    //? Update the quantity of the product in the database
+                    String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                        preparedStatement.setDouble(1, newQuantity);
+                        preparedStatement.setObject(2, productID);
+                        int rowAffected = preparedStatement.executeUpdate();
+
+                        if (rowAffected > 0) {
+                            connection.close();
+                            populateStockTable();
+                            updateCurrentStockWorth();
+                        } else {
+                            System.out.println("Error updating product quantities");
+                        }
+
+                    }finally {
+                        connection.close();
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error updating product quantities: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private  void updateCashAndMpesa(Double cash, Double mpesa) {
+        new Thread(() -> {
+            try {
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+
+                ResultSet resultSet = statement.executeQuery("SELECT current_cash, current_mpesa FROM utils");
+
+                if (resultSet.next()) {
+                    double currentCash = resultSet.getDouble("current_cash");
+                    double currentMpesa = resultSet.getDouble("current_mpesa");
+
+                    double newCash = currentCash + cash;
+                    double newMpesa = currentMpesa + mpesa;
+
+                    //? Update the cash and mpesa in the database
+                    String updateQuery = "UPDATE utils SET current_cash = ?, current_mpesa = ?,total_cash_from_sales = total_cash_from_sales + ?, total_mpesa_from_sales = total_mpesa_from_sales + ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
+                    preparedStatement.setDouble(1, newCash);
+                    preparedStatement.setDouble(2, newMpesa);
+                    preparedStatement.setDouble(3, cash);
+                    preparedStatement.setDouble(4, mpesa);
                     int rowAffected = preparedStatement.executeUpdate();
 
                     if (rowAffected > 0) {
-                        populateStockTable();
-                        updateCurrentStockWorth();
+                        connection.close();
                     } else {
-                        System.out.println("Error updating product quantities");
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error updating cash and mpesa");
+                        alert.setContentText("Error updating cash and mpesa");
+                        alert.showAndWait();
+                        connection.close();
                     }
-
                 }
+            } catch (Exception e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error updating cash and mpesa");
+                alert.showAndWait();
+                System.out.println("Error updating cash and mpesa: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println("Error updating product quantities: " + e.getMessage());
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public void updateCurrentStockWorth() {
@@ -392,7 +451,7 @@ public class SalesController {
                     int rowAffected = preparedStatement.executeUpdate();
 
                     if (rowAffected > 0) {
-                      ;
+                        connection.close();
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
@@ -400,7 +459,8 @@ public class SalesController {
                         alert.setContentText("Error updating stock worth");
                         alert.showAndWait();
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
+                    connection.close();
                     System.out.println("Error updating stock worth: " + e.getMessage());
                     e.printStackTrace();
                 }
@@ -509,6 +569,7 @@ public class SalesController {
                 product.setProductDescription(resultSet.getString("description"));
                 products.add(product);
             }
+            connection.close();
 
         } catch (Exception e) {
             System.out.println("Error fetching product: " + e.getMessage());
@@ -676,6 +737,7 @@ public class SalesController {
                 sale.setDescription(resultSet.getString("description"));
                 sales.add(sale);
             }
+            connection.close();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

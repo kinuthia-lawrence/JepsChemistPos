@@ -7,6 +7,7 @@ module com.larrykin.jepschemistpos {
     requires flexmark.util.ast;
     requires jakarta.mail;
     requires java.desktop;
+    requires org.xerial.sqlitejdbc;
 
 
     opens com.larrykin.jepschemistpos to javafx.fxml;
