@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.MODELS.UtilsData;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.application.Platform;
@@ -7,6 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -35,7 +38,7 @@ public class HomeController {
     private Label numberOfServicesLabel;
 
     @FXML
-    private LineChart<?, ?> salesLineChart;
+    private LineChart<String, Number> salesLineChart;
 
     @FXML
     private Label servicesTotalCashLabel;
@@ -79,10 +82,59 @@ public class HomeController {
             });
 
         });
+        initializeSalesChart();
     }
+
 
     DatabaseConn databaseConn = new DatabaseConn();
     TableView<UtilsData> utilsTableView = new TableView<>();
+
+
+    private void initializeSalesChart() {
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Sales Amount (Ksh..)");
+
+        salesLineChart.setTitle("Sales Trends");
+        salesLineChart.getXAxis().setLabel("Date");
+        salesLineChart.getYAxis().setLabel("Sales Amount (Ksh.)");
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Sales Data");
+
+        List<Sales> salesData = getSalesFromDatabase();
+        for (Sales sale : salesData) {
+            series.getData().add(new XYChart.Data<>(sale.getDate(), sale.getTotalAmount()));
+        }
+
+        salesLineChart.getData().add(series);
+    }
+
+    private List<Sales> getSalesFromDatabase() {
+    List<Sales> sales = new ArrayList<>();
+    try {
+        Connection connection = databaseConn.getConnection();
+        Statement statement = connection.createStatement();
+        String query = "SELECT date, SUM(total_amount) as total_amount FROM sales GROUP BY date";
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()) {
+            Sales sale = new Sales();
+            sale.setDate(resultSet.getString("date"));
+            sale.setTotalAmount(resultSet.getDouble("total_amount"));
+            sales.add(sale);
+        }
+        connection.close();
+    } catch (Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error fetching sales");
+        alert.setContentText("Error fetching sales from the database");
+        alert.showAndWait();
+        System.out.println("Error fetching sales: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return sales;
+}
 
     private void initializeSpinners() {
         SpinnerValueFactory<Double> cashValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1000000, 0);
@@ -117,7 +169,7 @@ public class HomeController {
                 return;
             }
             //? add the transaction to the money table
-            try{
+            try {
                 Connection conn = databaseConn.getConnection();
                 Statement statement = conn.createStatement();
                 String sql = "INSERT INTO money (date, cash_withdrawal, mpesa_withdrawal, description) VALUES (datetime('now'),?, ?, ?)";
@@ -131,7 +183,7 @@ public class HomeController {
                 if (rowAffected > 0) {
                     conn.close();
                     descriptionTextArea.clear();
-                }else {
+                } else {
                     conn.close();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
@@ -139,7 +191,7 @@ public class HomeController {
                     alert.setContentText("Error adding transaction to money table");
                     alert.showAndWait();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Error adding transaction to money table: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -160,7 +212,7 @@ public class HomeController {
                     alert.showAndWait();
                     withdrawCashSpinner.getValueFactory().setValue(0.0);
                     withdrawMpesaSpinner.getValueFactory().setValue(0.0);
-                }else {
+                } else {
                     conn.close();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
