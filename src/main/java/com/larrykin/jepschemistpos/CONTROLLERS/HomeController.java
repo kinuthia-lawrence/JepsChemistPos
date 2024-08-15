@@ -91,11 +91,7 @@ public class HomeController {
 
 
     private void initializeSalesChart() {
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Sales Amount (Ksh..)");
-
         salesLineChart.setTitle("Sales Trends");
-        salesLineChart.getXAxis().setLabel("Date");
         salesLineChart.getYAxis().setLabel("Sales Amount (Ksh.)");
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();

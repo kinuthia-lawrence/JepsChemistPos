@@ -68,9 +68,9 @@
       </AnchorPane>
       <AnchorPane layoutX="622.0" layoutY="286.0" prefHeight="380.0" prefWidth="700.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="5.0">
          <children>
-            <LineChart fx:id="salesLineChart" title="Sales Trends" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <LineChart fx:id="salesLineChart" alternativeColumnFillVisible="true" title="Sales Trends" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <xAxis>
-                  <CategoryAxis label="Date" prefHeight="53.0" prefWidth="415.0" />
+                  <CategoryAxis prefHeight="53.0" prefWidth="415.0" />
                </xAxis>
                <yAxis>
                   <NumberAxis label="Sales Amount (Ksh)" lowerBound="100.0" minorTickCount="10" tickUnit="10.0" upperBound="5000.0" />
