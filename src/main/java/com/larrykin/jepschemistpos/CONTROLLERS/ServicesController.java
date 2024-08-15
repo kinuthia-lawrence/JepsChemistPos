@@ -96,7 +96,9 @@ public class ServicesController {
                         //? On Success methods
                         conn.close();
                         Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
-                        updateStats(totalCashFromService);
+                        Double cash = Double.parseDouble(cashPaymentTextField.getText());
+                        Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText());
+                        updateStats(totalCashFromService, cash, mpesa);
                         populateTable();
 
                         //clear fields
@@ -141,7 +143,7 @@ public class ServicesController {
         }
     }
 
-    private void updateStats(Double totalCashFromService) {
+    private void updateStats(Double totalCashFromService,Double cash, Double mpesa) {
         try {
             Connection conn = databaseConn.getConnection();
             String query = "SELECT * FROM utils";
@@ -156,10 +158,14 @@ public class ServicesController {
                 double newServicesRevenue = currentCash + totalCashFromService;
                 int newNumberOfServices = numberOfServices + 1;
 
-                String updateQuery = "UPDATE utils SET services_revenue = ?, services_number = ?";
+                String updateQuery = "UPDATE utils SET services_revenue = ?, services_number = ?, current_cash = current_cash + ?, current_mpesa = current_mpesa + ?, services_total_cash = services_total_cash + ? , services_total_mpesa = services_total_mpesa + ? ";
                 PreparedStatement pstmt = conn.prepareStatement(updateQuery);
                 pstmt.setDouble(1, newServicesRevenue);
                 pstmt.setInt(2, newNumberOfServices);
+                pstmt.setDouble(3, cash);
+                pstmt.setDouble(4, mpesa);
+                pstmt.setDouble(5, cash);
+                pstmt.setDouble(6, mpesa);
 
                 int rowAffected = pstmt.executeUpdate();
 
@@ -388,7 +394,9 @@ public class ServicesController {
 
                                     conn.close();
                                     Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText()) - oldCashPayment - oldMpesaPayment;
-                                    updateStats(totalCashFromService);
+                                    Double cash = Double.parseDouble(cashPaymentTextField.getText()) - oldCashPayment;
+                                    Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText()) - oldMpesaPayment;
+                                    updateStats(totalCashFromService,cash,mpesa);
                                     populateTable();
 
                                     //clear fields

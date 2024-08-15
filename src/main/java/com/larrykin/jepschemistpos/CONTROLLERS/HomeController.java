@@ -114,6 +114,7 @@ public class HomeController {
                 if (rowAffected > 0) {
                     conn.close();
                     populateTableView();
+
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Success");
                     alert.setHeaderText("Success");
@@ -193,6 +194,9 @@ public class HomeController {
                 data.setServicesRevenue(resultSet.getDouble("services_revenue"));
                 data.setTotalValueOfAddedStock(resultSet.getDouble("total_value_of_added_stock"));
                 data.setTotalMpesaFromSales(resultSet.getDouble("total_mpesa_from_sales"));
+
+                servicesTotalCashLabel.setText(String.valueOf(resultSet.getDouble("services_total_cash")));
+                servicesTotalMpesaLabel.setText(String.valueOf(resultSet.getDouble("services_total_mpesa")));
 
                 utilsData.add(data);
             }
