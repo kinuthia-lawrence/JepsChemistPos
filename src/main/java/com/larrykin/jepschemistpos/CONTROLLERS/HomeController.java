@@ -6,10 +6,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -58,14 +56,32 @@ public class HomeController {
      initializeTable();
     }
 
-
-
     DatabaseConn databaseConn = new DatabaseConn();
     TableView<UtilsData> utilsTableView = new TableView<>();
 
-
-    //TODO  create a tableView with all the columns of the utils table
     private void initializeTable() {
+        TableColumn<UtilsData, Object> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        TableColumn<UtilsData, Boolean> themeColumn = new TableColumn<>("Light Theme");
+        themeColumn.setCellValueFactory(new PropertyValueFactory<>("lightTheme"));
+        TableColumn<UtilsData, Double> currentCashColumn = new TableColumn<>("Current Cash");
+        currentCashColumn.setCellValueFactory(new PropertyValueFactory<>("currentCash"));
+        TableColumn<UtilsData, Double> currentMpesaColumn = new TableColumn<>("Current Mpesa");
+        currentMpesaColumn.setCellValueFactory(new PropertyValueFactory<>("currentMpesa"));
+        TableColumn<UtilsData, Double> currentStockColumn = new TableColumn<>("Current Stock");
+        currentStockColumn.setCellValueFactory(new PropertyValueFactory<>("currentStock"));
+        TableColumn<UtilsData, Integer> servicesNumberColumn = new TableColumn<>("Services Number");
+        servicesNumberColumn.setCellValueFactory(new PropertyValueFactory<>("servicesNumber"));
+        TableColumn<UtilsData, Double> totalCashFromSalesColumn = new TableColumn<>("Total Cash From Sales");
+        totalCashFromSalesColumn.setCellValueFactory(new PropertyValueFactory<>("totalCashFromSales"));
+        TableColumn<UtilsData, Double> servicesRevenueColumn = new TableColumn<>("Services Revenue");
+        servicesRevenueColumn.setCellValueFactory(new PropertyValueFactory<>("servicesRevenue"));
+        TableColumn<UtilsData, Double> totalValueOfAddedStockColumn = new TableColumn<>("Total Value Of Added Stock");
+        totalValueOfAddedStockColumn.setCellValueFactory(new PropertyValueFactory<>("totalValueOfAddedStock"));
+        TableColumn<UtilsData, Double> totalMpesaFromSalesColumn = new TableColumn<>("Total Mpesa From Sales");
+        totalMpesaFromSalesColumn.setCellValueFactory(new PropertyValueFactory<>("totalMpesaFromSales"));
+
+        utilsTableView.getColumns().addAll(idColumn, themeColumn, currentCashColumn, currentMpesaColumn, currentStockColumn, servicesNumberColumn, totalCashFromSalesColumn, servicesRevenueColumn, totalValueOfAddedStockColumn, totalMpesaFromSalesColumn);
 
         populateTableView();
     }
@@ -74,50 +90,51 @@ public class HomeController {
         ObservableList<UtilsData> utilsData = FXCollections.observableArrayList();
         utilsData.addAll(getUtilsDataFromDatabase());
         utilsTableView.setItems(utilsData);
+        loadLabels(utilsData.get(0));
     }
+    //? get data from the database
     private List<UtilsData> getUtilsDataFromDatabase() {
         List<UtilsData> utilsData = new ArrayList<>();
 
+        try{
+            Connection conn = databaseConn.getConnection();
+
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM utils");
+
+            while (resultSet.next()) {
+                UtilsData data = new UtilsData();
+                data.setId(resultSet.getObject("id"));
+                data.setLightTheme(resultSet.getBoolean("light_theme"));
+                data.setCurrentCash(resultSet.getDouble("current_cash"));
+                data.setCurrentMpesa(resultSet.getDouble("current_mpesa"));
+                data.setCurrentStock(resultSet.getDouble("current_stock_value"));
+                data.setServicesNumber(resultSet.getInt("services_number"));
+                data.setTotalCashFromSales(resultSet.getDouble("total_cash_from_sales"));
+                data.setServicesRevenue(resultSet.getDouble("services_revenue"));
+                data.setTotalValueOfAddedStock(resultSet.getDouble("total_value_of_added_stock"));
+                data.setTotalMpesaFromSales(resultSet.getDouble("total_mpesa_from_sales"));
+
+                utilsData.add(data);
+            }
+
+        }catch (Exception e) {
+            System.out.println("Error getting utils data from database: " + e.getMessage());
+            e.printStackTrace();
+        }
         return utilsData;
     }
     //? load the data from the table to the labels
     private void loadLabels(UtilsData utilsData) {
-    }
-    public void loadStats() throws SQLException {
-        try {
-            System.out.println("Loading stats");
-            Connection conn = databaseConn.getConnection();
-            String query = "SELECT * FROM utils";
-
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery(query);
-
-            while (resultSet.next()) {
-                String currentCash = resultSet.getString("current_cash");
-                String currentMpesa = resultSet.getString("current_mpesa");
-                String currentStock = resultSet.getString("current_stock_value");
-                String servicesNumber = resultSet.getString("services_number");
-                String totalCashFromSales = resultSet.getString("total_cash_from_sales");
-                String servicesRevenue = resultSet.getString("services_revenue");
-                String totalValueOfAddedStock = resultSet.getString("total_value_of_added_stock");
-                String totalMpesaFromSales = resultSet.getString("total_mpesa_from_sales");
-
-                Platform.runLater(() -> {
-                    currentCashLabel.setText(currentCash);
-                    currentMpesaLabel.setText(currentMpesa);
-                    currentStockLabel.setText(currentStock);
-                    numberOfServicesLabel.setText(servicesNumber);
-                    totalCashLabel.setText(totalCashFromSales);
-                    totalServiceRevenueLabel.setText(servicesRevenue);
-                    totalStockAddedLabel.setText(totalValueOfAddedStock);
-                    TotalMpesa.setText(totalMpesaFromSales);
-                });
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error loading stats: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        Platform.runLater(() -> {
+            currentCashLabel.setText(String.valueOf(utilsData.getCurrentCash()));
+            currentMpesaLabel.setText(String.valueOf(utilsData.getCurrentMpesa()));
+            currentStockLabel.setText(String.valueOf(utilsData.getCurrentStock()));
+            numberOfServicesLabel.setText(String.valueOf(utilsData.getServicesNumber()));
+            totalCashLabel.setText(String.valueOf(utilsData.getTotalCashFromSales()));
+            totalServiceRevenueLabel.setText(String.valueOf(utilsData.getServicesRevenue()));
+            totalStockAddedLabel.setText(String.valueOf(utilsData.getTotalValueOfAddedStock()));
+            TotalMpesa.setText(String.valueOf(utilsData.getTotalMpesaFromSales()));
+        });
     }
 }

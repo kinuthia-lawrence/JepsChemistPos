@@ -7,6 +7,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -238,7 +240,21 @@ public class DashboardController {
         borderPane.setCenter(Model.getInstance().getViewFactory().getHomeAnchorPane());
         Model.getInstance().getViewFactory().getDashboardSelectedItem().addListener((observable, oldVal, newVal) -> {
             switch (newVal) {
-                case HOME -> borderPane.setCenter(Model.getInstance().getViewFactory().getHomeAnchorPane());
+                case HOME -> {
+                    try {
+                        // Ensure FXML is loaded correctly
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(getClass().getResource("/FXML/home.fxml"));
+                        Parent root = loader.load();
+                        //? Use the Controller created when the new FXML is loaded
+                        HomeController homeController = loader.getController();
+                        borderPane.setCenter(root);
+                    } catch (Exception e) {
+                        borderPane.setCenter(Model.getInstance().getViewFactory().getHomeAnchorPane());
+                        System.out.println("Error instantiating homeLoader: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
                 case SALES -> borderPane.setCenter(Model.getInstance().getViewFactory().getSaleAnchorPane());
                 case STOCK -> borderPane.setCenter(Model.getInstance().getViewFactory().getStockAnchorPane());
                 case SERVICES -> borderPane.setCenter(Model.getInstance().getViewFactory().getServicesAnchorPane());
@@ -266,7 +282,6 @@ public class DashboardController {
 
     private void setHome() {
         Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.HOME);
-
     }
 
     private void setSales() {

@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -49,27 +50,12 @@ public class ServicesController {
     @FXML
     public void initialize() {
         initializeTable();
-        instantiateHomeLoader();
         saveButton.setOnAction(event -> {
             saveService();
         });
     }
 
 
-    //? Instantiate the HomeController class
-    private HomeController homeController;
-
-    private void instantiateHomeLoader() {
-        try {
-            //? Instantiate the HomeController class
-            FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/FXML/home.fxml"));
-            Scene homeScene = new Scene(homeLoader.load());
-            homeController = homeLoader.getController();
-        } catch (Exception e) {
-            System.out.println("Error instantiating homeLoader: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     //database connection
     DatabaseConn databaseConn = new DatabaseConn();
@@ -177,7 +163,7 @@ public class ServicesController {
                 int rowAffected = pstmt.executeUpdate();
 
                 if (rowAffected > 0) {
-                    homeController.populateTableView();
+                   ;
                 } else {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
