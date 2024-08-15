@@ -37,6 +37,12 @@ public class HomeController {
     private Label numberOfServicesLabel;
 
     @FXML
+    private Label servicesTotalCashLabel;
+
+    @FXML
+    private Label servicesTotalMpesaLabel;
+
+    @FXML
     private Label totalCashLabel;
 
     @FXML
@@ -46,6 +52,9 @@ public class HomeController {
     private Label totalStockAddedLabel;
 
     @FXML
+    private Button withdrawButton;
+
+    @FXML
     private Spinner<Double> withdrawCashSpinner;
 
     @FXML
@@ -53,11 +62,79 @@ public class HomeController {
 
     @FXML
     public void initialize() {
-     initializeTable();
+        initializeTable();
+        initializeSpinners();
+        withdrawButton.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Are you sure you want to withdraw cash?");
+            alert.setContentText("Please confirm");
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    withdrawCash();
+                }
+                alert.close();
+            });
+
+        });
     }
 
     DatabaseConn databaseConn = new DatabaseConn();
     TableView<UtilsData> utilsTableView = new TableView<>();
+
+    private void initializeSpinners() {
+        SpinnerValueFactory<Double> cashValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1000000, 0);
+        SpinnerValueFactory<Double> mpesaValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1000000, 0);
+
+        withdrawCashSpinner.setEditable(true);
+        withdrawMpesaSpinner.setEditable(true);
+        withdrawCashSpinner.setValueFactory(cashValueFactory);
+        withdrawMpesaSpinner.setValueFactory(mpesaValueFactory);
+    }
+
+    private void withdrawCash() {
+        if (withdrawCashSpinner.getValue() != null || withdrawMpesaSpinner.getValue() != null) {
+            double cash = withdrawCashSpinner.getValue();
+            double mpesa = withdrawMpesaSpinner.getValue();
+
+            if (cash < 0 && mpesa < 0) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error");
+                alert.setContentText("Please enter a valid amount to withdraw");
+                alert.showAndWait();
+                return;
+            }
+
+            try {
+                Connection conn = databaseConn.getConnection();
+                Statement statement = conn.createStatement();
+                int rowAffected = statement.executeUpdate("UPDATE utils SET current_cash = current_cash - " + cash + ", current_mpesa = current_mpesa - " + mpesa + " WHERE id = 1");
+                if (rowAffected > 0) {
+                    conn.close();
+                    populateTableView();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText("Success");
+                    alert.setContentText("successfully withdrawn cash :" + cash + " and mpesa: " + mpesa);
+                    alert.showAndWait();
+                    withdrawCashSpinner.getValueFactory().setValue(0.0);
+                    withdrawMpesaSpinner.getValueFactory().setValue(0.0);
+                }else {
+                    conn.close();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error");
+                    alert.setContentText("Error withdrawing cash");
+                    alert.showAndWait();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error withdrawing cash: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void initializeTable() {
         TableColumn<UtilsData, Object> idColumn = new TableColumn<>("ID");
@@ -85,6 +162,7 @@ public class HomeController {
 
         populateTableView();
     }
+
     //? load data from utils to the tableView
     public void populateTableView() {
         ObservableList<UtilsData> utilsData = FXCollections.observableArrayList();
@@ -92,11 +170,12 @@ public class HomeController {
         utilsTableView.setItems(utilsData);
         loadLabels(utilsData.get(0));
     }
+
     //? get data from the database
     private List<UtilsData> getUtilsDataFromDatabase() {
         List<UtilsData> utilsData = new ArrayList<>();
 
-        try{
+        try {
             Connection conn = databaseConn.getConnection();
 
             Statement statement = conn.createStatement();
@@ -119,12 +198,13 @@ public class HomeController {
             }
             conn.close();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error getting utils data from database: " + e.getMessage());
             e.printStackTrace();
         }
         return utilsData;
     }
+
     //? load the data from the table to the labels
     private void loadLabels(UtilsData utilsData) {
         Platform.runLater(() -> {
@@ -138,4 +218,5 @@ public class HomeController {
             TotalMpesa.setText(String.valueOf(utilsData.getTotalMpesaFromSales()));
         });
     }
+
 }

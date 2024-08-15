@@ -321,6 +321,8 @@ public class StockController {
                 timeline.setCycleCount(1);
                 timeline.play();
                 alert.showAndWait();
+                //? On success Methods
+                salesController.updateCurrentStockWorth();
                 populateTable();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -328,8 +330,10 @@ public class StockController {
                 alert.setHeaderText("Error deleting Product");
                 alert.setContentText("Error deleting Product");
                 alert.showAndWait();
+                connection.close();
             }
 
+            connection.close();
         } catch (SQLException e) {
             System.out.println("Error(sql) deleting Product: " + e.getMessage());
             e.printStackTrace();
