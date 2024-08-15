@@ -383,6 +383,8 @@ public class StockController {
 
                         populateTable();
                         salesController.updateCurrentStockWorth();
+                        updateTotalStock(quantityValue, buyingPriceValue);
+
 
                         //clear fields
                         nameComboBox.setValue(null);
@@ -419,6 +421,33 @@ public class StockController {
                 alert.showAndWait();
             }
         });
+    }
+
+    private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
+        try{
+            Double totalStock = quantityValue * buyingPriceValue;
+            String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
+            Connection connection = conn.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setDouble(1, totalStock);
+            int resultSet = statement.executeUpdate();
+
+            if(resultSet > 0) {
+                ;
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error updating total stock");
+                alert.setContentText("Error updating total stock");
+                alert.showAndWait();
+            }
+        }catch (Exception e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error updating total stock");
+            alert.setContentText("Error updating total stock: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     private void editRow(Products product) {

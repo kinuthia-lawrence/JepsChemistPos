@@ -379,7 +379,7 @@ public class SalesController {
         try {
             Connection connection = databaseConn.getConnection();
             Statement statement = connection.createStatement();
-            String sql = "SELECT SUM(selling_price * quantity) AS stock_worth FROM products";
+            String sql = "SELECT SUM(buying_price * quantity) AS stock_worth FROM products";
             ResultSet resultSet = statement.executeQuery(sql);
 
             if (resultSet.next()) {
