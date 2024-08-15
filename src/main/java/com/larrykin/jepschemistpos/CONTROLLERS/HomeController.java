@@ -6,13 +6,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +33,9 @@ public class HomeController {
 
     @FXML
     private Label numberOfServicesLabel;
+
+    @FXML
+    private LineChart<?, ?> salesLineChart;
 
     @FXML
     private Label servicesTotalCashLabel;
@@ -97,6 +98,15 @@ public class HomeController {
         if (withdrawCashSpinner.getValue() != null || withdrawMpesaSpinner.getValue() != null) {
             double cash = withdrawCashSpinner.getValue();
             double mpesa = withdrawMpesaSpinner.getValue();
+            String description = descriptionTextArea.getText();
+            if (description.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Description Error");
+                alert.setContentText("Please enter a description");
+                alert.showAndWait();
+                return;
+            }
 
             if (cash < 0 && mpesa < 0) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -106,7 +116,35 @@ public class HomeController {
                 alert.showAndWait();
                 return;
             }
+            //? add the transaction to the money table
+            try{
+                Connection conn = databaseConn.getConnection();
+                Statement statement = conn.createStatement();
+                String sql = "INSERT INTO money (date, cash_withdrawal, mpesa_withdrawal, description) VALUES (datetime('now'),?, ?, ?)";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setDouble(1, cash);
+                preparedStatement.setDouble(2, mpesa);
+                preparedStatement.setString(3, description);
 
+                int rowAffected = preparedStatement.executeUpdate();
+
+                if (rowAffected > 0) {
+                    conn.close();
+                    descriptionTextArea.clear();
+                }else {
+                    conn.close();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error");
+                    alert.setContentText("Error adding transaction to money table");
+                    alert.showAndWait();
+                }
+            }catch (Exception e){
+                System.out.println("Error adding transaction to money table: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            //? update utils table
             try {
                 Connection conn = databaseConn.getConnection();
                 Statement statement = conn.createStatement();
