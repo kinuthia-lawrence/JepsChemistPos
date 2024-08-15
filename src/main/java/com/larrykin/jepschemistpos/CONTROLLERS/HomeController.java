@@ -110,31 +110,31 @@ public class HomeController {
     }
 
     private List<Sales> getSalesFromDatabase() {
-    List<Sales> sales = new ArrayList<>();
-    try {
-        Connection connection = databaseConn.getConnection();
-        Statement statement = connection.createStatement();
-        String query = "SELECT date, SUM(total_amount) as total_amount FROM sales GROUP BY date";
-        ResultSet resultSet = statement.executeQuery(query);
+        List<Sales> sales = new ArrayList<>();
+        try {
+            Connection connection = databaseConn.getConnection();
+            Statement statement = connection.createStatement();
+            String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
+            ResultSet resultSet = statement.executeQuery(query);
 
-        while (resultSet.next()) {
-            Sales sale = new Sales();
-            sale.setDate(resultSet.getString("date"));
-            sale.setTotalAmount(resultSet.getDouble("total_amount"));
-            sales.add(sale);
+            while (resultSet.next()) {
+                Sales sale = new Sales();
+                sale.setDate(resultSet.getString("date"));
+                sale.setTotalAmount(resultSet.getDouble("total_amount"));
+                sales.add(sale);
+            }
+            connection.close();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error fetching sales");
+            alert.setContentText("Error fetching sales from the database");
+            alert.showAndWait();
+            System.out.println("Error fetching sales: " + e.getMessage());
+            e.printStackTrace();
         }
-        connection.close();
-    } catch (Exception e) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Error fetching sales");
-        alert.setContentText("Error fetching sales from the database");
-        alert.showAndWait();
-        System.out.println("Error fetching sales: " + e.getMessage());
-        e.printStackTrace();
+        return sales;
     }
-    return sales;
-}
 
     private void initializeSpinners() {
         SpinnerValueFactory<Double> cashValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1000000, 0);
