@@ -5,6 +5,8 @@ import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -26,11 +28,28 @@ public class NotificationController {
     public void initialize() {
         initializeExpiredGoodsTable();
         initializeOutOfStockTable();
+        instantiateStockController();
 
     }
+
     //? instantiate database connection
     DatabaseConn databaseConn = new DatabaseConn();
     private StockController stockController;
+
+    private void instantiateStockController() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/stock.fxml"));
+            Parent root = loader.load();
+            stockController = loader.getController();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Instantiating Stock Controller");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
+    }
 
     private void initializeExpiredGoodsTable() {
         //? Expired goods table columns
@@ -116,7 +135,7 @@ public class NotificationController {
         });
 
         expiredGoodsTableView.getColumns().addAll(expiredProductIDColumn, expiredProductNameColumn, expiredProductCategoryColumn, expiredProductQuantityColumn, expiredProductPriceColumn, expiredSupplierColumn, dateAddedColumn, expiryDateColumn, deleteColumn, deleteAsLossColumn);
-        
+
         checkExpiredGoods();
     }
 
@@ -161,6 +180,7 @@ public class NotificationController {
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
                     stockController.deleteRow(product);
+                    checkOutOfStock();
                 });
             }
 
@@ -184,12 +204,12 @@ public class NotificationController {
         ObservableList<Products> outOfStockProducts = FXCollections.observableArrayList();
         List<Products> products = new ArrayList<>();
 
-        try{
+        try {
             Connection connection = databaseConn.getConnection();
             String query = "SELECT * FROM products WHERE quantity <= 2";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
@@ -201,7 +221,7 @@ public class NotificationController {
 
             }
             connection.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error Checking Out of Stock Products");
