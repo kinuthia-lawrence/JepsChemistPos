@@ -292,7 +292,7 @@ public class StockController {
         return products;
     }
 
-    private void deleteRow(Products product) {
+    public void deleteRow(Products product) {
         Alert deleteConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
         deleteConfirmation.setTitle("Delete Product");
         deleteConfirmation.setHeaderText("Are you sure you want to delete this Product?");
