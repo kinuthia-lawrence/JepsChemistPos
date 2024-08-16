@@ -3,6 +3,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.ENUMS.DashboardOptions;
 import com.larrykin.jepschemistpos.MODELS.Model;
 import com.larrykin.jepschemistpos.MODELS.User;
+import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -24,6 +25,9 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -73,7 +77,7 @@ public class DashboardController {
     private Button notificationButton;
 
     @FXML
-    private ImageView notificationIcon;
+    public ImageView notificationIcon;
 
     @FXML
     private HBox profileHBox;
@@ -125,7 +129,25 @@ public class DashboardController {
         loadDashboard();
         addListeners();
         otherActions();
+        initializeNotification();
 
+    }
+
+    private NotificationController notificationController;
+    DatabaseConn databaseConn = new DatabaseConn();
+
+    private void initializeNotification() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/notification.fxml"));
+            Parent root = loader.load();
+            notificationController = loader.getController();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error loading notifications");
+            alert.setContentText("Error loading notifications: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
 
@@ -217,10 +239,8 @@ public class DashboardController {
             Image reportImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/reports.png")));
             reportIcon.setImage(reportImage);
 
-            Image notificationImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/notify.png")));
-            notificationIcon.setImage(notificationImage);
-//            Image notificationImage = new Image(getClass().getResourceAsStream("/IMAGES/notification.gif"));
-//            notificationIcon.setImage(notificationImage);
+            //notification icon
+            checkExpiredGoodsAndOutOfStock();
 
             Image serviceImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/services.gif")));
             serviceIcon.setImage(serviceImage);
@@ -233,6 +253,36 @@ public class DashboardController {
         } catch (Exception ex) {
             System.out.println("Error loading images : " + ex.getMessage());
             ex.printStackTrace();
+        }
+    }
+
+    private void checkExpiredGoodsAndOutOfStock() {
+        try (Connection connection = databaseConn.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            String outOfStockQuery = "SELECT * FROM products WHERE quantity <= 2";
+            String selectExpiredGoodsSQL = "SELECT * FROM products WHERE expiry_date < CURRENT_DATE";
+
+            ResultSet outOfStockResultSet = statement.executeQuery(outOfStockQuery);
+            boolean outOfStockExists = outOfStockResultSet.next();
+
+            ResultSet expiredGoodsResultSet = statement.executeQuery(selectExpiredGoodsSQL);
+            boolean expiredGoodsExists = expiredGoodsResultSet.next();
+
+            if (outOfStockExists || expiredGoodsExists) {
+                Image notificationImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/notification.gif")));
+                notificationIcon.setImage(notificationImage);
+            } else {
+                Image notificationImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/notify.png")));
+                notificationIcon.setImage(notificationImage);
+            }
+
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error loading notifications");
+            alert.setContentText("Error loading notifications: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -258,14 +308,14 @@ public class DashboardController {
                 case SALES -> borderPane.setCenter(Model.getInstance().getViewFactory().getSaleAnchorPane());
                 case STOCK -> borderPane.setCenter(Model.getInstance().getViewFactory().getStockAnchorPane());
                 case SERVICES -> borderPane.setCenter(Model.getInstance().getViewFactory().getServicesAnchorPane());
-                case NOTIFICATIONS ->{
-                    try{
+                case NOTIFICATIONS -> {
+                    try {
                         FXMLLoader loader = new FXMLLoader();
                         loader.setLocation(getClass().getResource("/FXML/notification.fxml"));
                         Parent root = loader.load();
                         NotificationController notificationController = loader.getController();
                         borderPane.setCenter(root);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         borderPane.setCenter(Model.getInstance().getViewFactory().getNotificationAnchorPane());
                         System.out.println("Error instantiating notificationLoader: " + e.getMessage());
                         e.printStackTrace();

@@ -20,23 +20,24 @@ import java.util.List;
 public class NotificationController {
 
     @FXML
-    private TableView<Products> expiredGoodsTableView;
+    public TableView<Products> expiredGoodsTableView;
 
     @FXML
-    private TableView<Products> outOfStockTableView;
+    public TableView<Products> outOfStockTableView;
 
     @FXML
     public void initialize() {
         initializeExpiredGoodsTable();
         initializeOutOfStockTable();
         instantiateStockController();
+        alertNotification();
 
     }
+
 
     //? instantiate database connection
     DatabaseConn databaseConn = new DatabaseConn();
     private StockController stockController;
-
     private void instantiateStockController() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/stock.fxml"));
@@ -46,6 +47,26 @@ public class NotificationController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error Instantiating Stock Controller");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
+    }
+
+    public void alertNotification() {
+        try {
+            //check if any of the table has data
+            if (!expiredGoodsTableView.getItems().isEmpty() || !outOfStockTableView.getItems().isEmpty()) {
+               Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Notification");
+                alert.setHeaderText("You have some notifications");
+                alert.setContentText("You have some expired goods or out of stock products");
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Alerting Notification");
             alert.setContentText("Error: " + e.getMessage());
             alert.showAndWait();
             e.printStackTrace();
@@ -90,13 +111,13 @@ public class NotificationController {
         TableColumn<Products, String> deleteColumn = new TableColumn<>("Delete as Refunded");
         deleteColumn.setPrefWidth(150);  // Set a fixed width
         deleteColumn.setCellFactory(param -> new TableCell<Products, String>() {
-            private final Button deleteButton = new Button("Delete");
+            private final Button deleteButton = new Button("Delete as Refunded");
 
             {
-                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+                deleteButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    //todo : delete from database as refunded
+                    deleteAsRefunded(product);
                 });
             }
 
@@ -114,13 +135,13 @@ public class NotificationController {
         TableColumn<Products, String> deleteAsLossColumn = new TableColumn<>("Delete as Loss");
         deleteAsLossColumn.setPrefWidth(150);  // Set a fixed width
         deleteAsLossColumn.setCellFactory(param -> new TableCell<Products, String>() {
-            private final Button deleteButton = new Button("Delete");
+            private final Button deleteButton = new Button("Delete as Loss");
 
             {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    //todo : delete from database as loss
+                    deleteAsLoss(product);
                 });
             }
 
@@ -138,6 +159,68 @@ public class NotificationController {
         expiredGoodsTableView.getColumns().addAll(expiredProductIDColumn, expiredProductNameColumn, expiredProductCategoryColumn, expiredProductQuantityColumn, expiredProductPriceColumn, expiredSupplierColumn, dateAddedColumn, expiryDateColumn, deleteColumn, deleteAsLossColumn);
 
         checkExpiredGoods();
+    }
+
+    private void deleteAsLoss(Products product) {
+        //? Delete the product from the expired_goods table and increment the expired loss in utils
+        try {
+            //get the value = product quantity * buying price
+            double loss = product.getProductQuantity() * product.getBuyingPrice();
+
+            Connection connection = databaseConn.getConnection();
+            String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
+            String updateSQL = "UPDATE utils SET expired_loss = expired_loss + ?";
+
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
+                 PreparedStatement updateStatement = connection.prepareStatement(updateSQL)) {
+                deleteStatement.setInt(1, (int) product.getProductID());
+                deleteStatement.executeUpdate();
+
+                updateStatement.setDouble(1, loss);
+                updateStatement.executeUpdate();
+
+                connection.close();
+                populateExpiredGoodsTable();
+            }
+
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Deleting Product as Loss");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteAsRefunded(Products product) {
+        try {
+            //get the value = product quantity * buying price
+            double refunded = product.getProductQuantity() * product.getBuyingPrice();
+
+            Connection connection = databaseConn.getConnection();
+            String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
+            String updateSQL = "UPDATE utils SET refunded_expired = refunded_expired + ?";
+
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
+                 PreparedStatement updateStatement = connection.prepareStatement(updateSQL)) {
+                deleteStatement.setInt(1, (int) product.getProductID());
+                deleteStatement.executeUpdate();
+
+                updateStatement.setDouble(1, refunded);
+                updateStatement.executeUpdate();
+
+                connection.close();
+                populateExpiredGoodsTable();
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Deleting Product as Refunded");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
     }
 
     private void checkExpiredGoods() {
