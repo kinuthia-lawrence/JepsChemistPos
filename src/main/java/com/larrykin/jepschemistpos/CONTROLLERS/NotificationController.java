@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -140,6 +141,87 @@ public class NotificationController {
     }
 
     private void checkExpiredGoods() {
+        String selectExpiredGoodsSQL = "SELECT * FROM products WHERE expiry_date < CURRENT_DATE";
+        String insertExpiredGoodsSQL = "INSERT INTO expired_goods (id, name, category, quantity, buying_price, supplier_name, date_added, expiry_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String deleteExpiredGoodsSQL = "DELETE FROM products WHERE id = ?";
+
+        try (Connection connection = databaseConn.getConnection();
+             Statement selectStatement = connection.createStatement();
+             ResultSet resultSet = selectStatement.executeQuery(selectExpiredGoodsSQL)) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String category = resultSet.getString("category");
+                int quantity = resultSet.getInt("quantity");
+                double buyingPrice = resultSet.getDouble("buying_price");
+                String supplierName = resultSet.getString("supplier_name");
+                String dateAdded = resultSet.getString("date_added");
+                String expiryDate = resultSet.getString("expiry_date");
+
+                try (PreparedStatement insertStatement = connection.prepareStatement(insertExpiredGoodsSQL);
+                     PreparedStatement deleteStatement = connection.prepareStatement(deleteExpiredGoodsSQL)) {
+
+                    // Insert into expired_goods table
+                    insertStatement.setInt(1, id);
+                    insertStatement.setString(2, name);
+                    insertStatement.setString(3, category);
+                    insertStatement.setInt(4, quantity);
+                    insertStatement.setDouble(5, buyingPrice);
+                    insertStatement.setString(6, supplierName);
+                    insertStatement.setString(7, dateAdded);
+                    insertStatement.setString(8, expiryDate);
+                    insertStatement.executeUpdate();
+
+                    // Delete from products table
+                    deleteStatement.setInt(1, id);
+                    deleteStatement.executeUpdate();
+                }
+            }
+            connection.close();
+            populateExpiredGoodsTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Processing Expired Goods");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    private void populateExpiredGoodsTable() {
+        ObservableList<Products> expiredGoods = FXCollections.observableArrayList();
+        List<Products> products = new ArrayList<>();
+
+        try {
+            Connection connection = databaseConn.getConnection();
+            String query = "SELECT * FROM expired_goods";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                Products product = new Products();
+                product.setProductID(resultSet.getObject("id"));
+                product.setProductName(resultSet.getString("name"));
+                product.setProductCategory(resultSet.getString("category"));
+                product.setProductQuantity(resultSet.getDouble("quantity"));
+                product.setBuyingPrice(resultSet.getDouble("buying_price"));
+                product.setSupplierName(resultSet.getString("supplier_name"));
+                product.setDateAdded(resultSet.getString("date_added"));
+                product.setExpiryDate(resultSet.getString("expiry_date"));
+                products.add(product);
+            }
+            connection.close();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Populating Expired Goods Table");
+            alert.setContentText("Error: " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
+        expiredGoods.addAll(products);
+        expiredGoodsTableView.setItems(expiredGoods);
     }
 
 

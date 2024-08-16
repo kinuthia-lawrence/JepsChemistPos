@@ -258,8 +258,20 @@ public class DashboardController {
                 case SALES -> borderPane.setCenter(Model.getInstance().getViewFactory().getSaleAnchorPane());
                 case STOCK -> borderPane.setCenter(Model.getInstance().getViewFactory().getStockAnchorPane());
                 case SERVICES -> borderPane.setCenter(Model.getInstance().getViewFactory().getServicesAnchorPane());
-                case NOTIFICATIONS ->
+                case NOTIFICATIONS ->{
+                    try{
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(getClass().getResource("/FXML/notification.fxml"));
+                        Parent root = loader.load();
+                        NotificationController notificationController = loader.getController();
+                        borderPane.setCenter(root);
+                    }catch (Exception e) {
                         borderPane.setCenter(Model.getInstance().getViewFactory().getNotificationAnchorPane());
+                        System.out.println("Error instantiating notificationLoader: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+
+                }
                 case INVENTORY -> borderPane.setCenter(Model.getInstance().getViewFactory().getInventoryAnchorPane());
                 case REPORTS -> borderPane.setCenter(Model.getInstance().getViewFactory().getReportsAnchorPane());
                 case HELP -> borderPane.setCenter(Model.getInstance().getViewFactory().getHelpAnchorPane());
