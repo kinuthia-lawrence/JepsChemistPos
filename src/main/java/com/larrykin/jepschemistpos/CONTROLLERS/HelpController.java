@@ -31,7 +31,7 @@ public class HelpController implements Initializable {
 
             WebView webView = new WebView();
             webView.getEngine().loadContent(htmlContent);
-            webView.getEngine().setUserStyleSheetLocation(getClass().getResource("/STYLES/darkTheme.css").toString());
+            webView.getEngine().setUserStyleSheetLocation(getClass().getResource("/STYLES/dark-mode.css").toString());
 
             helpAnchorPane.getChildren().add(webView);
             //? Set the AnchorPane constraints to the WebView
