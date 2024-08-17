@@ -211,8 +211,8 @@ public class DashboardController {
 
             //? buttonIcons
 //? settings icon
-            Image settingsImage = new Image(getClass().getResourceAsStream("/IMAGES/settings.gif"));
-            Image settingsClicked = new Image(getClass().getResourceAsStream("/IMAGES/setting.gif"));
+            Image settingsImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/settings.gif")));
+            Image settingsClicked = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/setting.gif")));
 
 // Set the initial image
             settingsIcon.setImage(settingsImage);

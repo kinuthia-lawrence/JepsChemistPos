@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class ThemeManager {
     private static final String LIGHT_MODE = "/STYLES/light-mode.css";
@@ -16,9 +17,9 @@ public class ThemeManager {
     public static void applyTheme(Scene scene, boolean isDarkMode) {
         scene.getStylesheets().clear();
         if (isDarkMode) {
-            scene.getStylesheets().add(ThemeManager.class.getResource(DARK_MODE).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(ThemeManager.class.getResource(DARK_MODE)).toExternalForm());
         } else {
-            scene.getStylesheets().add(ThemeManager.class.getResource(LIGHT_MODE).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(ThemeManager.class.getResource(LIGHT_MODE)).toExternalForm());
         }
     }
 
@@ -27,7 +28,7 @@ public class ThemeManager {
         try {
             Connection connection = databaseConn.getConnection();
             PreparedStatement statement = connection.prepareStatement(updateSQL);
-            statement.setBoolean(1, !isDarkMode);
+            statement.setBoolean(1, isDarkMode);
             statement.executeUpdate();
 
             connection.close();
@@ -45,7 +46,6 @@ public class ThemeManager {
             if (resultSet.next()) {
                 return !resultSet.getBoolean("light_theme");
             }
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

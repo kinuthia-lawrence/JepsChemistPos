@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Stage;
 
-import java.util.List;
 
 public class SettingsController {
 
