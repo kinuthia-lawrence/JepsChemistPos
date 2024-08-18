@@ -15,30 +15,17 @@ public class SettingsController {
 
     @FXML
     public void initialize() {
-        Platform.runLater(() -> {
-            if (themeToggleButton.getScene() != null) {
-                // Register the scene
-                Stage stage = (Stage) themeToggleButton.getScene().getWindow();
-                Scene scene = stage.getScene();
-                SceneManager.addScene(scene);
-
-                // Apply the theme to the current scene
-                boolean isDarkModeTrue = ThemeManager.loadThemeState();
-                ThemeManager.applyTheme(scene, isDarkModeTrue);
-            }
-        });
-
-        // Load the current theme state
-        boolean isDarkMode = ThemeManager.loadThemeState();
-        themeToggleButton.setSelected(isDarkMode);
-        applyThemeToAllScenes(isDarkMode);
-
         // Toggle the theme when the button is clicked
         themeToggleButton.setOnAction(event -> {
-            boolean darkMode = themeToggleButton.isSelected();
-            applyThemeToAllScenes(darkMode);
-            ThemeManager.saveThemeState(darkMode);
-            System.out.println("toggle button clicked, dark mode is " + darkMode);
+            boolean darkMode = ThemeManager.loadThemeState();
+            boolean isDarkMode = !darkMode;
+            applyThemeToAllScenes(isDarkMode);
+            ThemeManager.saveThemeState(isDarkMode);
+            if (darkMode) {
+                themeToggleButton.setText("Dark Mode");
+            } else {
+                themeToggleButton.setText("Light Mode");
+            }
         });
     }
 
@@ -49,7 +36,6 @@ public class SettingsController {
                 Stage stage = (Stage) themeToggleButton.getScene().getWindow();
                 Scene scene = stage.getScene();
                 ThemeManager.applyTheme(scene, isDarkMode);
-                System.out.println("apply theme to all scenes, dark mode is " + isDarkMode);
 
                 // Apply theme to other scenes if they are already created
                 for (Scene otherScene : SceneManager.getAllScenes()) {

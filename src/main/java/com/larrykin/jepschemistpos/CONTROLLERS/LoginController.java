@@ -186,6 +186,11 @@ public class LoginController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Dashboard.fxml"));
             Scene dashboardScene = new Scene(fxmlLoader.load());
+
+            //? apply theme to the dashboard
+            boolean isDarkMode = ThemeManager.loadThemeState();
+            ThemeManager.applyTheme(dashboardScene, isDarkMode);
+
             DashboardController dashboardController = fxmlLoader.getController();
             dashboardController.setUser(user);//? Pass the user object to the dashboard controller
             Stage dashboardStage = new Stage();

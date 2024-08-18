@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public class UtilsData {
     private SimpleObjectProperty<Object> id;
-    private SimpleBooleanProperty lightTheme;
+    private SimpleBooleanProperty dark_theme;
     private SimpleDoubleProperty currentCash;
     private SimpleDoubleProperty currentMpesa;
     private SimpleDoubleProperty currentStock;
@@ -19,7 +19,7 @@ public class UtilsData {
 
     public UtilsData() {
         this.id = new SimpleObjectProperty<>();
-        this.lightTheme = new SimpleBooleanProperty(true);
+        this.dark_theme = new SimpleBooleanProperty(true);
         this.currentCash = new SimpleDoubleProperty(0.0);
         this.currentMpesa = new SimpleDoubleProperty(0.0);
         this.currentStock = new SimpleDoubleProperty(0.0);
@@ -30,9 +30,9 @@ public class UtilsData {
         this.totalMpesaFromSales = new SimpleDoubleProperty(0.0);
     }
 
-    public UtilsData(SimpleObjectProperty<Object> id, SimpleBooleanProperty lightTheme, SimpleDoubleProperty currentCash, SimpleDoubleProperty currentMpesa, SimpleDoubleProperty currentStock, SimpleIntegerProperty servicesNumber, SimpleDoubleProperty totalCashFromSales, SimpleDoubleProperty servicesRevenue, SimpleDoubleProperty totalValueOfAddedStock, SimpleDoubleProperty totalMpesaFromSales) {
+    public UtilsData(SimpleObjectProperty<Object> id, SimpleBooleanProperty dark_theme, SimpleDoubleProperty currentCash, SimpleDoubleProperty currentMpesa, SimpleDoubleProperty currentStock, SimpleIntegerProperty servicesNumber, SimpleDoubleProperty totalCashFromSales, SimpleDoubleProperty servicesRevenue, SimpleDoubleProperty totalValueOfAddedStock, SimpleDoubleProperty totalMpesaFromSales) {
         this.id = id;
-        this.lightTheme = lightTheme;
+        this.dark_theme = dark_theme;
         this.currentCash = currentCash;
         this.currentMpesa = currentMpesa;
         this.currentStock = currentStock;
@@ -55,16 +55,16 @@ public class UtilsData {
         this.id.set(id);
     }
 
-    public boolean isLightTheme() {
-        return lightTheme.get();
+    public boolean getDark_theme() {
+        return dark_theme.get();
     }
 
-    public SimpleBooleanProperty lightThemeProperty() {
-        return lightTheme;
+    public SimpleBooleanProperty dark_themeProperty() {
+        return dark_theme;
     }
 
-    public void setLightTheme(boolean lightTheme) {
-        this.lightTheme.set(lightTheme);
+    public void setDark_theme(boolean dark_theme) {
+        this.dark_theme.set(dark_theme);
     }
 
     public double getCurrentCash() {

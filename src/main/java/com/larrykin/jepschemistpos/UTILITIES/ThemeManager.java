@@ -20,22 +20,19 @@ public class ThemeManager {
         scene.getStylesheets().clear();
         if (isDarkMode) {
             scene.getStylesheets().add(Objects.requireNonNull(ThemeManager.class.getResource(DARK_MODE)).toExternalForm());
-            System.out.println("inside applyTheme if, dark mode is " + isDarkMode);
         } else {
             scene.getStylesheets().add(Objects.requireNonNull(ThemeManager.class.getResource(LIGHT_MODE)).toExternalForm());
-            System.out.println("inside applyTheme else, dark mode is " + isDarkMode);
         }
     }
 
 
     public static void saveThemeState(boolean isDarkMode) {
-        String updateSQL = "UPDATE utils SET light_theme = ?";
+        String updateSQL = "UPDATE utils SET dark_theme = ?";
         try {
             Connection connection = databaseConn.getConnection();
             PreparedStatement statement = connection.prepareStatement(updateSQL);
             statement.setBoolean(1, isDarkMode);
             statement.executeUpdate();
-            System.out.println("inside saveThemeState, dark mode is " + isDarkMode);
 
             connection.close();
         } catch (SQLException e) {
@@ -46,15 +43,14 @@ public class ThemeManager {
     }
 
     public static boolean loadThemeState() {
-        String querySQL = "SELECT light_theme FROM utils";
+        String querySQL = "SELECT dark_theme FROM utils";
         try (Connection connection = databaseConn.getConnection();
              PreparedStatement statement = connection.prepareStatement(querySQL);
              ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
-                return !resultSet.getBoolean("light_theme");
+                return resultSet.getBoolean("dark_theme");
             }
-            System.out.println("inside loadThemeState if, dark mode is " + resultSet.getBoolean("light_theme"));
         } catch (SQLException e) {
             e.printStackTrace();
         }

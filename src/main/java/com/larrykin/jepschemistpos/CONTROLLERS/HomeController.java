@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -226,8 +225,8 @@ public class HomeController {
     private void initializeTable() {
         TableColumn<UtilsData, Object> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        TableColumn<UtilsData, Boolean> themeColumn = new TableColumn<>("Light Theme");
-        themeColumn.setCellValueFactory(new PropertyValueFactory<>("lightTheme"));
+        TableColumn<UtilsData, Boolean> themeColumn = new TableColumn<>("Dark Theme");
+        themeColumn.setCellValueFactory(new PropertyValueFactory<>("dark_theme"));
         TableColumn<UtilsData, Double> currentCashColumn = new TableColumn<>("Current Cash");
         currentCashColumn.setCellValueFactory(new PropertyValueFactory<>("currentCash"));
         TableColumn<UtilsData, Double> currentMpesaColumn = new TableColumn<>("Current Mpesa");
@@ -271,7 +270,7 @@ public class HomeController {
             while (resultSet.next()) {
                 UtilsData data = new UtilsData();
                 data.setId(resultSet.getObject("id"));
-                data.setLightTheme(resultSet.getBoolean("light_theme"));
+                data.setDark_theme(resultSet.getBoolean("dark_theme"));
                 data.setCurrentCash(resultSet.getDouble("current_cash"));
                 data.setCurrentMpesa(resultSet.getDouble("current_mpesa"));
                 data.setCurrentStock(resultSet.getDouble("current_stock_value"));
