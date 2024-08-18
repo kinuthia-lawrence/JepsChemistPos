@@ -6,27 +6,45 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class SettingsController {
+
+    @FXML
+    private ImageView iconTheme;
 
     @FXML
     private ToggleButton themeToggleButton;
 
     @FXML
     public void initialize() {
+
+        setIcon();
         // Toggle the theme when the button is clicked
         themeToggleButton.setOnAction(event -> {
-            boolean darkMode = ThemeManager.loadThemeState();
-            boolean isDarkMode = !darkMode;
+            boolean theme = ThemeManager.loadThemeState();
+            boolean isDarkMode = !theme;
             applyThemeToAllScenes(isDarkMode);
             ThemeManager.saveThemeState(isDarkMode);
-            if (darkMode) {
-                themeToggleButton.setText("Dark Mode");
-            } else {
-                themeToggleButton.setText("Light Mode");
-            }
+            setIcon();
         });
+    }
+
+    private void setIcon() {
+        boolean darkMode = ThemeManager.loadThemeState();
+        if (darkMode) {
+            themeToggleButton.setText("Dark Mode");
+            Image dark_theme = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/dark_theme.png")));
+            iconTheme.setImage(dark_theme);
+        } else {
+            themeToggleButton.setText("Light Mode");
+            Image light_theme = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/light_theme.png")));
+            iconTheme.setImage(light_theme);
+        }
     }
 
     // Apply the theme to all scenes
