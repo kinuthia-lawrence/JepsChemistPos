@@ -16,7 +16,6 @@ public class SettingsController {
     @FXML
     public void initialize() {
         Platform.runLater(() -> {
-            // Ensure the scene is fully initialized before accessing it
             if (themeToggleButton.getScene() != null) {
                 // Register the scene
                 Stage stage = (Stage) themeToggleButton.getScene().getWindow();

@@ -1,5 +1,5 @@
 /* light-mode.css */
-.testAnchorPane {
+#testAnchorPane {
     -fx-background-color: #e6e6e6;
     -fx-text-fill: white;
 }

@@ -11,7 +11,7 @@ import java.util.Objects;
 public class ThemeManager {
     private static final String LIGHT_MODE = "/STYLES/light-mode.css";
     private static final String DARK_MODE = "/STYLES/dark-mode.css";
-//    public static Boolean isDarkMode = false;
+
 
     private static final DatabaseConn databaseConn = new DatabaseConn();
 

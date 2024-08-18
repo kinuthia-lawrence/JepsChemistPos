@@ -1,5 +1,5 @@
 /* dark-mode.css */
-.testAnchorPane {
+#testAnchorPane {
     -fx-background-color: #ff0000;
     -fx-text-fill: white;
 }
