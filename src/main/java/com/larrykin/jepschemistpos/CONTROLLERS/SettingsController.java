@@ -36,7 +36,7 @@ public class SettingsController {
 
     private void setIcon() {
         boolean darkMode = ThemeManager.loadThemeState();
-        if (darkMode) {
+        if (!darkMode) {
             themeToggleButton.setText("Dark Mode");
             Image dark_theme = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/dark_theme.png")));
             iconTheme.setImage(dark_theme);
