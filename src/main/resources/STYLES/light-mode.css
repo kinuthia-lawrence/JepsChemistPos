@@ -30,6 +30,7 @@ body {}
 
 .side-bar-button {
     -fx-alignment: center-left;
+    -fx-font-weight: bold;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
