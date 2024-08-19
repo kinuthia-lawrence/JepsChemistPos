@@ -31,7 +31,7 @@
                   <Button layoutX="293.0" layoutY="75.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Add User" AnchorPane.topAnchor="75.0" />
                </children>
             </AnchorPane>
-            <AnchorPane prefHeight="598.0" prefWidth="537.0" SplitPane.resizableWithParent="false">
+            <AnchorPane fx:id="applicationSettingsPane" prefHeight="598.0" prefWidth="537.0" SplitPane.resizableWithParent="false">
                <children>
                   <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Add a Supplier" />
                </children>
