@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="serviceAnchorPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
+<AnchorPane styleClass="parent" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
    <children>
       <AnchorPane fx:id="tableAnchorPane" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
          <padding>
@@ -18,7 +18,7 @@
          <children>
             <ScrollPane fx:id="scrollPane" prefHeight="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
-      <AnchorPane fx:id="addServiceAnchorPane" layoutY="10.0" minHeight="550.0" prefHeight="603.0" prefWidth="280.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+      <AnchorPane layoutY="10.0" minHeight="550.0" prefHeight="603.0" prefWidth="280.0" styleClass="form" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
          <children>
             <Label layoutX="11.0" layoutY="84.0" text="Service Name">
                <font>
@@ -52,14 +52,14 @@
             <Label layoutX="214.0" layoutY="454.0" text="Ksh." />
             <Label layoutX="214.0" layoutY="495.0" text="Ksh." />
             <TextField fx:id="serviceNameTextField" layoutX="11.0" layoutY="116.0" prefHeight="25.0" prefWidth="265.0" promptText="Blood Pressure" />
-            <Label fx:id="title" layoutX="80.0" layoutY="20.0" text="Record A Service" AnchorPane.topAnchor="20.0">
+            <Label fx:id="title" layoutX="80.0" layoutY="20.0" styleClass="title" text="Record A Service" AnchorPane.topAnchor="20.0">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
          </children>
       </AnchorPane>
-      <Label layoutX="57.0" layoutY="14.0" text="Service History">
+      <Label layoutX="57.0" layoutY="14.0" styleClass="title" text="Service History">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>

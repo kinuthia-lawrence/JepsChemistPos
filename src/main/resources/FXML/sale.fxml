@@ -18,13 +18,13 @@
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
-   <SplitPane dividerPositions="0.29797979797979796" layoutX="100.0" layoutY="70.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <AnchorPane minHeight="500.0" minWidth="450.0">
+   <SplitPane fx:id="salesSplitPane" dividerPositions="0.29797979797979796" layoutX="100.0" layoutY="70.0" styleClass="parent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane minHeight="500.0" minWidth="450.0" styleClass="parent">
          <Button fx:id="stockButton" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Stock" AnchorPane.topAnchor="14.0" />
          <Button fx:id="salesButton" layoutX="140.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Sales" AnchorPane.topAnchor="14.0" />
-         <ScrollPane fx:id="tableScrollPane" layoutX="14.0" layoutY="59.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
-         <HBox layoutX="240.0" layoutY="14.0" prefHeight="30.0" prefWidth="281.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-            <TextField fx:id="searchTextField" prefHeight="36.0" prefWidth="240.0" promptText="Type name to search ..." />
+         <ScrollPane fx:id="tableScrollPane" layoutX="14.0" layoutY="59.0" prefHeight="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+         <HBox fx:id="searchParent" layoutX="240.0" layoutY="14.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="266.0" promptText="Type name to search ..." />
             <Button fx:id="searchButton" mnemonicParsing="false">
                <graphic>
                   <ImageView fx:id="iconSearch" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
@@ -32,11 +32,14 @@
             </Button>
          </HBox>
       </AnchorPane>
-      <AnchorPane maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefWidth="400.0">
-         <ScrollPane layoutX="14.0" layoutY="25.0" maxHeight="300.0" prefHeight="199.0" prefWidth="393.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="5.0">
+      <AnchorPane maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefWidth="400.0" styleClass="form">
+         <ScrollPane layoutX="14.0" layoutY="25.0" maxHeight="300.0" prefHeight="199.0" prefWidth="393.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="25.0">
             <TableView fx:id="cartTableView" prefHeight="197.0" prefWidth="378.0" />
          </ScrollPane>
-         <Label layoutX="24.0" layoutY="6.0" text="Cart List" />
+         <Label layoutX="24.0" layoutY="6.0" text="Cart List" AnchorPane.topAnchor="6.0">
+            <padding>
+               <Insets top="2.0" />
+            </padding></Label>
          <Label layoutX="26.0" layoutY="296.0" text="Discout" AnchorPane.leftAnchor="20.0">
             <font>
                <Font name="System Italic" size="14.0" />

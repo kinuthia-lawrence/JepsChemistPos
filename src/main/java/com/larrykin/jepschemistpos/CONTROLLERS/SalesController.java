@@ -209,7 +209,7 @@ public class SalesController {
     TableView<Products> stockTableView = new TableView<>();
 
     private void initializeUIElements() {
-        Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/help.gif"));
+        Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/search.png"));
         iconSearch.setImage(searchImage);
     }
 
@@ -535,7 +535,7 @@ public class SalesController {
         stockTableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         salesTableView.setMinWidth(Region.USE_COMPUTED_SIZE);
 //        Double height = tableScrollPane.heightProperty().subtract(10).doubleValue();
-        stockTableView.setPrefHeight(520);
+        stockTableView.setPrefHeight(580);
         stockTableView.setMinHeight(Region.USE_COMPUTED_SIZE);
         stockTableView.setMaxHeight(Region.USE_COMPUTED_SIZE);
         stockTableView.setMaxWidth(Region.USE_COMPUTED_SIZE);
@@ -704,7 +704,7 @@ public class SalesController {
 
         salesTableView.getColumns().addAll(salesIDColumn, dateColumn, goodsColumn, expectedAmountColumn, totalAmountColumn, discountAmountColumn, cashColumn, mpesaColumn, creditColumn, descriptionColumn, deleteColumn);
         salesTableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
-        salesTableView.setPrefHeight(520);
+        salesTableView.setPrefHeight(580);
 
         populateSalesTable();
     }

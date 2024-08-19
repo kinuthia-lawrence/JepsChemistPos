@@ -49,6 +49,26 @@ body {}
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 4);
 }
 
+.split-pane {
+     -fx-background-color: #e6e6e6;
+     -fx-background-insets: 0;
+ }
+
+.parent {
+     -fx-background-color: #e6e6e6;
+     -fx-background-insets: 0;
+ }
+ .form {
+        -fx-background-color: #D3D3D3;
+        -fx-background-radius: 15;
+        -fx-border-radius: 15;
+        -fx-background-insets: 5;
+        -fx-padding: 10;
+  }
+  .title  {
+      -fx-font-size: 18;
+      -fx-font-weight: bold;
+  }
 
 /*---------------------------------------------------------------------------------------------------------------------DASHBOARD------------------------------------------------------------------------------------------------------*/
 #borderPane {
@@ -81,10 +101,6 @@ body {}
 }
 
 /*----------------------------------------------------------------------------------------SETTINGS-----------------------------------------------------------------------------------------------------------------------*/
-#applicationSettingsPane {
-    -fx-background-color: #e6e6e6;
-    -fx-background-insets: 0;
-}
 #themeToggleButton {
     -fx-background-color: transparent;
     -fx-border-radius: 15;
@@ -99,47 +115,39 @@ body {}
 }
 /*----------------------------------------------------------------------------------------HOME-----------------------------------------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------------------SALES-----------------------------------------------------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------------------STOCK-----------------------------------------------------------------------------------------------------------------------*/
-#stockAnchorPaneParent{
-    -fx-background-color: #e6e6e6;
-    -fx-background-insets: 0;
-}
-#stockAnchorPane {
-    -fx-background-color: #e6e6e6;
-    -fx-background-insets: 0;
-}
-#addStockAnchorPane {
-    -fx-background-color: #D3D3D3;
-    -fx-background-radius: 15;
+#searchParent {
+    -fx-alignment: center;
     -fx-border-radius: 15;
-    -fx-background-insets: 10;
-    -fx-padding: 10;
+    -fx-background-radius: 15;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 4);
 }
+#searchTextField{
+    -fx-alignment: center-left;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+#searchButton{
+    -fx-alignment: center-left;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+#searchButton:hover{
+      -fx-cursor: hand;
+      -fx-border-radius: 0 15 15 0;
+      -fx-background-radius: 0 15 15 0;
+      -fx-background-color: #f2f2f2;
+      -fx-border-color: transparent;
+      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 4);
+}
+/*----------------------------------------------------------------------------------------STOCK-----------------------------------------------------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------------------SERVICES-----------------------------------------------------------------------------------------------------------------------*/
-#serviceAnchorPane {
-    -fx-background-color: #e6e6e6;
-    -fx-background-insets: 0;
-}
-#addServiceAnchorPane {
-    -fx-background-color: #D3D3D3;
-    -fx-background-radius: 15;
-    -fx-border-radius: 15;
-    -fx-background-insets: 0;
-    -fx-margin:10;
-    -fx-padding: 10;
-}
-#title {
-    -fx-font-size: 18;
-    -fx-font-weight: bold;
-}
 
 /*----------------------------------------------------------------------------------------NOTIFICATION-----------------------------------------------------------------------------------------------------------------------*/
-#notificationAnchorPane {
-    -fx-background-color: #e6e6e6;
-    -fx-background-insets: 0;
-}
 
 /*----------------------------------------------------------------------------------------INVENTORY-----------------------------------------------------------------------------------------------------------------------*/
+
 /*----------------------------------------------------------------------------------------REPORT-----------------------------------------------------------------------------------------------------------------------*/
 
