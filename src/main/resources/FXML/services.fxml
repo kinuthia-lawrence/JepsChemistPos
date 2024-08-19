@@ -16,7 +16,7 @@
             <Insets left="10.0" />
          </padding>
          <children>
-            <ScrollPane fx:id="scrollPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <ScrollPane fx:id="scrollPane" prefHeight="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
       <AnchorPane fx:id="addServiceAnchorPane" layoutY="10.0" minHeight="550.0" prefHeight="603.0" prefWidth="280.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
          <children>

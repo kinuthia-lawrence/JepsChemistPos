@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -292,7 +293,7 @@ public class ServicesController {
         });
 
         historyTableView.getColumns().addAll(serviceIDColumn, dateColumn, serviceNameColumn, descriptionColumn, cashPaymentColumn, mpesaPaymentColumn, editColumn, deleteColumn);
-        historyTableView.setPrefHeight(520);
+        historyTableView.setPrefHeight(600);
 
         scrollPane.setContent(historyTableView);
         populateTable();
