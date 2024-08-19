@@ -9,18 +9,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
+<AnchorPane fx:id="serviceAnchorPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
    <children>
-      <AnchorPane fx:id="tableAnchorPane" layoutX="15.0" layoutY="5.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="40.0">
+      <AnchorPane fx:id="tableAnchorPane" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
          <padding>
             <Insets left="10.0" />
          </padding>
          <children>
             <ScrollPane fx:id="scrollPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
-      <AnchorPane layoutX="846.0" layoutY="26.0" minHeight="550.0" prefHeight="603.0" prefWidth="320.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="addServiceAnchorPane" layoutY="10.0" minHeight="550.0" prefHeight="603.0" prefWidth="280.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
          <children>
-            <Label layoutX="3.0" layoutY="84.0" text="Service Name">
+            <Label layoutX="11.0" layoutY="84.0" text="Service Name">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
@@ -30,7 +30,7 @@
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <TextArea fx:id="descriptionTextArea" layoutX="9.0" layoutY="181.0" prefHeight="221.0" prefWidth="303.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
+            <TextArea fx:id="descriptionTextArea" layoutX="9.0" layoutY="181.0" prefHeight="221.0" prefWidth="265.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
             <Label layoutX="114.0" layoutY="409.0" text="Payment Options">
                <font>
                   <Font name="System Italic" size="13.0" />
@@ -48,27 +48,21 @@
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="129.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Save" />
+            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="94.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Save" />
             <Label layoutX="214.0" layoutY="454.0" text="Ksh." />
             <Label layoutX="214.0" layoutY="495.0" text="Ksh." />
-            <TextField fx:id="serviceNameTextField" layoutY="116.0" prefHeight="25.0" prefWidth="303.0" promptText="Blood Pressure" />
-            <Label layoutX="87.0" layoutY="20.0" text="Record A Service" AnchorPane.topAnchor="20.0">
+            <TextField fx:id="serviceNameTextField" layoutX="11.0" layoutY="116.0" prefHeight="25.0" prefWidth="265.0" promptText="Blood Pressure" />
+            <Label fx:id="title" layoutX="80.0" layoutY="20.0" text="Record A Service" AnchorPane.topAnchor="20.0">
                <font>
-                  <Font name="System Italic" size="18.0" />
+                  <Font name="System Bold" size="18.0" />
                </font>
             </Label>
          </children>
-         <padding>
-            <Insets bottom="2.0" left="2.0" right="10.0" top="2.0" />
-         </padding>
       </AnchorPane>
       <Label layoutX="57.0" layoutY="14.0" text="Service History">
          <font>
-            <Font name="System Italic" size="18.0" />
+            <Font name="System Bold" size="18.0" />
          </font>
       </Label>
    </children>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
 </AnchorPane>
