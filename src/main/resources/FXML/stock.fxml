@@ -24,7 +24,7 @@
                         <TableView fx:id="stockTable" prefHeight="600.0" />
                      </content>
                   </ScrollPane>
-                  <Label layoutX="48.0" layoutY="14.0" text="Available Stock" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
+                  <Label layoutX="48.0" layoutY="14.0" styleClass="title" text="Available Stock" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
                      <font>
                         <Font name="System Bold Italic" size="14.0" />
                      </font>
