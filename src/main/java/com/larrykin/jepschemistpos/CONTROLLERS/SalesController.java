@@ -24,8 +24,7 @@ import java.util.List;
 
 public class SalesController {
 
-    @FXML
-    public Label expectedAmountLabel;
+
     @FXML
     private TableView<Products> cartTableView;
 
@@ -41,12 +40,20 @@ public class SalesController {
     @FXML
     private Spinner<Double> discoutSpinner;
 
+    @FXML
+    public Label expectedAmountLabel;
+
+    @FXML
+    private ImageView iconRefresh;
 
     @FXML
     private ImageView iconSearch;
 
     @FXML
     private Spinner<Double> mpesaSpinner;
+
+    @FXML
+    private Button refreshButton;
 
     @FXML
     private Button salesButton;
@@ -211,6 +218,24 @@ public class SalesController {
     private void initializeUIElements() {
         Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/search.png"));
         iconSearch.setImage(searchImage);
+
+        searchButton.setOnAction(event -> {
+            if (searchTextField.getText().isBlank()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Please enter a product name to search!");
+                alert.showAndWait();
+                return;
+            }
+            populateFilteredStockTable();
+        });
+
+        Image refreshImage = new Image(getClass().getResourceAsStream("/IMAGES/refresh.png"));
+        iconRefresh.setImage(refreshImage);
+
+        refreshButton.setOnAction(event -> {
+            refreshStockTable();
+        });
     }
 
     private void initializeButtons() {
@@ -232,7 +257,7 @@ public class SalesController {
         });
     }
 
-    private  void sellProducts() {
+    private void sellProducts() {
         // Check if cart is empty
         if (cartTableView.getItems().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -329,7 +354,7 @@ public class SalesController {
                         alert1.setContentText("Error in saving the sale");
                         alert1.showAndWait();
                     }
-                }finally {
+                } finally {
                     connection.close();
                 }
             } catch (SQLException e) {
@@ -351,7 +376,7 @@ public class SalesController {
         }
     }
 
-    private  void updateDatabase(TableView<Products> cartTableView) {
+    private void updateDatabase(TableView<Products> cartTableView) {
         new Thread(() -> {
             try {
                 Connection connection = databaseConn.getConnection();
@@ -375,7 +400,7 @@ public class SalesController {
                             System.out.println("Error updating product quantities");
                         }
 
-                    }finally {
+                    } finally {
                         connection.close();
                     }
                 }
@@ -386,7 +411,7 @@ public class SalesController {
         }).start();
     }
 
-    private  void updateCashAndMpesa(Double cash, Double mpesa) {
+    private void updateCashAndMpesa(Double cash, Double mpesa) {
         new Thread(() -> {
             try {
                 Connection connection = databaseConn.getConnection();
@@ -576,6 +601,53 @@ public class SalesController {
             e.printStackTrace();
         }
         return products;
+    }
+
+    //? populate filtered products
+    public void populateFilteredStockTable() {
+        stockTableView.getItems().clear();
+        stockTableView.getItems().addAll(filteredProducts());
+    }
+
+    private List<Products> filteredProducts() {
+        List<Products> products = new ArrayList<>();
+
+        String searchName = searchTextField.getText();
+
+        try {
+            Connection connection = databaseConn.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM  products  WHERE name LIKE  '%" + searchName + "%'");
+            while (resultSet.next()) {
+                Products product = new Products();
+                product.setProductID(resultSet.getObject("id"));
+                product.setProductName(resultSet.getString("name"));
+                product.setProductCategory(resultSet.getString("category"));
+                product.setProductQuantity(resultSet.getDouble("quantity"));
+                product.setSellingPrice(resultSet.getDouble("selling_price"));
+                product.setExpiryDate(resultSet.getString("expiry_date"));
+                product.setProductDescription(resultSet.getString("description"));
+                products.add(product);
+            }
+
+            connection.close();
+        } catch (Exception e) {
+            System.out.println("Error fetching filtered products" + e.getMessage());
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error filtering products");
+            alert.setContentText("Error :" + e.getMessage());
+            alert.showAndWait();
+        }
+
+        return products;
+    }
+
+    //? refreshTableView
+    public void refreshStockTable() {
+        searchTextField.setText("");
+        populateStockTable();
     }
 
     private void addToCart(Products product) {
