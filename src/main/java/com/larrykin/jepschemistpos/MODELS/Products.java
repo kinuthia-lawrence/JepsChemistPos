@@ -9,6 +9,7 @@ public class Products {
     private SimpleStringProperty productName;
     private SimpleStringProperty productCategory;
     private SimpleDoubleProperty productQuantity;
+    private SimpleDoubleProperty minProductQuantity;
     private SimpleDoubleProperty buyingPrice;
     private SimpleDoubleProperty sellingPrice;
     private SimpleStringProperty supplierName;
@@ -20,11 +21,12 @@ public class Products {
     private SimpleDoubleProperty sellingQuantity;
     private SimpleDoubleProperty total;
 
-    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
+    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
         this.productID = productID;
         this.productName = productName;
         this.productCategory = productCategory;
         this.productQuantity = productQuantity;
+        this.minProductQuantity = minProductQuantity;
         this.buyingPrice = buyingPrice;
         this.sellingPrice = sellingPrice;
         this.supplierName = supplierName;
@@ -40,6 +42,7 @@ public class Products {
         this.productName = new SimpleStringProperty("");
         this.productCategory = new SimpleStringProperty("");
         this.productQuantity = new SimpleDoubleProperty(0.0);
+        this.minProductQuantity = new SimpleDoubleProperty(0.0);
         this.buyingPrice = new SimpleDoubleProperty(0.0);
         this.sellingPrice = new SimpleDoubleProperty(0.0);
         this.supplierName = new SimpleStringProperty("");
@@ -96,6 +99,18 @@ public class Products {
 
     public void setProductQuantity(double productQuantity) {
         this.productQuantity.set(productQuantity);
+    }
+
+    public double getMinProductQuantity() {
+        return minProductQuantity.get();
+    }
+
+    public SimpleDoubleProperty minProductQuantityProperty() {
+        return minProductQuantity;
+    }
+
+    public void setMinProductQuantity(double minProductQuantity) {
+        this.minProductQuantity.set(minProductQuantity);
     }
 
     public double getBuyingPrice() {
@@ -173,9 +188,11 @@ public class Products {
     public double getSellingQuantity() {
         return sellingQuantity.get();
     }
+
     public SimpleDoubleProperty sellingQuantityProperty() {
         return sellingQuantity;
     }
+
     public void setSellingQuantity(double sellingQuantity) {
         this.sellingQuantity.set(sellingQuantity);
     }
@@ -183,9 +200,11 @@ public class Products {
     public double getTotal() {
         return total.get();
     }
+
     public SimpleDoubleProperty totalProperty() {
         return total;
     }
+
     public void setTotal(double total) {
         this.total.set(total);
     }

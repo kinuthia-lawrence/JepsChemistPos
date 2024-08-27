@@ -35,6 +35,9 @@ public class StockController {
     private DatePicker expiryDatePicker;
 
     @FXML
+    private Spinner<Double> minQuantitySpinner;
+
+    @FXML
     private ComboBox<String> nameComboBox;
 
     @FXML
@@ -91,6 +94,8 @@ public class StockController {
         quantitySpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         quantitySpinner.setValueFactory(valueFactory2);
+        SpinnerValueFactory<Double> valueFactory3 = new SpinnerValueFactory.DoubleSpinnerValueFactory(1.0, 100000.0, 1.0);
+        minQuantitySpinner.setValueFactory(valueFactory3);
 
         try {
 
@@ -175,6 +180,10 @@ public class StockController {
         TableColumn<Products, Double> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
         quantityColumn.setPrefWidth(75);
+        //Minimum Quantity
+        TableColumn<Products, Double> minQuantityProductColumn = new TableColumn<>("Min Qty.");
+        minQuantityProductColumn.setCellValueFactory(new PropertyValueFactory<>("minProductQuantity"));
+        minQuantityProductColumn.setPrefWidth(75);
         //Buying Price
         TableColumn<Products, Double> buyingPriceColumn = new TableColumn<>("B.Price");
         buyingPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
@@ -250,7 +259,7 @@ public class StockController {
             }
         });
 
-        stockTable.getColumns().addAll(serviceIDColumn, productNameColumn, categoryColumn, quantityColumn, buyingPriceColumn, sellingPriceColumn, supplierNameColumn, dateAddedColumn, expiryDateColumn, descriptionColumn, editColumn, deleteColumn);
+        stockTable.getColumns().addAll(serviceIDColumn, productNameColumn, categoryColumn, quantityColumn, minQuantityProductColumn, buyingPriceColumn, sellingPriceColumn, supplierNameColumn, dateAddedColumn, expiryDateColumn, descriptionColumn, editColumn, deleteColumn);
 
         populateTable();
     }
@@ -276,6 +285,7 @@ public class StockController {
                 product.setProductName(resultSet.getString("name"));
                 product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
+                product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));
                 product.setSellingPrice(resultSet.getDouble("selling_price"));
                 product.setSupplierName(resultSet.getString("supplier_name"));
@@ -346,6 +356,7 @@ public class StockController {
             String nameValue = nameComboBox.getValue();
             String categoryValue = categoryCombobox.getValue();
             Double quantityValue = quantitySpinner.getValue();
+            Double minQuantityValue = minQuantitySpinner.getValue();
             Double buyingPriceValue = buyingPriceSpinner.getValue();
             Double sellingPriceValue = sellingPriceSpinner.getValue();
             String supplierNameValue = supplierComboBox.getValue();
@@ -355,12 +366,13 @@ public class StockController {
             if (nameValue != null && !nameValue.isBlank() &&
                     categoryValue != null && !categoryValue.isBlank() &&
                     quantityValue != null && !quantityValue.isNaN() &&
+                    minQuantityValue !=null && !minQuantityValue.isNaN() &&
                     buyingPriceValue != null && !buyingPriceValue.isNaN() &&
                     sellingPriceValue != null && !sellingPriceValue.isNaN() &&
                     supplierNameValue != null && !supplierNameValue.isBlank() &&
                     expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                String sql = "INSERT INTO products (name, category, quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?, ?)";
+                String sql = "INSERT INTO products (name, category, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
                 try {
                     Connection connection = conn.getConnection();
                     PreparedStatement statement = connection.prepareStatement(sql);
@@ -368,11 +380,12 @@ public class StockController {
                     statement.setString(1, nameValue);
                     statement.setString(2, categoryValue);
                     statement.setDouble(3, quantityValue);
-                    statement.setDouble(4, buyingPriceValue);
-                    statement.setDouble(5, sellingPriceValue);
-                    statement.setString(6, supplierNameValue);
-                    statement.setString(7, expiryDateValue.toString());
-                    statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
+                    statement.setDouble(4, minQuantityValue);
+                    statement.setDouble(5, buyingPriceValue);
+                    statement.setDouble(6, sellingPriceValue);
+                    statement.setString(7, supplierNameValue);
+                    statement.setString(8, expiryDateValue.toString());
+                    statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
 
                     int rowAffected = statement.executeUpdate();
                     if (rowAffected > 0) {
@@ -394,6 +407,7 @@ public class StockController {
                         nameComboBox.setValue(null);
                         categoryCombobox.setValue(null);
                         quantitySpinner.getValueFactory().setValue(0.0);
+                        minQuantitySpinner.getValueFactory().setValue(0.0);
                         buyingPriceSpinner.getValueFactory().setValue(0.0);
                         sellingPriceSpinner.getValueFactory().setValue(0.0);
                         supplierComboBox.setValue(null);
@@ -461,6 +475,7 @@ public class StockController {
                 String oldName = product.getProductName();
                 String oldCategory = product.getProductCategory();
                 Double oldQuantity = product.getProductQuantity();
+                Double oldMinQuantity = product.getMinProductQuantity();
                 Double oldBuyingPrice = product.getBuyingPrice();
                 Double oldSellingPrice = product.getSellingPrice();
                 String oldSupplierName = product.getSupplierName();
@@ -471,6 +486,7 @@ public class StockController {
                 nameComboBox.setValue(oldName);
                 categoryCombobox.setValue(oldCategory);
                 quantitySpinner.getValueFactory().setValue(oldQuantity);
+                minQuantitySpinner.getValueFactory().setValue(oldMinQuantity);
                 buyingPriceSpinner.getValueFactory().setValue(oldBuyingPrice);
                 sellingPriceSpinner.getValueFactory().setValue(oldSellingPrice);
                 supplierComboBox.setValue(oldSupplierName);
@@ -483,6 +499,7 @@ public class StockController {
                     String nameValue = nameComboBox.getValue();
                     String categoryValue = categoryCombobox.getValue();
                     Double quantityValue = quantitySpinner.getValue();
+                    Double minQuantityValue = minQuantitySpinner.getValue();
                     Double buyingPriceValue = buyingPriceSpinner.getValue();
                     Double sellingPriceValue = sellingPriceSpinner.getValue();
                     String supplierNameValue = supplierComboBox.getValue();
@@ -492,12 +509,13 @@ public class StockController {
                     if (nameValue != null && !nameValue.isBlank() &&
                             categoryValue != null && !categoryValue.isBlank() &&
                             quantityValue != null && !quantityValue.isNaN() &&
+                            minQuantityValue !=null && !minQuantityValue.isNaN() &&
                             buyingPriceValue != null && !buyingPriceValue.isNaN() &&
                             sellingPriceValue != null && !sellingPriceValue.isNaN() &&
                             supplierNameValue != null && !supplierNameValue.isBlank() &&
                             expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                        String sql = "UPDATE products SET name = ?, category = ?, quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
+                        String sql = "UPDATE products SET name = ?, category = ?, quantity = ?, min_quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
                         try {
                             Connection connection = conn.getConnection();
                             PreparedStatement statement = connection.prepareStatement(sql);
@@ -505,12 +523,13 @@ public class StockController {
                             statement.setString(1, nameValue);
                             statement.setString(2, categoryValue);
                             statement.setDouble(3, quantityValue);
-                            statement.setDouble(4, buyingPriceValue);
-                            statement.setDouble(5, sellingPriceValue);
-                            statement.setString(6, supplierNameValue);
-                            statement.setString(7, expiryDateValue.toString());
-                            statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
-                            statement.setObject(9, product.getProductID());
+                            statement.setDouble(4, minQuantityValue);
+                            statement.setDouble(5, buyingPriceValue);
+                            statement.setDouble(6, sellingPriceValue);
+                            statement.setString(7, supplierNameValue);
+                            statement.setString(8, expiryDateValue.toString());
+                            statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
+                            statement.setObject(10, product.getProductID());
 
                             int rowAffected = statement.executeUpdate();
                             if (rowAffected > 0) {
@@ -528,6 +547,7 @@ public class StockController {
                                 nameComboBox.setValue(null);
                                 categoryCombobox.setValue(null);
                                 quantitySpinner.getValueFactory().setValue(0.0);
+                                minQuantitySpinner.getValueFactory().setValue(0.0);
                                 buyingPriceSpinner.getValueFactory().setValue(0.0);
                                 sellingPriceSpinner.getValueFactory().setValue(0.0);
                                 supplierComboBox.setValue(null);

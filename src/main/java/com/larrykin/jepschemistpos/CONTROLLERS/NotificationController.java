@@ -323,17 +323,21 @@ public class NotificationController {
         outOfStockProductCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
         outOfStockProductCategoryColumn.setPrefWidth(200);
         //product quantity column
-        TableColumn<Products, Double> outOfStockProductQuantityColumn = new TableColumn<>("Product Quantity");
+        TableColumn<Products, Double> outOfStockProductQuantityColumn = new TableColumn<>("Product Qty.");
         outOfStockProductQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
-        outOfStockProductQuantityColumn.setPrefWidth(200);
+        outOfStockProductQuantityColumn.setPrefWidth(125);
+        //minimum product quantity column
+        TableColumn<Products, Double> outOfStockMinProductQuantityColumn = new TableColumn<>("Minimum Qty.");
+        outOfStockMinProductQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("minProductQuantity"));
+        outOfStockMinProductQuantityColumn.setPrefWidth(125);
         //product price column
         TableColumn<Products, Double> outOfStockProductPriceColumn = new TableColumn<>("Buying Price");
         outOfStockProductPriceColumn.setCellValueFactory(new PropertyValueFactory<>("buyingPrice"));
-        outOfStockProductPriceColumn.setPrefWidth(150);
+        outOfStockProductPriceColumn.setPrefWidth(125);
         //supplier column
         TableColumn<Products, String> outOfStockSupplierColumn = new TableColumn<>("Supplier Name");
         outOfStockSupplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
-        outOfStockSupplierColumn.setPrefWidth(200);
+        outOfStockSupplierColumn.setPrefWidth(175);
         //delete column
         TableColumn<Products, String> deleteColumn = new TableColumn<>("Delete Product");
         deleteColumn.setPrefWidth(100);  // Set a fixed width
@@ -360,7 +364,7 @@ public class NotificationController {
             }
         });
 
-        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductCategoryColumn, outOfStockProductQuantityColumn, outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
+        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductCategoryColumn, outOfStockProductQuantityColumn, outOfStockMinProductQuantityColumn,  outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
 
         checkOutOfStock();
     }
@@ -371,7 +375,7 @@ public class NotificationController {
 
         try {
             Connection connection = databaseConn.getConnection();
-            String query = "SELECT * FROM products WHERE quantity <= 2";
+            String query = "SELECT * FROM products WHERE quantity <= min_quantity";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
@@ -380,6 +384,7 @@ public class NotificationController {
                 product.setProductName(resultSet.getString("name"));
                 product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
+                product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));
                 product.setSupplierName(resultSet.getString("supplier_name"));
                 products.add(product);
