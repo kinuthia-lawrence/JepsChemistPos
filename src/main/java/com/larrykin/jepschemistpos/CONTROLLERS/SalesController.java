@@ -334,9 +334,9 @@ public class SalesController {
                         alert1.showAndWait();
 
                         connection.close();
-                        populateSalesTable();
                         updateDatabase(cartTableView);
                         updateCashAndMpesa(cash, mpesa);
+                        populateSalesTable();
 
                         // Clear carts, label, spinners, and textArea
                         cartTableView.getItems().clear();
@@ -384,6 +384,8 @@ public class SalesController {
                     Object productID = product.getProductID();
                     double sellingQuantity = product.getSellingQuantity();
                     double newQuantity = product.getProductQuantity() - sellingQuantity;
+                    System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
+                    //TODO : fix adding product erros
 
                     //? Update the quantity of the product in the database
                     String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
