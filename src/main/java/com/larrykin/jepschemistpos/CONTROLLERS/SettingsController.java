@@ -30,10 +30,58 @@ import java.util.concurrent.TimeUnit;
 
 public class SettingsController {
     @FXML
+    private Button activateAddUser;
+
+    @FXML
+    private Button activateChangePassword;
+
+    @FXML
     private Button addSupplierButton;
 
     @FXML
     private AnchorPane addSupplierPane;
+
+    @FXML
+    private Button addUserButton;
+
+    @FXML
+    private PasswordField auConfirmPasswordField;
+
+    @FXML
+    private TextField auEmailAccountToCreate;
+
+    @FXML
+    private PasswordField auPasswordField;
+
+    @FXML
+    private TextField auSuperAdminEmail;
+
+    @FXML
+    private PasswordField auSuperAdminPassword;
+
+    @FXML
+    private TextField auUsernameForTheAccount;
+
+    @FXML
+    private Button changePasswordButton;
+
+    @FXML
+    private PasswordField cpConfirmPasswordField;
+
+    @FXML
+    private TextField cpEmailAccountToChangePassword;
+
+    @FXML
+    private PasswordField cpNewPasswordField;
+
+    @FXML
+    private PasswordField cpOldPassword;
+
+    @FXML
+    private TextField cpSuperAdminEmail;
+
+    @FXML
+    private PasswordField cpSuperAdminPassword;
 
     @FXML
     private ImageView iconTheme;
@@ -59,8 +107,12 @@ public class SettingsController {
     @FXML
     public void initialize() {
         initializeTable();
-
+        initializeButtons();
         setIcon();
+    }
+
+    //?initialize buttons
+    private void initializeButtons() {
         // Toggle the theme when the button is clicked
         themeToggleButton.setOnAction(event -> {
             boolean theme = ThemeManager.loadThemeState();
@@ -69,9 +121,291 @@ public class SettingsController {
             ThemeManager.saveThemeState(isDarkMode);
             setIcon();
         });
+
+        //activate change password
+        activateChangePassword.setOnAction(event -> {
+            cpSuperAdminEmail.setDisable(false);
+            cpSuperAdminPassword.setDisable(false);
+            cpEmailAccountToChangePassword.setDisable(false);
+            cpOldPassword.setDisable(false);
+            cpNewPasswordField.setDisable(false);
+            cpConfirmPasswordField.setDisable(false);
+            changePasswordButton.setDisable(false);
+        });
+
+        //activate add user
+        activateAddUser.setOnAction(event -> {
+            auSuperAdminEmail.setDisable(false);
+            auSuperAdminPassword.setDisable(false);
+            auEmailAccountToCreate.setDisable(false);
+            auUsernameForTheAccount.setDisable(false);
+            auPasswordField.setDisable(false);
+            auConfirmPasswordField.setDisable(false);
+            addUserButton.setDisable(false);
+        });
+        //add supplier
+        addSupplierButton.setOnAction(event -> {
+            addSupplier();
+        });
+        //change password
+        changePasswordButton.setOnAction(event -> {
+            changePassword();
+        });
+        //add user
+        addUserButton.setOnAction(event -> {
+            addUser();
+        });
     }
 
-    //columns for supplierName, supplierContactInformation, editButton and DeleteButton
+    //?Add a user
+    private void addUser() {
+        //check if the fields are not empty
+        String superAdminEmail = auSuperAdminEmail.getText();
+        String superAdminPassword = auSuperAdminPassword.getText();
+        String emailAccountToCreate = auEmailAccountToCreate.getText();
+        String usernameForTheAccount = auUsernameForTheAccount.getText();
+        String password = auPasswordField.getText();
+        String confirmPassword = auConfirmPasswordField.getText();
+
+        //check if the fields are not empty
+        if (!superAdminEmail.isBlank() && !superAdminPassword.isBlank() && !emailAccountToCreate.isBlank() && !usernameForTheAccount.isBlank() && !password.isBlank() && !confirmPassword.isBlank()) {
+            //check if the new password and confirm password are the same
+            if (password.equals(confirmPassword)) {
+                //check if the super admin email and password are correct
+                try{
+                    //check if the super admin email, username = admin and password are correct
+                    Connection conn = databaseConn.getConnection();
+                    String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                    preparedStatement.setString(1, superAdminEmail);
+                    preparedStatement.setString(2, superAdminPassword);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    conn.close();
+                    if (resultSet.next()) {
+                        //check if the email account to create does not exist
+                        Connection conn2 = databaseConn.getConnection();
+                        String sql2 = "SELECT * FROM users WHERE email = ?";
+                        PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
+                        preparedStatement2.setString(1, emailAccountToCreate);
+                        ResultSet resultSet2 = preparedStatement2.executeQuery();
+                        conn2.close();
+                        if (!resultSet2.next()) {
+                            //add the user
+                            addUserToDatabase(emailAccountToCreate, usernameForTheAccount, password);
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error Adding User");
+                            alert.setHeaderText("Email Account to create already exists");
+                            alert.showAndWait();
+                        }
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error Adding User");
+                        alert.setHeaderText("Super Admin Email or Password is incorrect");
+                        alert.showAndWait();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error(sql): " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Adding User");
+                alert.setHeaderText("Password and Confirm Password do not match");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Adding User");
+            alert.setHeaderText("Please check the fields and try again");
+            alert.showAndWait();
+        }
+    }
+
+    private void addUserToDatabase(String emailAccountToCreate, String usernameForTheAccount, String password) {
+        try (Connection conn = databaseConn.getConnection()) {
+            String sql = "INSERT INTO users(email, username, password) VALUES(?, ?, ?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, emailAccountToCreate);
+            preparedStatement.setString(2, usernameForTheAccount);
+            preparedStatement.setString(3, password);
+            int output = preparedStatement.executeUpdate();
+            if (output > 0) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("User Added");
+                alert.setHeaderText("User Added Successfully");
+                TimeUnit.SECONDS.sleep(2);
+                alert.showAndWait();
+                auSuperAdminEmail.clear();
+                auSuperAdminPassword.clear();
+                auEmailAccountToCreate.clear();
+                auUsernameForTheAccount.clear();
+                auPasswordField.clear();
+                auConfirmPasswordField.clear();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error(sql) Adding User");
+                alert.setHeaderText("Error Adding User");
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            System.out.println("Error(sql): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    //?Change password
+    private void changePassword() {
+        //check if the fields are not empty
+        String superAdminEmail = cpSuperAdminEmail.getText();
+        String superAdminPassword = cpSuperAdminPassword.getText();
+        String emailAccountToChangePassword = cpEmailAccountToChangePassword.getText();
+        String oldPassword = cpOldPassword.getText();
+        String newPassword = cpNewPasswordField.getText();
+        String confirmPassword = cpConfirmPasswordField.getText();
+        if (!superAdminEmail.isBlank() && !superAdminPassword.isBlank() && !emailAccountToChangePassword.isBlank() && !oldPassword.isBlank() && !newPassword.isBlank() && !confirmPassword.isBlank()) {
+            //check if the new password and confirm password are the same
+            if (newPassword.equals(confirmPassword)) {
+                //check if the super admin email and password are correct
+                try {
+                    //check if the super admin email, username = admin and password are correct
+                    Connection conn = databaseConn.getConnection();
+                    String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                    preparedStatement.setString(1, superAdminEmail);
+                    preparedStatement.setString(2, superAdminPassword);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    conn.close();
+                    if (resultSet.next()) {
+                        //check if the email account to change password exists
+                        Connection conn2 = databaseConn.getConnection();
+                        String sql2 = "SELECT * FROM users WHERE email = ?";
+                        PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
+                        preparedStatement2.setString(1, emailAccountToChangePassword);
+                        ResultSet resultSet2 = preparedStatement2.executeQuery();
+                        conn2.close();
+                        if (resultSet2.next()) {
+                            //check if the old password is correct
+                            Connection conn3 = databaseConn.getConnection();
+                            String sql3 = "SELECT * FROM users WHERE email = ? AND password = ?";
+                            PreparedStatement preparedStatement3 = conn.prepareStatement(sql3);
+                            preparedStatement3.setString(1, emailAccountToChangePassword);
+                            preparedStatement3.setString(2, oldPassword);
+                            ResultSet resultSet3 = preparedStatement3.executeQuery();
+                            conn3.close();
+                            if (resultSet3.next()) {
+                                //change the password
+                                changePasswordInDatabase(newPassword, emailAccountToChangePassword);
+                            } else {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Error Changing Password");
+                                alert.setHeaderText("Old Password is incorrect");
+                                alert.showAndWait();
+                            }
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error Changing Password");
+                            alert.setHeaderText("Email Account to change password does not exist");
+                            alert.showAndWait();
+                        }
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error Changing Password");
+                        alert.setHeaderText("Super Admin Email or Password is incorrect");
+                        alert.showAndWait();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error(sql): " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Changing Password");
+                alert.setHeaderText("New Password and Confirm Password do not match");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Changing Password");
+            alert.setHeaderText("Please check the fields and try again");
+            alert.showAndWait();
+        }
+    }
+
+    private void changePasswordInDatabase(String newPassword, String emailAccountToChangePassword) {
+        try (Connection conn = databaseConn.getConnection()) {
+            String sql = "UPDATE users SET password = ? WHERE email = ?";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setString(2, emailAccountToChangePassword);
+            int output = preparedStatement.executeUpdate();
+
+            if (output > 0) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Password Changed");
+                alert.setHeaderText("Password Changed Successfully");
+                TimeUnit.SECONDS.sleep(2);
+                alert.showAndWait();
+                cpSuperAdminEmail.clear();
+                cpSuperAdminPassword.clear();
+                cpEmailAccountToChangePassword.clear();
+                cpOldPassword.clear();
+                cpNewPasswordField.clear();
+                cpConfirmPasswordField.clear();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error(sql) Changing Password");
+                alert.setHeaderText("Error Changing Password");
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            System.out.println("Error(sql): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    //?Add a supplier
+    private void addSupplier() {
+        String supplierNameText = supplierName.getText();
+        String supplierContactInformationText = supplierContactInformation.getText();
+        if (!supplierNameText.isBlank() && !supplierContactInformationText.isBlank()) {
+            try (Connection conn = databaseConn.getConnection()) {
+                String sql = "INSERT INTO suppliers(name, contact_information) VALUES(?, ?)";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setString(1, supplierNameText);
+                preparedStatement.setString(2, supplierContactInformationText);
+                int output = preparedStatement.executeUpdate();
+                conn.close();
+                if (output > 0) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Supplier Added");
+                    alert.setHeaderText("Supplier Added Successfully");
+                    TimeUnit.SECONDS.sleep(2);
+                    alert.showAndWait();
+                    populateSuppliersTable();
+                    supplierName.clear();
+                    supplierContactInformation.clear();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error(sql) Adding Supplier");
+                    alert.setHeaderText("Error Adding Supplier");
+                    alert.showAndWait();
+                }
+            } catch (Exception e) {
+                System.out.println("Error(sql): " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Adding Supplier");
+            alert.setHeaderText("Please check the fields and try again");
+            alert.showAndWait();
+        }
+    }
+
+    //?columns for supplierName, supplierContactInformation, editButton and DeleteButton
     private void initializeTable() {
         //supplierName
         TableColumn<Supplier, String> supplierNameColumn = new TableColumn<>("Supplier Name");
@@ -219,7 +553,7 @@ public class SettingsController {
 
             preparedStatement.setObject(1, supplier.getSupplierName());
             int rowAffected = preparedStatement.executeUpdate();
-            if(rowAffected > 0){
+            if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText("Supplier deleted successfully");
@@ -245,14 +579,14 @@ public class SettingsController {
         }
     }
 
-    // Populate the suppliers table
+    //? Populate the suppliers table
     private void populateSuppliersTable() {
         ObservableList<Supplier> suppliers = FXCollections.observableArrayList();
         suppliers.addAll(getSuppliers());
         suppliersTable.setItems(suppliers);
     }
 
-    //get supplier from the database
+    //?get supplier from the database
     private List<Supplier> getSuppliers() {
         List<Supplier> supplierList = new ArrayList<>();
 
@@ -274,6 +608,7 @@ public class SettingsController {
         return supplierList;
     }
 
+    //?set the icon
     private void setIcon() {
         boolean darkMode = ThemeManager.loadThemeState();
         if (!darkMode) {
@@ -287,7 +622,7 @@ public class SettingsController {
         }
     }
 
-    // Apply the theme to all scenes
+    //? Apply the theme to all scenes
     private void applyThemeToAllScenes(boolean isDarkMode) {
         Platform.runLater(() -> {
             if (themeToggleButton.getScene() != null) {
