@@ -21,6 +21,7 @@ import org.sqlite.SQLiteErrorCode;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SalesController {
 
@@ -380,50 +381,51 @@ public class SalesController {
         }
     }
 
-    private void updateDatabase(TableView<Products> cartTableView) {
-        new Thread(() -> {
-            try {
-                //TODO : fix adding product errors( its just updating the first element  to be added to the cart)
-                for (Products product : cartTableView.getItems()) {
-
-                    try {
-                        Object productID = product.getProductID();
-                        double sellingQuantity = product.getSellingQuantity();
-                        double newQuantity = product.getProductQuantity() - sellingQuantity;
-                        System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
 
 
-                        //? Update the quantity of the product in the database
-                        String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
-                        try (
-                                Connection connection = databaseConn.getConnection();
-                                PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)
-                        ) {
-                            preparedStatement.setDouble(1, newQuantity);
-                            preparedStatement.setObject(2, productID);
-                            int rowAffected = preparedStatement.executeUpdate();
+private void updateDatabase(TableView<Products> cartTableView) {
+    new Thread(() -> {
+        try {
+            // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
+            CopyOnWriteArrayList<Products> productsList = new CopyOnWriteArrayList<>(cartTableView.getItems());
 
-                            if (rowAffected > 0) {
-                                connection.close();
-                                populateStockTable();
-                                updateCurrentStockWorth();
-                            } else {
-                                System.out.println("Error,Product quantities not updated");
-                                connection.close();
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Error updating product quantities : child" + e.getMessage());
+            for (Products product : productsList) {
+                try {
+                    Object productID = product.getProductID();
+                    double sellingQuantity = product.getSellingQuantity();
+                    double newQuantity = product.getProductQuantity() - sellingQuantity;
+                    System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
+
+                    // Update the quantity of the product in the database
+                    String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+                    try (
+                        Connection connection = databaseConn.getConnection();
+                        PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)
+                    ) {
+                        preparedStatement.setDouble(1, newQuantity);
+                        preparedStatement.setObject(2, productID);
+                        int rowAffected = preparedStatement.executeUpdate();
+
+                        if (rowAffected > 0) {
+                            ;
+                        } else {
+                            System.out.println("Error, Product ID: " + productID + " not updated.");
                         }
                     } catch (Exception e) {
-                        System.out.println("while updating quantities failed: " + e.getMessage());
+                        System.out.println("Error updating product quantities: " + e.getMessage());
                     }
+                } catch (Exception e) {
+                    System.out.println("Error processing product: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                System.out.println("Error updating product quantities: parent " + e.getMessage());
-                e.printStackTrace();
             }
-        }).start();
-    }
+            populateStockTable();
+            updateCurrentStockWorth();
+        } catch (Exception e) {
+            System.out.println("Error updating product quantities: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }).start();
+}
 
     private void updateCashAndMpesa(Double cash, Double mpesa) {
         new Thread(() -> {
