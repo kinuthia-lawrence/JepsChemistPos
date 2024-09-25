@@ -9,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
@@ -304,6 +303,7 @@ public class StockController {
                 products.add(product);
             }
 
+            connection.close();
         } catch (Exception e) {
             System.out.println("Error fetching product: " + e.getMessage());
             e.printStackTrace();

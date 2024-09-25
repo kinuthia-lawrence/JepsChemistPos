@@ -220,6 +220,7 @@ public class SalesController {
     TableView<Sales> salesTableView = new TableView<>();
     TableView<Products> stockTableView = new TableView<>();
 
+    //? Initialize UI elements
     private void initializeUIElements() {
         Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/search.png"));
         iconSearch.setImage(searchImage);
@@ -243,6 +244,7 @@ public class SalesController {
         });
     }
 
+    //? Initialize buttons
     private void initializeButtons() {
         stockButton.setOnAction(event -> {
             // Clear the content of the tableScrollPane
@@ -262,6 +264,7 @@ public class SalesController {
         });
     }
 
+    //? Sell products
     private void sellProducts() {
         // Check if cart is empty
         if (cartTableView.getItems().isEmpty()) {
@@ -382,51 +385,51 @@ public class SalesController {
     }
 
 
+    //? Update database after selling
+    private void updateDatabase(TableView<Products> cartTableView) {
+        new Thread(() -> {
+            try {
+                // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
+                CopyOnWriteArrayList<Products> productsList = new CopyOnWriteArrayList<>(cartTableView.getItems());
 
-private void updateDatabase(TableView<Products> cartTableView) {
-    new Thread(() -> {
-        try {
-            // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
-            CopyOnWriteArrayList<Products> productsList = new CopyOnWriteArrayList<>(cartTableView.getItems());
+                for (Products product : productsList) {
+                    try {
+                        Object productID = product.getProductID();
+                        double sellingQuantity = product.getSellingQuantity();
+                        double newQuantity = product.getProductQuantity() - sellingQuantity;
 
-            for (Products product : productsList) {
-                try {
-                    Object productID = product.getProductID();
-                    double sellingQuantity = product.getSellingQuantity();
-                    double newQuantity = product.getProductQuantity() - sellingQuantity;
-                    System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
+                        // Update the quantity of the product in the database
+                        String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+                        try (
+                                Connection connection = databaseConn.getConnection();
+                                PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)
+                        ) {
+                            preparedStatement.setDouble(1, newQuantity);
+                            preparedStatement.setObject(2, productID);
+                            int rowAffected = preparedStatement.executeUpdate();
 
-                    // Update the quantity of the product in the database
-                    String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
-                    try (
-                        Connection connection = databaseConn.getConnection();
-                        PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)
-                    ) {
-                        preparedStatement.setDouble(1, newQuantity);
-                        preparedStatement.setObject(2, productID);
-                        int rowAffected = preparedStatement.executeUpdate();
-
-                        if (rowAffected > 0) {
-                            ;
-                        } else {
-                            System.out.println("Error, Product ID: " + productID + " not updated.");
+                            if (rowAffected > 0) {
+                                ;
+                            } else {
+                                System.out.println("Error, Product ID: " + productID + " not updated.");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Error updating product quantities: " + e.getMessage());
                         }
                     } catch (Exception e) {
-                        System.out.println("Error updating product quantities: " + e.getMessage());
+                        System.out.println("Error processing product: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.out.println("Error processing product: " + e.getMessage());
                 }
+                populateStockTable();
+                updateCurrentStockWorth();
+            } catch (Exception e) {
+                System.out.println("Error updating product quantities: " + e.getMessage());
+                e.printStackTrace();
             }
-            populateStockTable();
-            updateCurrentStockWorth();
-        } catch (Exception e) {
-            System.out.println("Error updating product quantities: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }).start();
-}
+        }).start();
+    }
 
+    //? Update cash and mpesa
     private void updateCashAndMpesa(Double cash, Double mpesa) {
         new Thread(() -> {
             try {
@@ -473,6 +476,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         }).start();
     }
 
+    //? Update current stock worth
     public void updateCurrentStockWorth() {
         double stockWorth = 0.0;
 
@@ -516,6 +520,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         }
     }
 
+    //? Initialize stock table
     private void initializeStockTable() {
         //id column
         TableColumn<Products, Object> productsObjectTableColumn = new TableColumn<>("ID");
@@ -584,12 +589,14 @@ private void updateDatabase(TableView<Products> cartTableView) {
         populateStockTable();
     }
 
+    //? Populate stock table
     private void populateStockTable() {
         ObservableList<Products> products = FXCollections.observableArrayList();
         products.addAll(getProductsFromDatabase());
         stockTableView.setItems(products);
     }
 
+    //? Get products from database
     private List<Products> getProductsFromDatabase() {
         List<Products> products = new ArrayList<>();
 
@@ -625,6 +632,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         stockTableView.getItems().addAll(filteredProducts());
     }
 
+    //? Filtered products
     private List<Products> filteredProducts() {
         List<Products> products = new ArrayList<>();
 
@@ -666,6 +674,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         populateStockTable();
     }
 
+    //? Add to cart
     private void addToCart(Products product) {
         // Add product to the cart
         if (product.getProductQuantity() == 0) {
@@ -682,12 +691,14 @@ private void updateDatabase(TableView<Products> cartTableView) {
         updateExpectedAmount();
     }
 
+    //? Update total
     private void updateTotal(Products product) {
         double total = product.getSellingPrice() * product.getSellingQuantity();
         product.setTotal(total);
         updateExpectedAmount();
     }
 
+    //? Update expected amount
     private void updateExpectedAmount() {
         double totalAmount = 0.0;
         for (Products product : cartTableView.getItems()) {
@@ -696,6 +707,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         expectedAmountLabel.setText(String.format("%.2f", totalAmount));
     }
 
+    //? Initialize sales table
     private void initializeSalesTable() {
         //id
         TableColumn<Sales, Object> salesIDColumn = new TableColumn<>("ID");
@@ -797,12 +809,14 @@ private void updateDatabase(TableView<Products> cartTableView) {
         populateSalesTable();
     }
 
+    //? Populate sales table
     private void populateSalesTable() {
         ObservableList<Sales> sales = FXCollections.observableArrayList();
         sales.addAll(getSalesFromDatabase());
         salesTableView.setItems(sales);
     }
 
+    //? Get sales from database
     private List<Sales> getSalesFromDatabase() {
         List<Sales> sales = new ArrayList<>();
         try {
@@ -838,6 +852,7 @@ private void updateDatabase(TableView<Products> cartTableView) {
         return sales;
     }
 
+    //? Load spinners
     private void loadSpinners() {
         discoutSpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
