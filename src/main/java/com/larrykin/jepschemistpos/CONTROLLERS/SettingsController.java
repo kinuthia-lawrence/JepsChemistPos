@@ -172,7 +172,7 @@ public class SettingsController {
             //check if the new password and confirm password are the same
             if (password.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                try{
+                try {
                     //check if the super admin email, username = admin and password are correct
                     Connection conn = databaseConn.getConnection();
                     String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
@@ -185,7 +185,7 @@ public class SettingsController {
                         //check if the email account to create does not exist
                         Connection conn2 = databaseConn.getConnection();
                         String sql2 = "SELECT * FROM users WHERE email = ?";
-                        PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
+                        PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
                         preparedStatement2.setString(1, emailAccountToCreate);
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
                         conn2.close();
@@ -243,6 +243,13 @@ public class SettingsController {
                 auUsernameForTheAccount.clear();
                 auPasswordField.clear();
                 auConfirmPasswordField.clear();
+                //
+                auSuperAdminEmail.setDisable(true);
+                auConfirmPasswordField.setDisable(true);
+                auEmailAccountToCreate.setDisable(true);
+                auUsernameForTheAccount.setDisable(true);
+                auPasswordField.setDisable(true);
+                auConfirmPasswordField.setDisable(true);
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error(sql) Adding User");
@@ -281,7 +288,7 @@ public class SettingsController {
                         //check if the email account to change password exists
                         Connection conn2 = databaseConn.getConnection();
                         String sql2 = "SELECT * FROM users WHERE email = ?";
-                        PreparedStatement preparedStatement2 = conn.prepareStatement(sql2);
+                        PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
                         preparedStatement2.setString(1, emailAccountToChangePassword);
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
                         conn2.close();
@@ -289,7 +296,7 @@ public class SettingsController {
                             //check if the old password is correct
                             Connection conn3 = databaseConn.getConnection();
                             String sql3 = "SELECT * FROM users WHERE email = ? AND password = ?";
-                            PreparedStatement preparedStatement3 = conn.prepareStatement(sql3);
+                            PreparedStatement preparedStatement3 = conn3.prepareStatement(sql3);
                             preparedStatement3.setString(1, emailAccountToChangePassword);
                             preparedStatement3.setString(2, oldPassword);
                             ResultSet resultSet3 = preparedStatement3.executeQuery();
@@ -354,6 +361,13 @@ public class SettingsController {
                 cpOldPassword.clear();
                 cpNewPasswordField.clear();
                 cpConfirmPasswordField.clear();
+                //disable fields
+                cpSuperAdminPassword.setDisable(true);
+                cpSuperAdminEmail.setDisable(true);
+                cpEmailAccountToChangePassword.setDisable(true);
+                cpOldPassword.setDisable(true);
+                cpNewPasswordField.setDisable(true);
+                cpConfirmPasswordField.setDisable(true);
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error(sql) Changing Password");
@@ -416,7 +430,7 @@ public class SettingsController {
         supplierContactInformationColumn.setCellValueFactory(new PropertyValueFactory<>("supplierContactInformation"));
         supplierContactInformationColumn.setPrefWidth(200);
         //editButton
-        TableColumn<Supplier, String> editColumn = new TableColumn<>("Edit");
+        TableColumn<Supplier, String> editColumn = new TableColumn<>("   Edit ");
         editColumn.setPrefWidth(100);  // Set a fixed width
         editColumn.setCellFactory(param -> new TableCell<Supplier, String>() {
             private final Button editButton = new Button("Edit");
@@ -441,7 +455,7 @@ public class SettingsController {
             }
         });
         //delete column
-        TableColumn<Supplier, String> deleteColumn = new TableColumn<>("Delete");
+        TableColumn<Supplier, String> deleteColumn = new TableColumn<>("  Delete ");
         deleteColumn.setPrefWidth(100);  // Set a fixed width
         deleteColumn.setCellFactory(param -> new TableCell<Supplier, String>() {
             private final Button deleteButton = new Button("Delete");
