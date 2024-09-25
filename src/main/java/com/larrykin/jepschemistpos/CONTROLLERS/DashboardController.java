@@ -158,7 +158,7 @@ public class DashboardController {
         }
         companyHyperlink.setOnAction(event -> {
             try {
-                Desktop.getDesktop().browse(new URI("https://kinuthia-lawrence.github.io/portfolio/"));
+                Desktop.getDesktop().browse(new URI("https://larrykin343.onrender.com/"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }

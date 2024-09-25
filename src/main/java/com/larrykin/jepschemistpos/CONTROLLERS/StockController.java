@@ -98,7 +98,6 @@ public class StockController {
         minQuantitySpinner.setValueFactory(valueFactory3);
 
         try {
-
             Connection connection = conn.getConnection();
             Statement statement = connection.createStatement();
 
@@ -111,10 +110,11 @@ public class StockController {
             while (resultSet.next()) {
                 categoryCombobox.getItems().add(resultSet.getString("category_name"));
             }
+
+            // Load product names into the productNames list
             resultSet = statement.executeQuery("SELECT * FROM products");
             while (resultSet.next()) {
-                nameComboBox.setEditable(true);
-                nameComboBox.getItems().add(resultSet.getString("name"));
+                productNames.add(resultSet.getString("name"));
             }
 
         } catch (Exception e) {
@@ -122,11 +122,12 @@ public class StockController {
             e.printStackTrace();
         }
 
+        // Call setupNameComboBox to set up the nameComboBox
+        setupNameComboBox();
     }
 
-
     private void setupNameComboBox() {
-
+        nameComboBox.setEditable(true); // Ensure the ComboBox is editable
         nameComboBox.setItems(productNames);
 
         // Create a FilteredList wrapping the productNames list
@@ -158,6 +159,14 @@ public class StockController {
                 nameComboBox.setItems(productNames);
                 nameComboBox.getSelectionModel().select(nameComboBox.getEditor().getText());
             }
+        });
+
+        // Ensure the ComboBox is always focusable and editable
+        nameComboBox.setOnMouseClicked(event -> {
+            if (productNames.isEmpty()) {
+                nameComboBox.setItems(FXCollections.observableArrayList());
+            }
+            nameComboBox.show();
         });
     }
 
@@ -366,7 +375,7 @@ public class StockController {
             if (nameValue != null && !nameValue.isBlank() &&
                     categoryValue != null && !categoryValue.isBlank() &&
                     quantityValue != null && !quantityValue.isNaN() &&
-                    minQuantityValue !=null && !minQuantityValue.isNaN() &&
+                    minQuantityValue != null && !minQuantityValue.isNaN() &&
                     buyingPriceValue != null && !buyingPriceValue.isNaN() &&
                     sellingPriceValue != null && !sellingPriceValue.isNaN() &&
                     supplierNameValue != null && !supplierNameValue.isBlank() &&
@@ -442,7 +451,7 @@ public class StockController {
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
-        try{
+        try {
             Double totalStock = quantityValue * buyingPriceValue;
             String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
             Connection connection = conn.getConnection();
@@ -450,16 +459,16 @@ public class StockController {
             statement.setDouble(1, totalStock);
             int resultSet = statement.executeUpdate();
 
-            if(resultSet > 0) {
+            if (resultSet > 0) {
                 ;
-            }else {
+            } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Error updating total stock");
                 alert.setContentText("Error updating total stock");
                 alert.showAndWait();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error updating total stock");
@@ -509,7 +518,7 @@ public class StockController {
                     if (nameValue != null && !nameValue.isBlank() &&
                             categoryValue != null && !categoryValue.isBlank() &&
                             quantityValue != null && !quantityValue.isNaN() &&
-                            minQuantityValue !=null && !minQuantityValue.isNaN() &&
+                            minQuantityValue != null && !minQuantityValue.isNaN() &&
                             buyingPriceValue != null && !buyingPriceValue.isNaN() &&
                             sellingPriceValue != null && !sellingPriceValue.isNaN() &&
                             supplierNameValue != null && !supplierNameValue.isBlank() &&

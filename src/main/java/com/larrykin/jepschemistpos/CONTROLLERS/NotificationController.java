@@ -264,6 +264,7 @@ public class NotificationController {
             connection.close();
             populateExpiredGoodsTable();
         } catch (Exception e) {
+            System.out.println("Error :" + e.getMessage() );
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

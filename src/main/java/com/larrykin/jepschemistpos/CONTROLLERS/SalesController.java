@@ -89,6 +89,7 @@ public class SalesController {
     }
 
     private void initializeCartTable() {
+
         // Create columns
         TableColumn<Products, Object> productIDColumn = new TableColumn<>("F.ID");
         productIDColumn.setCellValueFactory(new PropertyValueFactory<>("productID"));
@@ -116,6 +117,8 @@ public class SalesController {
                         product.setSellingQuantity(currentQuantity - 1);
                         updateTotal(product);
                         cartTableView.refresh();
+                    } else {
+                        product.setSellingQuantity(1);
                     }
                 });
             }
@@ -153,6 +156,7 @@ public class SalesController {
                         updateTotal(product);
                         cartTableView.refresh();
                     } else {
+                        product.setSellingQuantity(availableQuantity);
                         Alert alert = new Alert(Alert.AlertType.WARNING);
                         alert.setTitle("Quantity Limit Reached");
                         alert.setHeaderText("Cannot increment quantity");
@@ -379,35 +383,43 @@ public class SalesController {
     private void updateDatabase(TableView<Products> cartTableView) {
         new Thread(() -> {
             try {
-                Connection connection = databaseConn.getConnection();
+                //TODO : fix adding product errors( its just updating the first element  to be added to the cart)
                 for (Products product : cartTableView.getItems()) {
-                    Object productID = product.getProductID();
-                    double sellingQuantity = product.getSellingQuantity();
-                    double newQuantity = product.getProductQuantity() - sellingQuantity;
-                    System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
-                    //TODO : fix adding product erros
 
-                    //? Update the quantity of the product in the database
-                    String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
-                    try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                        preparedStatement.setDouble(1, newQuantity);
-                        preparedStatement.setObject(2, productID);
-                        int rowAffected = preparedStatement.executeUpdate();
+                    try {
+                        Object productID = product.getProductID();
+                        double sellingQuantity = product.getSellingQuantity();
+                        double newQuantity = product.getProductQuantity() - sellingQuantity;
+                        System.out.println("Product ID: " + productID + ", Selling Quantity: " + sellingQuantity + ", New Quantity: " + newQuantity);
 
-                        if (rowAffected > 0) {
-                            connection.close();
-                            populateStockTable();
-                            updateCurrentStockWorth();
-                        } else {
-                            System.out.println("Error updating product quantities");
+
+                        //? Update the quantity of the product in the database
+                        String updateQuery = "UPDATE products SET quantity = ? WHERE id = ?";
+                        try (
+                                Connection connection = databaseConn.getConnection();
+                                PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)
+                        ) {
+                            preparedStatement.setDouble(1, newQuantity);
+                            preparedStatement.setObject(2, productID);
+                            int rowAffected = preparedStatement.executeUpdate();
+
+                            if (rowAffected > 0) {
+                                connection.close();
+                                populateStockTable();
+                                updateCurrentStockWorth();
+                            } else {
+                                System.out.println("Error,Product quantities not updated");
+                                connection.close();
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Error updating product quantities : child" + e.getMessage());
                         }
-
-                    } finally {
-                        connection.close();
+                    } catch (Exception e) {
+                        System.out.println("while updating quantities failed: " + e.getMessage());
                     }
                 }
             } catch (Exception e) {
-                System.out.println("Error updating product quantities: " + e.getMessage());
+                System.out.println("Error updating product quantities: parent " + e.getMessage());
                 e.printStackTrace();
             }
         }).start();
