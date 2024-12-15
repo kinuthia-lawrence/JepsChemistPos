@@ -8,6 +8,7 @@ module com.larrykin.jepschemistpos {
     requires jakarta.mail;
     requires java.desktop;
     requires org.xerial.sqlitejdbc;
+    requires org.slf4j;
 
 
     opens com.larrykin.jepschemistpos to javafx.fxml;

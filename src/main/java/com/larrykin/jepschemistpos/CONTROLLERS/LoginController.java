@@ -66,6 +66,9 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        DatabaseConn databaseConn = new DatabaseConn();
+        databaseConn.getConnection();
+
         launchImages();
         helpHyperlink.setOnAction(event -> openHelp());
         forgotPasswordHyperLink.setOnAction(event -> openForgotPassword());
