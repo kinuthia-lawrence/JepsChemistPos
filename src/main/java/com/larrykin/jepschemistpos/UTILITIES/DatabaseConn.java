@@ -1,12 +1,11 @@
 package com.larrykin.jepschemistpos.UTILITIES;
 
 
+import com.larrykin.jepschemistpos.MODELS.UtilsData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DatabaseConn {
     private static final Logger log = LoggerFactory.getLogger(DatabaseConn.class);
@@ -15,7 +14,7 @@ public class DatabaseConn {
         Connection connection = null;
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:jepschemist.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:jelpschemist.db");
             createSchemaIfNotExist(connection);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -148,6 +147,22 @@ public class DatabaseConn {
                             "    )\n" +
                             ");"
             );
+
+            // Check if a row with id = 1 already exists
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count == 0) {
+                // Insert only if the row does not exist
+                stmt.execute(
+                        "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
+                                "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
+                                "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
+                                "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
+                );
+            }
 
         } catch (SQLException e) {
             log.error("Error creating schemas:: ", e);

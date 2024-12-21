@@ -286,6 +286,21 @@ public class HomeController {
                 utilsData.add(data);
             }
             conn.close();
+      /*      //? if the table is empty, add a new row
+            if(utilsData.isEmpty()){
+                UtilsData data = new UtilsData();
+                data.setId(1);
+                data.setDark_theme(false);
+                data.setCurrentCash(0.0);
+                data.setCurrentMpesa(0.0);
+                data.setCurrentStock(0.0);
+                data.setServicesNumber(0);
+                data.setTotalCashFromSales(0.0);
+                data.setServicesRevenue(0.0);
+                data.setTotalValueOfAddedStock(0.0);
+                data.setTotalMpesaFromSales(0.0);
+                utilsData.add(data);
+            }*/
 
         } catch (Exception e) {
             System.out.println("Error getting utils data from database: " + e.getMessage());

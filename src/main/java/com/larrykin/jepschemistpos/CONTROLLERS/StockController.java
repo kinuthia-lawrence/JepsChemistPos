@@ -69,6 +69,7 @@ public class StockController {
     DatabaseConn conn = new DatabaseConn();
 
     private ObservableList<String> productNames = FXCollections.observableArrayList();
+    private ObservableList<String> categories = FXCollections.observableArrayList();
     private SalesController salesController;
 
     private void instantiateControllers() {
@@ -107,7 +108,7 @@ public class StockController {
 
             resultSet = statement.executeQuery("SELECT * FROM categories");
             while (resultSet.next()) {
-                categoryCombobox.getItems().add(resultSet.getString("category_name"));
+                categories.add(resultSet.getString("category_name"));
             }
 
             // Load product names into the productNames list
@@ -123,6 +124,7 @@ public class StockController {
 
         // Call setupNameComboBox to set up the nameComboBox
         setupNameComboBox();
+        setupCategoryComboBox();
     }
 
     private void setupNameComboBox() {
@@ -166,6 +168,49 @@ public class StockController {
                 nameComboBox.setItems(FXCollections.observableArrayList());
             }
             nameComboBox.show();
+        });
+    }
+    private void setupCategoryComboBox() {
+        categoryCombobox.setEditable(true); // Ensure the ComboBox is editable
+        categoryCombobox.setItems(categories);
+
+        // Create a FilteredList wrapping the categories list
+        FilteredList<String> filteredItems = new FilteredList<>(categories, p -> true);
+
+        // Add a listener to the ComboBox editor to filter the items
+        categoryCombobox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            final TextField editor = categoryCombobox.getEditor();
+            final String selected = categoryCombobox.getSelectionModel().getSelectedItem();
+
+            // If no item in the ComboBox is selected or the editor's text is not equal to the selected item
+            if (selected == null || !selected.equals(editor.getText())) {
+                filteredItems.setPredicate(item -> {
+                    // If the filter text is empty, display all items
+                    if (newValue == null || newValue.isEmpty()) {
+                        return true;
+                    }
+                    // Compare item text with filter text
+                    String lowerCaseFilter = newValue.toLowerCase();
+                    return item.toLowerCase().contains(lowerCaseFilter);
+                });
+                categoryCombobox.setItems(filteredItems);
+            }
+        });
+
+        // Add a listener to update the ComboBox items when the editor loses focus
+        categoryCombobox.getEditor().focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) {
+                categoryCombobox.setItems(categories);
+                categoryCombobox.getSelectionModel().select(categoryCombobox.getEditor().getText());
+            }
+        });
+
+        // Ensure the ComboBox is always focusable and editable
+        categoryCombobox.setOnMouseClicked(event -> {
+            if (categories.isEmpty()) {
+                categoryCombobox.setItems(FXCollections.observableArrayList());
+            }
+            categoryCombobox.show();
         });
     }
 
