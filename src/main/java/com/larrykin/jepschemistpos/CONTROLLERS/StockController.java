@@ -14,6 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ import java.util.List;
 
 public class StockController {
 
+    private static final Logger log = LoggerFactory.getLogger(StockController.class);
     @FXML
     private Button addStockButton;
 
@@ -194,6 +197,7 @@ public class StockController {
             nameComboBox.show();
         });
     }
+
     private void setupCategoryComboBox() {
         categoryCombobox.setEditable(true); // Ensure the ComboBox is editable
         categoryCombobox.setItems(categories);
@@ -477,6 +481,7 @@ public class StockController {
                         alert.showAndWait();
 
                         populateTable();
+                        saveCategory(categoryValue);
                         loadFields();
                         salesController.updateCurrentStockWorth();
                         updateTotalStock(quantityValue, buyingPriceValue);
@@ -518,6 +523,52 @@ public class StockController {
                 alert.showAndWait();
             }
         });
+    }
+
+    private void saveCategory(String categoryValue) {
+        try {
+            Connection connection = conn.getConnection();
+            // Check if the category already exists
+            String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
+            PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+            checkStatement.setString(1, categoryValue);
+            ResultSet resultSet = checkStatement.executeQuery();
+            resultSet.next();
+            int count = resultSet.getInt(1);
+
+            if (count == 0) {
+                // Category does not exist, proceed with insertion
+                String insertSql = "INSERT INTO categories (category_name) VALUES (?)";
+                PreparedStatement insertStatement = connection.prepareStatement(insertSql);
+                insertStatement.setString(1, categoryValue);
+                int rowsAffected = insertStatement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText("Category saved successfully");
+                    alert.setContentText("Category saved successfully");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error saving category");
+                    alert.setContentText("Error saving category");
+                    alert.showAndWait();
+                }
+            } else {
+                log.info("Category already exists");
+            }
+            connection.close();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error saving category");
+            alert.setContentText("Error saving category: " + e.getMessage());
+            alert.showAndWait();
+
+            log.error("Error saving category: " + e.getMessage());
+        }
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
@@ -620,7 +671,10 @@ public class StockController {
                                 timeline.setCycleCount(1);
                                 timeline.play();
                                 alert.showAndWait();
+
                                 populateTable();
+                                saveCategory(categoryValue);
+                                loadFields();
 
                                 //clear fields
                                 nameComboBox.setValue(null);
