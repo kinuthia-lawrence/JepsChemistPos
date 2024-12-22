@@ -264,6 +264,21 @@ public class HomeController {
         try {
             Connection conn = databaseConn.getConnection();
 
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count == 0) {
+                // Insert only if the row does not exist
+                stmt.execute(
+                        "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
+                                "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
+                                "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
+                                "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
+                );
+            }
+
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM utils");
 
@@ -286,22 +301,6 @@ public class HomeController {
                 utilsData.add(data);
             }
             conn.close();
-      /*      //? if the table is empty, add a new row
-            if(utilsData.isEmpty()){
-                UtilsData data = new UtilsData();
-                data.setId(1);
-                data.setDark_theme(false);
-                data.setCurrentCash(0.0);
-                data.setCurrentMpesa(0.0);
-                data.setCurrentStock(0.0);
-                data.setServicesNumber(0);
-                data.setTotalCashFromSales(0.0);
-                data.setServicesRevenue(0.0);
-                data.setTotalValueOfAddedStock(0.0);
-                data.setTotalMpesaFromSales(0.0);
-                utilsData.add(data);
-            }*/
-
         } catch (Exception e) {
             System.out.println("Error getting utils data from database: " + e.getMessage());
             e.printStackTrace();

@@ -1,14 +1,13 @@
 package com.larrykin.jepschemistpos.VIEWS;
 
 import com.larrykin.jepschemistpos.ENUMS.DashboardOptions;
-import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
 
 
 
@@ -147,6 +146,8 @@ public class ViewFactory {
             stage.setResizable(false);
             stage.centerOnScreen();
             stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            Image icon = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
+            stage.getIcons().add(icon);
             stage.show();
         } catch (Exception e) {
             System.out.println("Error loading the loginAnchorPane" + e.getMessage());

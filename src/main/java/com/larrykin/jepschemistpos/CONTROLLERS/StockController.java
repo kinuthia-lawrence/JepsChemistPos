@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 import java.sql.*;
@@ -46,6 +48,12 @@ public class StockController {
     private Spinner<Double> quantitySpinner;
 
     @FXML
+    private Button refreshButton;
+
+    @FXML
+    private ImageView refreshIcon;
+
+    @FXML
     private Button saveButton;
 
     @FXML
@@ -60,9 +68,20 @@ public class StockController {
     @FXML
     public void initialize() {
         initializeTable();
+        initializeButtons();
         loadFields();
         instantiateControllers();
         addStockButton.setOnAction(e -> saveProduct());
+    }
+
+    private void initializeButtons() {
+        Image refreshImage = new Image(getClass().getResourceAsStream("/images/refresh.png"));
+        refreshIcon.setImage(refreshImage);
+
+        refreshButton.setOnAction(e -> {
+            populateTable();
+            loadFields();
+        });
     }
 
     //database instance
@@ -100,6 +119,11 @@ public class StockController {
         try {
             Connection connection = conn.getConnection();
             Statement statement = connection.createStatement();
+
+            //Clear existing items in the ComboBoxes
+            nameComboBox.getItems().clear();
+            categoryCombobox.getItems().clear();
+            supplierComboBox.getItems().clear();
 
             ResultSet resultSet = statement.executeQuery("SELECT * FROM suppliers");
             while (resultSet.next()) {
@@ -453,6 +477,7 @@ public class StockController {
                         alert.showAndWait();
 
                         populateTable();
+                        loadFields();
                         salesController.updateCurrentStockWorth();
                         updateTotalStock(quantityValue, buyingPriceValue);
 

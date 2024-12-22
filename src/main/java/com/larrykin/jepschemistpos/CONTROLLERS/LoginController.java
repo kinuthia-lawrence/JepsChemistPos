@@ -204,6 +204,9 @@ public class LoginController implements Initializable {
             dashboardStage.setWidth(screenBounds.getWidth());
             dashboardStage.setHeight(screenBounds.getHeight());
 
+            Image icon = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
+            dashboardStage.getIcons().add(icon);
+
             dashboardStage.show();
             Stage loginStage = (Stage) loginButton.getScene().getWindow();
             loginStage.close();
