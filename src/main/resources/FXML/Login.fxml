@@ -19,7 +19,7 @@
       <effect>
          <DropShadow height="32.72" offsetX="2.0" radius="15.1275" spread="0.1" width="29.79" />
       </effect>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="5.0" layoutY="9.0" prefHeight="99.0" prefWidth="219.0" rotate="-15.0" text="JEPS" textFill="#111af7" underline="true" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="9.0">
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="5.0" layoutY="9.0" prefHeight="99.0" prefWidth="219.0" rotate="-15.0" text="JELPS" textFill="#111af7" underline="true" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="9.0">
          <font>
             <Font name="System Bold Italic" size="55.0" />
          </font>
@@ -81,10 +81,15 @@
          <padding>
             <Insets right="5.0" />
          </padding></Hyperlink>
-      <Hyperlink fx:id="helpHyperlink" alignment="CENTER" focusTraversable="false" layoutX="11.0" layoutY="344.0" prefHeight="23.0" prefWidth="232.0" text="Help?" underline="true" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Hyperlink fx:id="helpHyperlink" alignment="CENTER" focusTraversable="false" layoutX="27.0" layoutY="356.0" prefHeight="23.0" prefWidth="87.0" text="Help?" underline="true" AnchorPane.leftAnchor="27.0" AnchorPane.rightAnchor="140.0">
          <padding>
             <Insets right="5.0" />
          </padding></Hyperlink>
+      <Hyperlink fx:id="signUpHyperlink" alignment="CENTER" focusTraversable="false" layoutX="115.0" layoutY="356.0" prefHeight="23.0" prefWidth="87.0" text="Sign Up?" underline="true">
+         <padding>
+            <Insets right="5.0" />
+         </padding>
+      </Hyperlink>
       <padding>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </padding>

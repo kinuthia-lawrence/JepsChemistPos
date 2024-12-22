@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.User;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import com.larrykin.jepschemistpos.UTILITIES.ThemeManager;
@@ -23,11 +24,16 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LoginController implements Initializable {
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @FXML
     private AnchorPane anchorPaneLeft;
@@ -62,7 +68,11 @@ public class LoginController implements Initializable {
     private AnchorPane mainPane;
 
     @FXML
+    private Hyperlink signUpHyperlink;
+
+    @FXML
     private PasswordField passwordField;
+    DatabaseConn connectNow = new DatabaseConn();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -72,6 +82,37 @@ public class LoginController implements Initializable {
         launchImages();
         helpHyperlink.setOnAction(event -> openHelp());
         forgotPasswordHyperLink.setOnAction(event -> openForgotPassword());
+        signUpHyperlink.setOnAction(event -> openSignUp());
+    }
+
+    private void openSignUp() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Sign Up");
+        alert.setHeaderText("Confirm Sign Up");
+        alert.setContentText("Are you sure it's 1'st Time SignUp? You will need Developer Approval; Otherwise contact" +
+                " Administrator");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.CANCEL);
+        //?Add icon
+        Image image = new Image(getClass().getResourceAsStream("/IMAGES/passwordLock.png"));
+        ImageView imageView = new ImageView(image);
+        alert.setGraphic(imageView);
+
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.YES) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/signUp.fxml"));
+            Stage signUpStage = new Stage();
+            try {
+                Scene scene = new Scene(fxmlLoader.load());
+                signUpStage.setScene(scene);
+                signUpStage.centerOnScreen();
+                signUpStage.setTitle("Sign Up");
+                signUpStage.show();
+            } catch (Exception e) {
+                log.error("Error loading Sign Up{}", e.getMessage());
+                e.printStackTrace();
+            }
+        } else alert.close();
     }
 
     private void openForgotPassword() {
@@ -99,12 +140,10 @@ public class LoginController implements Initializable {
                 forgotPasswordStage.setTitle("Forgot Password");
                 forgotPasswordStage.show();
             } catch (Exception e) {
-                System.out.println("Error loading forgot Password" + e.getMessage());
+                log.error("Error loading forgot Password{}", e.getMessage());
                 e.printStackTrace();
             }
         } else alert.close();
-
-
     }
 
     private void openHelp() {
@@ -157,29 +196,34 @@ public class LoginController implements Initializable {
         }
         //! Set accelerator for login button (Shift+E)
         KeyCombination keyCombination = new KeyCodeCombination(KeyCode.E, KeyCombination.SHIFT_DOWN);
-        User developerUser = new User("Larrykin343", "larrykin343@gmail.com");
+        User developerUser = new User("Larrykin343", "larrykin343@gmail.com", ROLE.ADMIN);
         loginButton.getScene().getAccelerators().put(keyCombination, () -> loadDashboard(developerUser));
     }
 
     private void checkLoginCredentials(String usernameInput, String passwordInput) {
-        DatabaseConn connectNow = new DatabaseConn();
-        Connection connectDB = connectNow.getConnection();
+        String verifyLogin = "SELECT username, email, role FROM users WHERE (username = ? OR email = ?) AND password = ?";
+        try (
+                Connection connectDB = connectNow.getConnection();
+                PreparedStatement preparedStatement = connectDB.prepareStatement(verifyLogin);
+        ) {
+            preparedStatement.setString(1, usernameInput);
+            preparedStatement.setString(2, usernameInput);
+            preparedStatement.setString(3, passwordInput);
 
-        String verifyLogin = "SELECT username, email FROM users WHERE username = '" + usernameInput + "' AND password = '" + passwordInput + "'";
-        try {
-            Statement statement = connectDB.createStatement();
-            ResultSet queryResult = statement.executeQuery(verifyLogin);
+            ResultSet queryResult = preparedStatement.executeQuery();
+
             if (queryResult.next()) {
                 String username = queryResult.getString("username");
                 String email = queryResult.getString("email");
-                User loggedInUser = new User(username, email);
+                String role = queryResult.getString("role");
+                User loggedInUser = new User(username, email, ROLE.valueOf(role));
                 loadDashboard(loggedInUser);
+                log.info("User: {} has logged in as {}", username, role);
             } else {
                 passwordField.clear();
                 usernameTextField.clear();
                 errorLabel.setText("Invalid Login. Please try again.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

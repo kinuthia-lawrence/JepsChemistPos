@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Supplier;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import com.larrykin.jepschemistpos.UTILITIES.SceneManager;
@@ -175,7 +176,7 @@ public class SettingsController {
                 try {
                     //check if the super admin email, username = admin and password are correct
                     Connection conn = databaseConn.getConnection();
-                    String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
+                    String sql = "SELECT * FROM users WHERE email = ? AND role = '" + ROLE.ADMIN + "' AND password = ?";
                     PreparedStatement preparedStatement = conn.prepareStatement(sql);
                     preparedStatement.setString(1, superAdminEmail);
                     preparedStatement.setString(2, superAdminPassword);
@@ -225,11 +226,12 @@ public class SettingsController {
 
     private void addUserToDatabase(String emailAccountToCreate, String usernameForTheAccount, String password) {
         try (Connection conn = databaseConn.getConnection()) {
-            String sql = "INSERT INTO users(email, username, password) VALUES(?, ?, ?)";
+            String sql = "INSERT INTO users(email, username, role, password) VALUES(?, ?, ?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, emailAccountToCreate);
             preparedStatement.setString(2, usernameForTheAccount);
-            preparedStatement.setString(3, password);
+            preparedStatement.setString(3, ROLE.USER.toString());
+            preparedStatement.setString(4, password);
             int output = preparedStatement.executeUpdate();
             if (output > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -348,7 +350,7 @@ public class SettingsController {
             preparedStatement.setString(1, newPassword);
             preparedStatement.setString(2, emailAccountToChangePassword);
             int output = preparedStatement.executeUpdate();
-
+            conn.close();
             if (output > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Password Changed");
@@ -510,6 +512,7 @@ public class SettingsController {
                             preparedStatement.setString(2, newSupplierContactInformation);
                             preparedStatement.setString(3, oldSupplierName);
                             int output = preparedStatement.executeUpdate();
+                            conn.close();
                             if (output > 0) {
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Supplier Updated");
@@ -561,12 +564,13 @@ public class SettingsController {
             return;
         }
         String deleteQuery = "DELETE FROM suppliers WHERE name=?";
-        try {
-            Connection connection = databaseConn.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery);
-
+        try (
+                Connection connection = databaseConn.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery);
+        ) {
             preparedStatement.setObject(1, supplier.getSupplierName());
             int rowAffected = preparedStatement.executeUpdate();
+            connection.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -584,9 +588,8 @@ public class SettingsController {
                 alert.setHeaderText("Error deleting Supplier");
                 alert.setContentText("Error deleting Supplier");
                 alert.showAndWait();
-                connection.close();
             }
-            connection.close();
+
         } catch (Exception e) {
             System.out.println("Error (sql):" + e.getMessage());
             e.printStackTrace();
@@ -604,10 +607,12 @@ public class SettingsController {
     private List<Supplier> getSuppliers() {
         List<Supplier> supplierList = new ArrayList<>();
 
-        try (Connection conn = databaseConn.getConnection()) {
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM suppliers");
-
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM suppliers");
+        ) {
+            conn.close();
             while (resultSet.next()) {
                 Supplier supplier = new Supplier();
                 supplier.setSupplierName(resultSet.getString("name"));

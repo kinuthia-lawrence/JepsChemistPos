@@ -120,6 +120,7 @@ public class DatabaseConn {
                             "                     UNIQUE,\n" +
                             "    email    TEXT    NOT NULL\n" +
                             "                     UNIQUE,\n" +
+                            "    role     TEXT    NOT NULL,\n" +
                             "    password TEXT    NOT NULL,\n" +
                             "    PRIMARY KEY (\n" +
                             "        id AUTOINCREMENT\n" +

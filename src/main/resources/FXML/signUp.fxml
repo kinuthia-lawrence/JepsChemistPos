@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="passwordReset" prefHeight="562.0" prefWidth="510.0" style="-fx-background-color: #8D8D8D;" stylesheets="@../STYLES/forgotPassword.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.SignUpController">
+    <Label alignment="CENTER" layoutX="39.0" layoutY="33.0" prefHeight="34.0" prefWidth="231.0" text="Create Admin" textFill="#fcf8f8" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="10.0">
+        <font>
+            <Font name="System Bold Italic" size="23.0" />
+        </font>
+    </Label>
+    <Button fx:id="getCodeButton" layoutX="74.0" layoutY="110.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="356.0" text="Request Code From Developer" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="74.0" AnchorPane.topAnchor="110.0" />
+    <Label alignment="CENTER" layoutX="6.0" layoutY="76.0" prefHeight="34.0" prefWidth="492.0" text="Click to request Code from Admin" textFill="#f8f6f6" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="76.0">
+        <font>
+            <Font name="System Bold Italic" size="12.0" />
+        </font>
+    </Label>
+    <Label fx:id="alertLabel" alignment="CENTER" layoutX="4.0" layoutY="51.0" prefHeight="25.0" prefWidth="491.0"
+           textFill="#f20808" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="51.0">
+        <font>
+            <Font name="System Bold Italic" size="13.0" />
+        </font>
+    </Label>
+    <PasswordField fx:id="enterPassword" disable="true" layoutX="79.0" layoutY="363.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter Password" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="66.0">
+        <font>
+            <Font size="15.0" />
+        </font>
+    </PasswordField>
+    <PasswordField fx:id="confirmPassword" disable="true" layoutX="79.0" layoutY="421.0" prefHeight="47.0" prefWidth="355.0" promptText="Confirm Password" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="66.0">
+        <font>
+            <Font size="15.0" />
+        </font>
+    </PasswordField>
+    <Button fx:id="saveUser" disable="true" layoutX="80.0" layoutY="490.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="356.0" text="Create User" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="68.0" />
+    <TextField fx:id="adminUsername" disable="true" layoutX="81.0" layoutY="300.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter your Username" AnchorPane.leftAnchor="81.0" AnchorPane.rightAnchor="67.0">
+        <font>
+            <Font size="15.0" />
+        </font>
+    </TextField>
+    <Label fx:id="codeAlert" alignment="CENTER" layoutX="7.0" layoutY="157.0" prefHeight="25.0" prefWidth="503.0" textFill="#0af024">
+        <font>
+            <Font name="System Bold Italic" size="13.0" />
+        </font>
+    </Label>
+   <TextField fx:id="adminEmail" disable="true" layoutX="78.0" layoutY="246.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter Your Email">
+      <font>
+         <Font size="15.0" />
+      </font>
+   </TextField>
+   <TextField fx:id="codeTextField" disable="true" layoutX="78.0" layoutY="182.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter Code From Developer">
+      <font>
+         <Font size="15.0" />
+      </font>
+   </TextField>
+</AnchorPane>

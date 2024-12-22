@@ -119,10 +119,10 @@ public class StockController {
         SpinnerValueFactory<Double> valueFactory3 = new SpinnerValueFactory.DoubleSpinnerValueFactory(1.0, 100000.0, 1.0);
         minQuantitySpinner.setValueFactory(valueFactory3);
 
-        try {
-            Connection connection = conn.getConnection();
-            Statement statement = connection.createStatement();
-
+        try (
+                Connection connection = conn.getConnection();
+                Statement statement = connection.createStatement();
+        ) {
             //Clear existing items in the ComboBoxes
             nameComboBox.getItems().clear();
             categoryCombobox.getItems().clear();
@@ -140,6 +140,7 @@ public class StockController {
 
             // Load product names into the productNames list
             resultSet = statement.executeQuery("SELECT * FROM products");
+            connection.close();
             while (resultSet.next()) {
                 productNames.add(resultSet.getString("name"));
             }
@@ -354,12 +355,12 @@ public class StockController {
     private List<Products> getProductsFromDatabase() {
         List<Products> products = new ArrayList<>();
 
-        try {
-            Connection connection = conn.getConnection();
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
-
+        try (
+                Connection connection = conn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -376,7 +377,7 @@ public class StockController {
                 products.add(product);
             }
 
-            connection.close();
+
         } catch (Exception e) {
             System.out.println("Error fetching product: " + e.getMessage());
             e.printStackTrace();
@@ -397,13 +398,13 @@ public class StockController {
         }
 
         String sql = "DELETE FROM products WHERE id = ?";
-        try {
-            Connection connection = conn.getConnection();
-            PreparedStatement pstmt = connection.prepareStatement(sql);
-
+        try (
+                Connection connection = conn.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql);
+        ) {
             pstmt.setObject(1, product.getProductID());
             int rowAffected = pstmt.executeUpdate();
-
+            connection.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -425,7 +426,7 @@ public class StockController {
                 connection.close();
             }
 
-            connection.close();
+
         } catch (SQLException e) {
             System.out.println("Error(sql) deleting Product: " + e.getMessage());
             e.printStackTrace();
@@ -455,10 +456,10 @@ public class StockController {
                     expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
                 String sql = "INSERT INTO products (name, category, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
-                try {
-                    Connection connection = conn.getConnection();
-                    PreparedStatement statement = connection.prepareStatement(sql);
-
+                try (
+                        Connection connection = conn.getConnection();
+                        PreparedStatement statement = connection.prepareStatement(sql);
+                ) {
                     statement.setString(1, nameValue);
                     statement.setString(2, categoryValue);
                     statement.setDouble(3, quantityValue);
@@ -470,6 +471,7 @@ public class StockController {
                     statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
 
                     int rowAffected = statement.executeUpdate();
+                    connection.close();
                     if (rowAffected > 0) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Success");
@@ -526,8 +528,9 @@ public class StockController {
     }
 
     private void saveCategory(String categoryValue) {
-        try {
-            Connection connection = conn.getConnection();
+        try (
+                Connection connection = conn.getConnection();
+        ) {
             // Check if the category already exists
             String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
             PreparedStatement checkStatement = connection.prepareStatement(checkSql);
@@ -535,7 +538,7 @@ public class StockController {
             ResultSet resultSet = checkStatement.executeQuery();
             resultSet.next();
             int count = resultSet.getInt(1);
-
+            connection.close();
             if (count == 0) {
                 // Category does not exist, proceed with insertion
                 String insertSql = "INSERT INTO categories (category_name) VALUES (?)";
@@ -559,7 +562,7 @@ public class StockController {
             } else {
                 log.info("Category already exists");
             }
-            connection.close();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -572,14 +575,16 @@ public class StockController {
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
-        try {
+        try (
+                Connection connection = conn.getConnection();
+        ) {
             Double totalStock = quantityValue * buyingPriceValue;
             String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
-            Connection connection = conn.getConnection();
+
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setDouble(1, totalStock);
             int resultSet = statement.executeUpdate();
-
+            connection.close();
             if (resultSet > 0) {
                 ;
             } else {
@@ -646,10 +651,10 @@ public class StockController {
                             expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
                         String sql = "UPDATE products SET name = ?, category = ?, quantity = ?, min_quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
-                        try {
-                            Connection connection = conn.getConnection();
-                            PreparedStatement statement = connection.prepareStatement(sql);
-
+                        try (
+                                Connection connection = conn.getConnection();
+                                PreparedStatement statement = connection.prepareStatement(sql);
+                        ) {
                             statement.setString(1, nameValue);
                             statement.setString(2, categoryValue);
                             statement.setDouble(3, quantityValue);
@@ -662,6 +667,7 @@ public class StockController {
                             statement.setObject(10, product.getProductID());
 
                             int rowAffected = statement.executeUpdate();
+                            connection.close();
                             if (rowAffected > 0) {
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Success");

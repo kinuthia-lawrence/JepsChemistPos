@@ -32,7 +32,7 @@
     </bottom>
     <left>
         <VBox fx:id="sidebar" prefHeight="520.0" prefWidth="206.0" spacing="5.0" BorderPane.alignment="CENTER">
-            <Label prefHeight="128.0" prefWidth="221.0" rotate="-18.4" text="Jeps Chemist">
+            <Label prefHeight="128.0" prefWidth="221.0" rotate="-18.4" text="Jelps Chemist">
                 <VBox.margin>
                     <Insets />
                 </VBox.margin>
