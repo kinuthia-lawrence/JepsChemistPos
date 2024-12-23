@@ -86,7 +86,6 @@ public class ServicesController {
                     pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
 
                     int rowAffected = pstmt.executeUpdate();
-                    conn.close();
 
                     if (rowAffected > 0) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -99,6 +98,8 @@ public class ServicesController {
                         alert.showAndWait();
 
                         //? On Success methods
+                        conn.close();
+
 
                         Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
                         Double cash = Double.parseDouble(cashPaymentTextField.getText());
@@ -155,16 +156,16 @@ public class ServicesController {
                 Statement stmt = conn.createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);
         ) {
-            conn.close();
-            stmt.close();
-            resultSet.close();
+
             while (resultSet.next()) {
                 double currentCash = resultSet.getDouble("services_revenue");
                 int numberOfServices = resultSet.getInt("services_number");
 
                 double newServicesRevenue = currentCash + totalCashFromService;
                 int newNumberOfServices = numberOfServices + 1;
-
+                conn.close();
+                stmt.close();
+                resultSet.close();
                 String updateQuery = "UPDATE utils SET services_revenue = ?, services_number = ?, current_cash = current_cash + ?, current_mpesa = current_mpesa + ?, services_total_cash = services_total_cash + ? , services_total_mpesa = services_total_mpesa + ? ";
                 try (
                         Connection conn1 = databaseConn.getConnection();
@@ -179,7 +180,6 @@ public class ServicesController {
                     pstmt.setDouble(6, mpesa);
 
                     int rowAffected = pstmt.executeUpdate();
-                    conn1.close();
                     if (rowAffected > 0) {
                         ;
                     } else {
@@ -330,7 +330,6 @@ public class ServicesController {
 
             pstmt.setObject(1, service.getServiceID());
             int rowAffected = pstmt.executeUpdate();
-            conn.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -341,7 +340,7 @@ public class ServicesController {
                 timeline.play();
                 alert.showAndWait();
 
-
+                conn.close();
                 populateTable();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -396,7 +395,6 @@ public class ServicesController {
 
                                 int rowAffected = pstmt.executeUpdate();
 
-                                conn.close();
                                 if (rowAffected > 0) {
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                     alert.setTitle("Success");
@@ -407,6 +405,7 @@ public class ServicesController {
                                     timeline.play();
                                     alert.showAndWait();
 
+                                    conn.close();
 
                                     Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText()) - oldCashPayment - oldMpesaPayment;
                                     Double cash = Double.parseDouble(cashPaymentTextField.getText()) - oldCashPayment;
@@ -481,7 +480,6 @@ public class ServicesController {
                 Statement stmt = conn.createStatement();
                 ResultSet resultSet = stmt.executeQuery("SELECT * FROM service_history");
         ) {
-            conn.close();
             while (resultSet.next()) {
                 Service service = new Service();
                 service.setServiceID(resultSet.getObject("id"));

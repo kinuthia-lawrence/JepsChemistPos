@@ -112,7 +112,6 @@ public class HomeController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(query);
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setDate(resultSet.getString("date"));
@@ -176,7 +175,6 @@ public class HomeController {
                 preparedStatement.setString(3, description);
 
                 int rowAffected = preparedStatement.executeUpdate();
-                conn.close();
                 if (rowAffected > 0) {
 
                     descriptionTextArea.clear();
@@ -198,7 +196,6 @@ public class HomeController {
                     Statement statement = conn.createStatement();
             ) {
                 int rowAffected = statement.executeUpdate("UPDATE utils SET current_cash = current_cash - " + cash + ", current_mpesa = current_mpesa - " + mpesa + " WHERE id = 1");
-                conn.close();
                 if (rowAffected > 0) {
                     populateTableView();
 

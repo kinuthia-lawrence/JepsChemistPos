@@ -133,7 +133,6 @@ public class SignUpController {
                 Connection connection = databaseConn.getConnection();
                 ResultSet queryResults = connection.createStatement().executeQuery(listUsers);
         ) {
-            connection.close();
             if (queryResults.next()) {
                 alertLabel.setText("Admin already exist, please contact the administrator");
                 alertLabel.setVisible(true);

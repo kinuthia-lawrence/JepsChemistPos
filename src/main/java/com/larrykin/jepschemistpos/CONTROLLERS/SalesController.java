@@ -330,7 +330,6 @@ public class SalesController {
                     preparedStatement.setDouble(7, credit);
                     preparedStatement.setString(8, description);
                     int rowAffected = preparedStatement.executeUpdate();
-                    connection.close();
                     if (rowAffected > 0) {
                         Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
                         alert1.setTitle("Success");
@@ -341,6 +340,7 @@ public class SalesController {
                         timeline.play();
                         alert1.showAndWait();
 
+                        connection.close();
                         updateDatabase(cartTableView);
                         updateCashAndMpesa(cash, mpesa);
                         populateSalesTable();
@@ -449,7 +449,6 @@ public class SalesController {
                     preparedStatement.setDouble(3, cash);
                     preparedStatement.setDouble(4, mpesa);
                     int rowAffected = preparedStatement.executeUpdate();
-                    connection.close();
                     if (rowAffected > 0) {
                         ;
                     } else {
@@ -492,7 +491,6 @@ public class SalesController {
                     preparedStatement.setDouble(1, stockWorth);
                     int rowAffected = preparedStatement.executeUpdate();
 
-                    connection.close();
                     if (rowAffected > 0) {
                         ;
                     } else {
@@ -598,7 +596,6 @@ public class SalesController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -634,7 +631,6 @@ public class SalesController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM  products  WHERE name LIKE  '%" + searchName + "%'");
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -816,7 +812,6 @@ public class SalesController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM sales");
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setSalesID(resultSet.getObject("id"));

@@ -78,7 +78,6 @@ public class ForgotPasswordController implements Initializable {
                     Statement statement = connectDB.createStatement();
                     ResultSet queryResult = statement.executeQuery(checkEmail);
             ) {
-                connectDB.close();
                 if (queryResult.next()) {
                     EmailAlert.setText("A password reset code has been sent to " + email);
                     // Generate a random code
@@ -136,6 +135,7 @@ public class ForgotPasswordController implements Initializable {
                     enterNewPassword.setDisable(false);
                     confirmNewPassword.setDisable(false);
                     emailCodeTextField.setDisable(false);
+                    connectDB.close();
                     setNewPasswordButton.setOnAction(event -> SetNewPassword(randomCode));
                 } else {
                     EmailAlert.setText("Admin does not exist !!!");
@@ -169,7 +169,7 @@ public class ForgotPasswordController implements Initializable {
                             Statement statement = connectDB.createStatement();
                     ) {
                         statement.executeUpdate(updatePassword);
-                        connectDB.close();
+
 
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Password Changed");

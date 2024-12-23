@@ -44,12 +44,10 @@ public class ReportsController {
         List<Sales> sales = new ArrayList<>();
         String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
         try (
-
                 Connection connection = databaseConn.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(query);
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setDate(resultSet.getString("date"));

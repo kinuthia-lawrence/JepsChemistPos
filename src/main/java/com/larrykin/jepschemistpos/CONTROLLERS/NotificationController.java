@@ -288,7 +288,6 @@ public class NotificationController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(query);
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -386,7 +385,6 @@ public class NotificationController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(query);
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -397,7 +395,6 @@ public class NotificationController {
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));
                 product.setSupplierName(resultSet.getString("supplier_name"));
                 products.add(product);
-
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -410,7 +407,5 @@ public class NotificationController {
         }
         outOfStockProducts.addAll(products);
         outOfStockTableView.setItems(outOfStockProducts);
-
-
     }
 }

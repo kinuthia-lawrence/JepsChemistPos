@@ -140,11 +140,9 @@ public class StockController {
 
             // Load product names into the productNames list
             resultSet = statement.executeQuery("SELECT * FROM products");
-            connection.close();
             while (resultSet.next()) {
                 productNames.add(resultSet.getString("name"));
             }
-
         } catch (Exception e) {
             System.out.println("Error loading combo boxes: " + e.getMessage());
             e.printStackTrace();
@@ -360,7 +358,6 @@ public class StockController {
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
         ) {
-            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -376,8 +373,6 @@ public class StockController {
                 product.setProductDescription(resultSet.getString("description"));
                 products.add(product);
             }
-
-
         } catch (Exception e) {
             System.out.println("Error fetching product: " + e.getMessage());
             e.printStackTrace();
@@ -404,7 +399,6 @@ public class StockController {
         ) {
             pstmt.setObject(1, product.getProductID());
             int rowAffected = pstmt.executeUpdate();
-            connection.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -415,6 +409,7 @@ public class StockController {
                 timeline.play();
                 alert.showAndWait();
                 //? On success Methods
+                connection.close();
                 salesController.updateCurrentStockWorth();
                 populateTable();
             } else {
@@ -423,7 +418,6 @@ public class StockController {
                 alert.setHeaderText("Error deleting Product");
                 alert.setContentText("Error deleting Product");
                 alert.showAndWait();
-                connection.close();
             }
 
 
@@ -471,7 +465,6 @@ public class StockController {
                     statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
 
                     int rowAffected = statement.executeUpdate();
-                    connection.close();
                     if (rowAffected > 0) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Success");
@@ -482,6 +475,7 @@ public class StockController {
                         timeline.play();
                         alert.showAndWait();
 
+                        connection.close();
                         populateTable();
                         saveCategory(categoryValue);
                         loadFields();
@@ -528,17 +522,16 @@ public class StockController {
     }
 
     private void saveCategory(String categoryValue) {
-            String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
+        String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
         try (
                 Connection connection = conn.getConnection();
-            // Check if the category already exists
-            PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+                // Check if the category already exists
+                PreparedStatement checkStatement = connection.prepareStatement(checkSql);
         ) {
             checkStatement.setString(1, categoryValue);
             ResultSet resultSet = checkStatement.executeQuery();
             resultSet.next();
             int count = resultSet.getInt(1);
-            connection.close();
             if (count == 0) {
                 // Category does not exist, proceed with insertion
                 String insertSql = "INSERT INTO categories (category_name) VALUES (?)";
@@ -570,20 +563,19 @@ public class StockController {
             alert.setContentText("Error saving category: " + e.getMessage());
             alert.showAndWait();
 
-            log.error("Error saving category: " + e.getMessage());
+            log.error("Error saving category: {}", e.getMessage());
         }
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
-            Double totalStock = quantityValue * buyingPriceValue;
-            String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
+        Double totalStock = quantityValue * buyingPriceValue;
+        String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
         try (
                 Connection connection = conn.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
+                PreparedStatement statement = connection.prepareStatement(sql);
         ) {
             statement.setDouble(1, totalStock);
             int resultSet = statement.executeUpdate();
-            connection.close();
             if (resultSet > 0) {
                 ;
             } else {
@@ -666,7 +658,6 @@ public class StockController {
                             statement.setObject(10, product.getProductID());
 
                             int rowAffected = statement.executeUpdate();
-                            connection.close();
                             if (rowAffected > 0) {
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Success");
@@ -677,6 +668,7 @@ public class StockController {
                                 timeline.play();
                                 alert.showAndWait();
 
+                                connection.close();
                                 populateTable();
                                 saveCategory(categoryValue);
                                 loadFields();

@@ -182,16 +182,16 @@ public class SettingsController {
                     preparedStatement.setString(1, superAdminEmail);
                     preparedStatement.setString(2, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
-                    conn.close();
                     if (resultSet.next()) {
+                        conn.close();
                         //check if the email account to create does not exist
                         Connection conn2 = databaseConn.getConnection();
                         String sql2 = "SELECT * FROM users WHERE email = ?";
                         PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
                         preparedStatement2.setString(1, emailAccountToCreate);
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
-                        conn2.close();
                         if (!resultSet2.next()) {
+                            conn2.close();
                             //add the user
                             addUserToDatabase(emailAccountToCreate, usernameForTheAccount, password);
                         } else {
@@ -235,7 +235,6 @@ public class SettingsController {
             preparedStatement.setString(3, ROLE.USER.toString());
             preparedStatement.setString(4, password);
             int output = preparedStatement.executeUpdate();
-            conn.close();
             if (output > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("User Added");
@@ -289,16 +288,16 @@ public class SettingsController {
                     preparedStatement.setString(1, superAdminEmail);
                     preparedStatement.setString(2, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
-                    conn.close();
                     if (resultSet.next()) {
+                        conn.close();
                         //check if the email account to change password exists
                         Connection conn2 = databaseConn.getConnection();
                         String sql2 = "SELECT * FROM users WHERE email = ?";
                         PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
                         preparedStatement2.setString(1, emailAccountToChangePassword);
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
-                        conn2.close();
                         if (resultSet2.next()) {
+                            conn2.close();
                             //check if the old password is correct
                             Connection conn3 = databaseConn.getConnection();
                             String sql3 = "SELECT * FROM users WHERE email = ? AND password = ?";
@@ -306,8 +305,8 @@ public class SettingsController {
                             preparedStatement3.setString(1, emailAccountToChangePassword);
                             preparedStatement3.setString(2, oldPassword);
                             ResultSet resultSet3 = preparedStatement3.executeQuery();
-                            conn3.close();
                             if (resultSet3.next()) {
+                                conn3.close();
                                 //change the password
                                 changePasswordInDatabase(newPassword, emailAccountToChangePassword);
                             } else {
@@ -355,7 +354,6 @@ public class SettingsController {
             preparedStatement.setString(1, newPassword);
             preparedStatement.setString(2, emailAccountToChangePassword);
             int output = preparedStatement.executeUpdate();
-            conn.close();
             if (output > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Password Changed");
@@ -399,13 +397,14 @@ public class SettingsController {
                 preparedStatement.setString(1, supplierNameText);
                 preparedStatement.setString(2, supplierContactInformationText);
                 int output = preparedStatement.executeUpdate();
-                conn.close();
                 if (output > 0) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Supplier Added");
                     alert.setHeaderText("Supplier Added Successfully");
                     TimeUnit.SECONDS.sleep(2);
                     alert.showAndWait();
+
+                    conn.close();
                     populateSuppliersTable();
                     supplierName.clear();
                     supplierContactInformation.clear();
@@ -519,7 +518,6 @@ public class SettingsController {
                             preparedStatement.setString(2, newSupplierContactInformation);
                             preparedStatement.setString(3, oldSupplierName);
                             int output = preparedStatement.executeUpdate();
-                            conn.close();
                             if (output > 0) {
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Supplier Updated");
@@ -527,6 +525,7 @@ public class SettingsController {
                                 TimeUnit.SECONDS.sleep(2);
                                 alert.showAndWait();
 
+                                conn.close();
 
                                 populateSuppliersTable();
                                 supplierName.clear();
@@ -577,7 +576,6 @@ public class SettingsController {
         ) {
             preparedStatement.setObject(1, supplier.getSupplierName());
             int rowAffected = preparedStatement.executeUpdate();
-            connection.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -588,6 +586,7 @@ public class SettingsController {
                 timeline.play();
                 alert.showAndWait();
                 //? On success Methods
+                connection.close();
                 populateSuppliersTable();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -619,7 +618,6 @@ public class SettingsController {
                 Statement statement = conn.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM suppliers");
         ) {
-            conn.close();
             while (resultSet.next()) {
                 Supplier supplier = new Supplier();
                 supplier.setSupplierName(resultSet.getString("name"));
