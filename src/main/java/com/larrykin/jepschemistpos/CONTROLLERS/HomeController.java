@@ -11,6 +11,8 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 
 public class HomeController {
 
+    private static final Logger log = LoggerFactory.getLogger(HomeController.class);
     @FXML
     private Label TotalMpesa;
 
@@ -253,13 +256,16 @@ public class HomeController {
         ObservableList<UtilsData> utilsData = FXCollections.observableArrayList();
         utilsData.addAll(getUtilsDataFromDatabase());
         utilsTableView.setItems(utilsData);
-       if (!utilsData.isEmpty()) loadLabels(utilsData.get(0));
+        if (!utilsData.isEmpty()) loadLabels(utilsData.get(0));
     }
 
     //? get data from the database
     private List<UtilsData> getUtilsDataFromDatabase() {
         List<UtilsData> utilsData = new ArrayList<>();
 
+        /*boolean isUtilsEmpty = false;
+
+        //? check if utils is empty
         try (
                 Connection conn = databaseConn.getConnection();
                 Statement stmt = conn.createStatement();
@@ -269,17 +275,36 @@ public class HomeController {
             int count = rs.getInt(1);
 
             if (count == 0) {
-                // Insert only if the row does not exist
-                stmt.execute(
-                        "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
-                                "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
-                                "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
-                                "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
-                );
+                isUtilsEmpty = true;
             }
+        } catch (Exception e) {
+            log.error("Error getting utils data from database: {}", e.getMessage());
+            e.printStackTrace();
+        }
 
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM utils");
+        //? if the utils table is empty, insert the default values
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement stmt = conn.createStatement();
+        ) {
+            // Insert only if the row does not exist
+            if (isUtilsEmpty)  stmt.execute(
+                    "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
+                            "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
+                            "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
+                            "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
+            );
+        } catch (Exception e) {
+            log.error("Error encountered inserting values to utils table.{}", e.getMessage());
+            e.printStackTrace();
+        }*/
+
+        //? return the data
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM utils");
+        ) {
             while (resultSet.next()) {
                 UtilsData data = new UtilsData();
                 data.setId(resultSet.getObject("id"));
@@ -298,11 +323,10 @@ public class HomeController {
 
                 utilsData.add(data);
             }
-
         } catch (Exception e) {
-            System.out.println("Error getting utils data from database: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error when reading values from the utils table {}", e.getMessage());
         }
+
         return utilsData;
     }
 

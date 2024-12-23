@@ -237,15 +237,14 @@ public class SignUpController {
             return;
         }
 
-        log.info("Code{}", code);
-        log.info("randomCode{}", randomCode);
+//        log.info("Code{}", code);
+//        log.info("randomCode{}", randomCode);
         //verify the code
         if (!code.equals(randomCode)) {
                 codeAlert.setText("Invalid code");
                 codeAlert.setVisible(true);
                 saveUser.setDisable(false);
                 return;
-
         }
 
         //confirm passwords

@@ -148,6 +148,32 @@ public class DatabaseConn {
                             "    )\n" +
                             ");"
             );
+            try (
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
+            ) {
+                resultSet.next();
+                int count = resultSet.getInt(1);
+
+                if (count == 0) {
+                    try (
+                            PreparedStatement preparedStatement = connection.prepareStatement(
+                                    "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
+                                            "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
+                                            "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
+                                            "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
+                            );
+                    ) {
+                        preparedStatement.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error("Error inserting values into utils table: {}", e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            } catch (SQLException e) {
+                log.error("Error checking for existing record in utils table: {}", e.getMessage());
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             log.error("Error creating schemas:: ", e);
             throw new RuntimeException(e);
