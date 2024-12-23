@@ -106,19 +106,20 @@ public class HomeController {
 
     private List<Sales> getSalesFromDatabase() {
         List<Sales> sales = new ArrayList<>();
-        try {
-            Connection connection = databaseConn.getConnection();
-            Statement statement = connection.createStatement();
-            String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
-            ResultSet resultSet = statement.executeQuery(query);
-
+        String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setDate(resultSet.getString("date"));
                 sale.setTotalAmount(resultSet.getDouble("total_amount"));
                 sales.add(sale);
             }
-            connection.close();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -164,22 +165,22 @@ public class HomeController {
                 return;
             }
             //? add the transaction to the money table
-            try {
-                Connection conn = databaseConn.getConnection();
-                Statement statement = conn.createStatement();
-                String sql = "INSERT INTO money (date, cash_withdrawal, mpesa_withdrawal, description) VALUES (datetime('now'),?, ?, ?)";
-                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            String sql = "INSERT INTO money (date, cash_withdrawal, mpesa_withdrawal, description) VALUES (datetime('now'),?, ?, ?)";
+            try (
+                    Connection conn = databaseConn.getConnection();
+                    Statement statement = conn.createStatement();
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ) {
                 preparedStatement.setDouble(1, cash);
                 preparedStatement.setDouble(2, mpesa);
                 preparedStatement.setString(3, description);
 
                 int rowAffected = preparedStatement.executeUpdate();
-
+                conn.close();
                 if (rowAffected > 0) {
-                    conn.close();
+
                     descriptionTextArea.clear();
                 } else {
-                    conn.close();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error");
@@ -192,12 +193,13 @@ public class HomeController {
             }
 
             //? update utils table
-            try {
-                Connection conn = databaseConn.getConnection();
-                Statement statement = conn.createStatement();
+            try (
+                    Connection conn = databaseConn.getConnection();
+                    Statement statement = conn.createStatement();
+            ) {
                 int rowAffected = statement.executeUpdate("UPDATE utils SET current_cash = current_cash - " + cash + ", current_mpesa = current_mpesa - " + mpesa + " WHERE id = 1");
+                conn.close();
                 if (rowAffected > 0) {
-                    conn.close();
                     populateTableView();
 
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -208,7 +210,7 @@ public class HomeController {
                     withdrawCashSpinner.getValueFactory().setValue(0.0);
                     withdrawMpesaSpinner.getValueFactory().setValue(0.0);
                 } else {
-                    conn.close();
+
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error");
@@ -254,18 +256,18 @@ public class HomeController {
         ObservableList<UtilsData> utilsData = FXCollections.observableArrayList();
         utilsData.addAll(getUtilsDataFromDatabase());
         utilsTableView.setItems(utilsData);
-        loadLabels(utilsData.get(0));
+       if (!utilsData.isEmpty()) loadLabels(utilsData.get(0));
     }
 
     //? get data from the database
     private List<UtilsData> getUtilsDataFromDatabase() {
         List<UtilsData> utilsData = new ArrayList<>();
 
-        try {
-            Connection conn = databaseConn.getConnection();
-
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
+        ) {
             rs.next();
             int count = rs.getInt(1);
 
@@ -281,7 +283,6 @@ public class HomeController {
 
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM utils");
-
             while (resultSet.next()) {
                 UtilsData data = new UtilsData();
                 data.setId(resultSet.getObject("id"));
@@ -300,7 +301,7 @@ public class HomeController {
 
                 utilsData.add(data);
             }
-            conn.close();
+
         } catch (Exception e) {
             System.out.println("Error getting utils data from database: " + e.getMessage());
             e.printStackTrace();

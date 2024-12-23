@@ -330,7 +330,7 @@ public class SalesController {
                     preparedStatement.setDouble(7, credit);
                     preparedStatement.setString(8, description);
                     int rowAffected = preparedStatement.executeUpdate();
-
+                    connection.close();
                     if (rowAffected > 0) {
                         Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
                         alert1.setTitle("Success");
@@ -341,7 +341,6 @@ public class SalesController {
                         timeline.play();
                         alert1.showAndWait();
 
-                        connection.close();
                         updateDatabase(cartTableView);
                         updateCashAndMpesa(cash, mpesa);
                         populateSalesTable();
@@ -362,8 +361,6 @@ public class SalesController {
                         alert1.setContentText("Error in saving the sale");
                         alert1.showAndWait();
                     }
-                } finally {
-                    connection.close();
                 }
             } catch (SQLException e) {
                 if (e.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY.code) {
@@ -432,12 +429,11 @@ public class SalesController {
     //? Update cash and mpesa
     private void updateCashAndMpesa(Double cash, Double mpesa) {
         new Thread(() -> {
-            try {
-                Connection connection = databaseConn.getConnection();
-                Statement statement = connection.createStatement();
-
-                ResultSet resultSet = statement.executeQuery("SELECT current_cash, current_mpesa FROM utils");
-
+            try (
+                    Connection connection = databaseConn.getConnection();
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("SELECT current_cash, current_mpesa FROM utils");
+            ) {
                 if (resultSet.next()) {
                     double currentCash = resultSet.getDouble("current_cash");
                     double currentMpesa = resultSet.getDouble("current_mpesa");
@@ -453,16 +449,16 @@ public class SalesController {
                     preparedStatement.setDouble(3, cash);
                     preparedStatement.setDouble(4, mpesa);
                     int rowAffected = preparedStatement.executeUpdate();
-
+                    connection.close();
                     if (rowAffected > 0) {
-                        connection.close();
+                        ;
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
                         alert.setHeaderText("Error updating cash and mpesa");
                         alert.setContentText("Error updating cash and mpesa");
                         alert.showAndWait();
-                        connection.close();
+
                     }
                 }
             } catch (Exception e) {
@@ -480,11 +476,12 @@ public class SalesController {
     public void updateCurrentStockWorth() {
         double stockWorth = 0.0;
 
-        try {
-            Connection connection = databaseConn.getConnection();
-            Statement statement = connection.createStatement();
-            String sql = "SELECT SUM(buying_price * quantity) AS stock_worth FROM products";
-            ResultSet resultSet = statement.executeQuery(sql);
+        String sql = "SELECT SUM(buying_price * quantity) AS stock_worth FROM products";
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql);
+        ) {
 
             if (resultSet.next()) {
                 stockWorth = resultSet.getDouble("stock_worth");
@@ -495,8 +492,9 @@ public class SalesController {
                     preparedStatement.setDouble(1, stockWorth);
                     int rowAffected = preparedStatement.executeUpdate();
 
+                    connection.close();
                     if (rowAffected > 0) {
-                        connection.close();
+                        ;
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
@@ -505,15 +503,10 @@ public class SalesController {
                         alert.showAndWait();
                     }
                 } catch (Exception e) {
-                    connection.close();
                     System.out.println("Error updating stock worth: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
-
-            resultSet.close();
-            statement.close();
-            connection.close();
         } catch (SQLException e) {
             System.out.println("Error calculating stock worth: " + e.getMessage());
             e.printStackTrace();
@@ -600,12 +593,12 @@ public class SalesController {
     private List<Products> getProductsFromDatabase() {
         List<Products> products = new ArrayList<>();
 
-        try {
-            Connection connection = databaseConn.getConnection();
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
-
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM products");
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -617,8 +610,6 @@ public class SalesController {
                 product.setProductDescription(resultSet.getString("description"));
                 products.add(product);
             }
-            connection.close();
-
         } catch (Exception e) {
             System.out.println("Error fetching product: " + e.getMessage());
             e.printStackTrace();
@@ -638,10 +629,12 @@ public class SalesController {
 
         String searchName = searchTextField.getText();
 
-        try {
-            Connection connection = databaseConn.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM  products  WHERE name LIKE  '%" + searchName + "%'");
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM  products  WHERE name LIKE  '%" + searchName + "%'");
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -654,7 +647,6 @@ public class SalesController {
                 products.add(product);
             }
 
-            connection.close();
         } catch (Exception e) {
             System.out.println("Error fetching filtered products" + e.getMessage());
             e.printStackTrace();
@@ -819,12 +811,12 @@ public class SalesController {
     //? Get sales from database
     private List<Sales> getSalesFromDatabase() {
         List<Sales> sales = new ArrayList<>();
-        try {
-            Connection connection = databaseConn.getConnection();
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM sales");
-
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM sales");
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setSalesID(resultSet.getObject("id"));
@@ -839,7 +831,7 @@ public class SalesController {
                 sale.setDescription(resultSet.getString("description"));
                 sales.add(sale);
             }
-            connection.close();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

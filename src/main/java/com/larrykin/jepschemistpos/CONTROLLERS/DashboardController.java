@@ -158,7 +158,7 @@ public class DashboardController {
         }
         companyHyperlink.setOnAction(event -> {
             try {
-                Desktop.getDesktop().browse(new URI("https://larrykin343.onrender.com/"));
+                Desktop.getDesktop().browse(new URI("https://larrykin343.vercel.app/"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
@@ -260,7 +260,7 @@ public class DashboardController {
         try (Connection connection = databaseConn.getConnection();
              Statement statement = connection.createStatement()) {
 
-            String outOfStockQuery = "SELECT * FROM products WHERE quantity <= 2";
+            String outOfStockQuery = "SELECT * FROM products WHERE quantity <= min_quantity";
             String selectExpiredGoodsSQL = "SELECT * FROM products WHERE expiry_date < CURRENT_DATE";
 
             ResultSet outOfStockResultSet = statement.executeQuery(outOfStockQuery);

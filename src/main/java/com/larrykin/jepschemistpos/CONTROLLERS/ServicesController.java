@@ -18,6 +18,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -26,6 +28,7 @@ import java.util.List;
 
 public class ServicesController {
 
+    private static final Logger log = LoggerFactory.getLogger(ServicesController.class);
     @FXML
     private TextField cashPaymentTextField;
 
@@ -73,16 +76,17 @@ public class ServicesController {
                 }
 
                 String sql = "INSERT INTO service_history (date, service_name, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?)";
-                try {
-                    Connection conn = databaseConn.getConnection();
-                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                try (
+                        Connection conn = databaseConn.getConnection();
+                        PreparedStatement pstmt = conn.prepareStatement(sql);
+                ) {
                     pstmt.setString(1, serviceNameTextField.getText());
                     pstmt.setString(2, descriptionTextArea.getText());
                     pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
                     pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
 
                     int rowAffected = pstmt.executeUpdate();
-
+                    conn.close();
 
                     if (rowAffected > 0) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -95,7 +99,7 @@ public class ServicesController {
                         alert.showAndWait();
 
                         //? On Success methods
-                        conn.close();
+
                         Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
                         Double cash = Double.parseDouble(cashPaymentTextField.getText());
                         Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText());
@@ -113,7 +117,7 @@ public class ServicesController {
                         alert.setHeaderText("Error saving service");
                         alert.setContentText("Error saving service");
                         alert.showAndWait();
-                        conn.close();
+
                     }
 
                 } catch (SQLException e) {
@@ -144,14 +148,16 @@ public class ServicesController {
         }
     }
 
-    private void updateStats(Double totalCashFromService,Double cash, Double mpesa) {
-        try {
-            Connection conn = databaseConn.getConnection();
-            String query = "SELECT * FROM utils";
-
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery(query);
-
+    private void updateStats(Double totalCashFromService, Double cash, Double mpesa) {
+        String query = "SELECT * FROM utils";
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet resultSet = stmt.executeQuery(query);
+        ) {
+            conn.close();
+            stmt.close();
+            resultSet.close();
             while (resultSet.next()) {
                 double currentCash = resultSet.getDouble("services_revenue");
                 int numberOfServices = resultSet.getInt("services_number");
@@ -160,29 +166,34 @@ public class ServicesController {
                 int newNumberOfServices = numberOfServices + 1;
 
                 String updateQuery = "UPDATE utils SET services_revenue = ?, services_number = ?, current_cash = current_cash + ?, current_mpesa = current_mpesa + ?, services_total_cash = services_total_cash + ? , services_total_mpesa = services_total_mpesa + ? ";
-                PreparedStatement pstmt = conn.prepareStatement(updateQuery);
-                pstmt.setDouble(1, newServicesRevenue);
-                pstmt.setInt(2, newNumberOfServices);
-                pstmt.setDouble(3, cash);
-                pstmt.setDouble(4, mpesa);
-                pstmt.setDouble(5, cash);
-                pstmt.setDouble(6, mpesa);
+                try (
+                        Connection conn1 = databaseConn.getConnection();
+                        Statement stmt1 = conn1.createStatement();
+                        PreparedStatement pstmt = conn1.prepareStatement(updateQuery);
+                ) {
+                    pstmt.setDouble(1, newServicesRevenue);
+                    pstmt.setInt(2, newNumberOfServices);
+                    pstmt.setDouble(3, cash);
+                    pstmt.setDouble(4, mpesa);
+                    pstmt.setDouble(5, cash);
+                    pstmt.setDouble(6, mpesa);
 
-                int rowAffected = pstmt.executeUpdate();
+                    int rowAffected = pstmt.executeUpdate();
+                    conn1.close();
+                    if (rowAffected > 0) {
+                        ;
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error updating stats");
+                        alert.setContentText("Error updating stats");
+                        alert.showAndWait();
 
-                if (rowAffected > 0) {
-                    ;
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error updating stats");
-                    alert.setContentText("Error updating stats");
-                    alert.showAndWait();
-                    conn.close();
+                    }
+                } catch (Exception e) {
+                    log.error("Error updating stats: " + e.getMessage());
                 }
             }
-            conn.close();
-
         } catch (Exception e) {
             System.out.println("Error updating stats: " + e.getMessage());
             e.printStackTrace();
@@ -312,13 +323,14 @@ public class ServicesController {
         }
 
         String sql = "DELETE FROM service_history WHERE id = ?";
-        try {
-            Connection conn = databaseConn.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+        try (
+                Connection conn = databaseConn.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
 
             pstmt.setObject(1, service.getServiceID());
             int rowAffected = pstmt.executeUpdate();
-
+            conn.close();
             if (rowAffected > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -329,7 +341,7 @@ public class ServicesController {
                 timeline.play();
                 alert.showAndWait();
 
-                conn.close();
+
                 populateTable();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -337,7 +349,7 @@ public class ServicesController {
                 alert.setHeaderText("Error deleting service");
                 alert.setContentText("Error deleting service");
                 alert.showAndWait();
-                conn.close();
+
             }
 
         } catch (SQLException e) {
@@ -371,9 +383,11 @@ public class ServicesController {
                             }
 
                             String sql = "UPDATE service_history SET service_name = ?, description = ?, cash_payment = ?, mpesa_payment = ? WHERE id = ?";
-                            try {
-                                Connection conn = databaseConn.getConnection();
-                                PreparedStatement pstmt = conn.prepareStatement(sql);
+                            try (
+                                    Connection conn = databaseConn.getConnection();
+                                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                            ) {
+
                                 pstmt.setString(1, serviceNameTextField.getText());
                                 pstmt.setString(2, descriptionTextArea.getText());
                                 pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
@@ -382,7 +396,7 @@ public class ServicesController {
 
                                 int rowAffected = pstmt.executeUpdate();
 
-
+                                conn.close();
                                 if (rowAffected > 0) {
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                     alert.setTitle("Success");
@@ -393,11 +407,11 @@ public class ServicesController {
                                     timeline.play();
                                     alert.showAndWait();
 
-                                    conn.close();
+
                                     Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText()) - oldCashPayment - oldMpesaPayment;
                                     Double cash = Double.parseDouble(cashPaymentTextField.getText()) - oldCashPayment;
                                     Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText()) - oldMpesaPayment;
-                                    updateStats(totalCashFromService,cash,mpesa);
+                                    updateStats(totalCashFromService, cash, mpesa);
                                     populateTable();
 
                                     //clear fields
@@ -416,7 +430,7 @@ public class ServicesController {
                                     alert.setContentText("Error Updating service");
                                     alert.showAndWait();
 
-                                    conn.close();
+
                                 }
 
                             } catch (SQLException e) {
@@ -462,12 +476,12 @@ public class ServicesController {
 
     private List<Service> getServicesFromDatabase() {
         List<Service> services = new ArrayList<>();
-        try {
-            Connection conn = databaseConn.getConnection();
-
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery("SELECT * FROM service_history");
-
+        try (
+                Connection conn = databaseConn.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet resultSet = stmt.executeQuery("SELECT * FROM service_history");
+        ) {
+            conn.close();
             while (resultSet.next()) {
                 Service service = new Service();
                 service.setServiceID(resultSet.getObject("id"));
@@ -478,7 +492,7 @@ public class ServicesController {
                 service.setMpesaPayment(resultSet.getDouble("mpesa_payment"));
                 services.add(service);
             }
-            conn.close();
+
 
         } catch (Exception e) {
             System.out.println("Error fetching services: " + e.getMessage());

@@ -42,19 +42,20 @@ public class ReportsController {
 
     private List<Sales> getSalesFromDatabase() {
         List<Sales> sales = new ArrayList<>();
-        try {
-            Connection connection = databaseConn.getConnection();
-            Statement statement = connection.createStatement();
-            String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
-            ResultSet resultSet = statement.executeQuery(query);
+        String query = "SELECT strftime('%Y-%m-%d', date) as date, SUM(total_amount) as total_amount FROM sales GROUP BY strftime('%Y-%m-%d', date)";
+        try (
 
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Sales sale = new Sales();
                 sale.setDate(resultSet.getString("date"));
                 sale.setTotalAmount(resultSet.getInt("total_amount"));
                 sales.add(sale);
             }
-            connection.close();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

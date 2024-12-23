@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -14,13 +15,12 @@
         </font>
     </Label>
     <Button fx:id="getCodeButton" layoutX="74.0" layoutY="110.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="356.0" text="Request Code From Developer" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="74.0" AnchorPane.topAnchor="110.0" />
-    <Label alignment="CENTER" layoutX="6.0" layoutY="76.0" prefHeight="34.0" prefWidth="492.0" text="Click to request Code from Admin" textFill="#f8f6f6" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="76.0">
+    <Label alignment="CENTER" layoutX="6.0" layoutY="76.0" prefHeight="34.0" prefWidth="492.0" text="Click to request Code from Developer" textFill="#f8f6f6" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="76.0">
         <font>
             <Font name="System Bold Italic" size="12.0" />
         </font>
     </Label>
-    <Label fx:id="alertLabel" alignment="CENTER" layoutX="4.0" layoutY="51.0" prefHeight="25.0" prefWidth="491.0"
-           textFill="#f20808" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="51.0">
+    <Label fx:id="alertLabel" alignment="CENTER" layoutX="4.0" layoutY="51.0" prefHeight="25.0" prefWidth="491.0" textFill="#f20808" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="51.0">
         <font>
             <Font name="System Bold Italic" size="13.0" />
         </font>
@@ -51,9 +51,10 @@
          <Font size="15.0" />
       </font>
    </TextField>
-   <TextField fx:id="codeTextField" disable="true" layoutX="78.0" layoutY="182.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter Code From Developer">
+   <PasswordField fx:id="codeTextField" disable="true" layoutX="78.0" layoutY="182.0" prefHeight="47.0" prefWidth="355.0" promptText="Enter Code From Developer">
       <font>
          <Font size="15.0" />
       </font>
-   </TextField>
+   </PasswordField>
+   <ToggleButton fx:id="developerModeToggle" layoutX="401.0" layoutY="2.0" mnemonicParsing="false" text="Developer Mode" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 </AnchorPane>

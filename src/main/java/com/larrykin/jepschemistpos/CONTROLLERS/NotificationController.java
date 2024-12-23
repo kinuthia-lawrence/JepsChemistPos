@@ -38,6 +38,7 @@ public class NotificationController {
     //? instantiate database connection
     DatabaseConn databaseConn = new DatabaseConn();
     private StockController stockController;
+
     private void instantiateStockController() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/stock.fxml"));
@@ -57,7 +58,7 @@ public class NotificationController {
         try {
             //check if any of the table has data
             if (!expiredGoodsTableView.getItems().isEmpty() || !outOfStockTableView.getItems().isEmpty()) {
-               Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Notification");
                 alert.setHeaderText("You have some notifications");
                 alert.setContentText("You have some expired goods or out of stock products");
@@ -163,25 +164,26 @@ public class NotificationController {
 
     private void deleteAsLoss(Products product) {
         //? Delete the product from the expired_goods table and increment the expired loss in utils
-        try {
-            //get the value = product quantity * buying price
-            double loss = product.getProductQuantity() * product.getBuyingPrice();
+        //get the value = product quantity * buying price
+        double loss = product.getProductQuantity() * product.getBuyingPrice();
 
-            Connection connection = databaseConn.getConnection();
-            String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
-            String updateSQL = "UPDATE utils SET expired_loss = expired_loss + ?";
 
-            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
-                 PreparedStatement updateStatement = connection.prepareStatement(updateSQL)) {
-                deleteStatement.setInt(1, (int) product.getProductID());
-                deleteStatement.executeUpdate();
+        String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
+        String updateSQL = "UPDATE utils SET expired_loss = expired_loss + ?";
+        try (
+                Connection connection = databaseConn.getConnection();
+                PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
+                PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+        ) {
+            deleteStatement.setInt(1, (int) product.getProductID());
+            deleteStatement.executeUpdate();
 
-                updateStatement.setDouble(1, loss);
-                updateStatement.executeUpdate();
+            updateStatement.setDouble(1, loss);
+            updateStatement.executeUpdate();
 
-                connection.close();
-                populateExpiredGoodsTable();
-            }
+            connection.close();
+            populateExpiredGoodsTable();
+
 
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -194,25 +196,27 @@ public class NotificationController {
     }
 
     private void deleteAsRefunded(Products product) {
-        try {
-            //get the value = product quantity * buying price
-            double refunded = product.getProductQuantity() * product.getBuyingPrice();
+        //get the value = product quantity * buying price
+        double refunded = product.getProductQuantity() * product.getBuyingPrice();
 
-            Connection connection = databaseConn.getConnection();
-            String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
-            String updateSQL = "UPDATE utils SET refunded_expired = refunded_expired + ?";
+        String deleteSQL = "DELETE FROM expired_goods WHERE id = ?";
+        String updateSQL = "UPDATE utils SET refunded_expired = refunded_expired + ?";
+        try (
+                Connection connection = databaseConn.getConnection();
+                PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
+                PreparedStatement updateStatement = connection.prepareStatement(updateSQL);
+        ) {
 
-            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSQL);
-                 PreparedStatement updateStatement = connection.prepareStatement(updateSQL)) {
-                deleteStatement.setInt(1, (int) product.getProductID());
-                deleteStatement.executeUpdate();
 
-                updateStatement.setDouble(1, refunded);
-                updateStatement.executeUpdate();
+            deleteStatement.setInt(1, (int) product.getProductID());
+            deleteStatement.executeUpdate();
 
-                connection.close();
-                populateExpiredGoodsTable();
-            }
+            updateStatement.setDouble(1, refunded);
+            updateStatement.executeUpdate();
+
+            connection.close();
+            populateExpiredGoodsTable();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -264,7 +268,7 @@ public class NotificationController {
             connection.close();
             populateExpiredGoodsTable();
         } catch (Exception e) {
-            System.out.println("Error :" + e.getMessage() );
+            System.out.println("Error :" + e.getMessage());
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -278,11 +282,13 @@ public class NotificationController {
         ObservableList<Products> expiredGoods = FXCollections.observableArrayList();
         List<Products> products = new ArrayList<>();
 
-        try {
-            Connection connection = databaseConn.getConnection();
-            String query = "SELECT * FROM expired_goods";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+        String query = "SELECT * FROM expired_goods";
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -295,7 +301,7 @@ public class NotificationController {
                 product.setExpiryDate(resultSet.getString("expiry_date"));
                 products.add(product);
             }
-            connection.close();
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -365,7 +371,7 @@ public class NotificationController {
             }
         });
 
-        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductCategoryColumn, outOfStockProductQuantityColumn, outOfStockMinProductQuantityColumn,  outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
+        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductCategoryColumn, outOfStockProductQuantityColumn, outOfStockMinProductQuantityColumn, outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
 
         checkOutOfStock();
     }
@@ -374,11 +380,13 @@ public class NotificationController {
         ObservableList<Products> outOfStockProducts = FXCollections.observableArrayList();
         List<Products> products = new ArrayList<>();
 
-        try {
-            Connection connection = databaseConn.getConnection();
-            String query = "SELECT * FROM products WHERE quantity <= min_quantity";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+        String query = "SELECT * FROM products WHERE quantity <= min_quantity";
+        try (
+                Connection connection = databaseConn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+        ) {
+            connection.close();
             while (resultSet.next()) {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
@@ -391,7 +399,6 @@ public class NotificationController {
                 products.add(product);
 
             }
-            connection.close();
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

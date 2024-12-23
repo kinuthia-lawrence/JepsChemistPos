@@ -173,11 +173,12 @@ public class SettingsController {
             //check if the new password and confirm password are the same
             if (password.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                try {
-                    //check if the super admin email, username = admin and password are correct
-                    Connection conn = databaseConn.getConnection();
-                    String sql = "SELECT * FROM users WHERE email = ? AND role = '" + ROLE.ADMIN + "' AND password = ?";
-                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                String sql = "SELECT * FROM users WHERE email = ? AND role = '" + ROLE.ADMIN + "' AND password = ?";
+                try (
+                        //check if the super admin email, username = admin and password are correct
+                        Connection conn = databaseConn.getConnection();
+                        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                ) {
                     preparedStatement.setString(1, superAdminEmail);
                     preparedStatement.setString(2, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
@@ -225,14 +226,16 @@ public class SettingsController {
     }
 
     private void addUserToDatabase(String emailAccountToCreate, String usernameForTheAccount, String password) {
-        try (Connection conn = databaseConn.getConnection()) {
-            String sql = "INSERT INTO users(email, username, role, password) VALUES(?, ?, ?, ?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        String sql = "INSERT INTO users(email, username, role, password) VALUES(?, ?, ?, ?)";
+        try (Connection conn = databaseConn.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        ) {
             preparedStatement.setString(1, emailAccountToCreate);
             preparedStatement.setString(2, usernameForTheAccount);
             preparedStatement.setString(3, ROLE.USER.toString());
             preparedStatement.setString(4, password);
             int output = preparedStatement.executeUpdate();
+            conn.close();
             if (output > 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("User Added");
@@ -277,11 +280,12 @@ public class SettingsController {
             //check if the new password and confirm password are the same
             if (newPassword.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                try {
-                    //check if the super admin email, username = admin and password are correct
-                    Connection conn = databaseConn.getConnection();
-                    String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
-                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
+                try (
+                        //check if the super admin email, username = admin and password are correct
+                        Connection conn = databaseConn.getConnection();
+                        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                ) {
                     preparedStatement.setString(1, superAdminEmail);
                     preparedStatement.setString(2, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
@@ -344,9 +348,10 @@ public class SettingsController {
     }
 
     private void changePasswordInDatabase(String newPassword, String emailAccountToChangePassword) {
-        try (Connection conn = databaseConn.getConnection()) {
-            String sql = "UPDATE users SET password = ? WHERE email = ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
+        try (Connection conn = databaseConn.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        ) {
             preparedStatement.setString(1, newPassword);
             preparedStatement.setString(2, emailAccountToChangePassword);
             int output = preparedStatement.executeUpdate();
@@ -387,9 +392,10 @@ public class SettingsController {
         String supplierNameText = supplierName.getText();
         String supplierContactInformationText = supplierContactInformation.getText();
         if (!supplierNameText.isBlank() && !supplierContactInformationText.isBlank()) {
-            try (Connection conn = databaseConn.getConnection()) {
-                String sql = "INSERT INTO suppliers(name, contact_information) VALUES(?, ?)";
-                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            String sql = "INSERT INTO suppliers(name, contact_information) VALUES(?, ?)";
+            try (Connection conn = databaseConn.getConnection();
+                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ) {
                 preparedStatement.setString(1, supplierNameText);
                 preparedStatement.setString(2, supplierContactInformationText);
                 int output = preparedStatement.executeUpdate();
@@ -505,9 +511,10 @@ public class SettingsController {
 
                     //check if name and contact info. is black if not, update the supplier
                     if (!newSupplierName.isBlank() || !newSupplierContactInformation.isBlank()) {
-                        try (Connection conn = databaseConn.getConnection()) {
-                            String sql = "UPDATE suppliers SET name = ?, contact_information = ? WHERE name = ?";
-                            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                        String sql = "UPDATE suppliers SET name = ?, contact_information = ? WHERE name = ?";
+                        try (Connection conn = databaseConn.getConnection();
+                             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                        ) {
                             preparedStatement.setString(1, newSupplierName);
                             preparedStatement.setString(2, newSupplierContactInformation);
                             preparedStatement.setString(3, oldSupplierName);

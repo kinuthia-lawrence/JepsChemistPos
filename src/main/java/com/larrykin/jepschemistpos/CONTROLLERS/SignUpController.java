@@ -43,6 +43,9 @@ public class SignUpController {
     private PasswordField confirmPassword;
 
     @FXML
+    private ToggleButton developerModeToggle;
+
+    @FXML
     private PasswordField enterPassword;
 
     @FXML
@@ -66,11 +69,58 @@ public class SignUpController {
             getCodeButton.setDisable(true);
             signUp();
         });
-
         saveUser.setOnAction(event -> {
             log.info("Save user button clicked");
             saveUser.setDisable(true);
             createUser(randomCode);
+        });
+        developerModeToggle.setOnAction(event -> {
+            if(developerModeToggle.isSelected()){
+                getCodeButton.setDisable(true);
+                //? check if there exist registered users
+                String listUsers = "SELECT * FROM users";
+
+                try (
+                        Connection connection = databaseConn.getConnection();
+                        ResultSet queryResults = connection.createStatement().executeQuery(listUsers);
+                ) {
+                    connection.close();
+                    if (queryResults.next()) {
+                        alertLabel.setText("Admin already exist, please contact the administrator");
+                        alertLabel.setVisible(true);
+                        alertLabel.setStyle("-fx-text-fill: red");
+                        return;
+                    } else {
+                        // Generate a random code
+                        randomCode = "L@rrykin2547";
+                        //set fields to enabled
+                        codeTextField.setDisable(false);
+                        adminEmail.setDisable(false);
+                        adminUsername.setDisable(false);
+                        enterPassword.setDisable(false);
+                        confirmPassword.setDisable(false);
+                        saveUser.setDisable(false);
+                    }
+                } catch (Exception e) {
+                    getCodeButton.setDisable(false);
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error occurred");
+                    alert.setContentText("An error occurred while trying to check for registered users");
+                    alert.showAndWait();
+
+                    log.error("Error occurred while trying to check for registered users", e);
+                }
+            }else{
+                getCodeButton.setDisable(false);
+                alertLabel.setVisible(false);
+                codeTextField.setDisable(true);
+                adminEmail.setDisable(true);
+                adminUsername.setDisable(true);
+                enterPassword.setDisable(true);
+                confirmPassword.setDisable(true);
+                saveUser.setDisable(true);
+            }
         });
     }
 
@@ -142,16 +192,21 @@ public class SignUpController {
                         customAlert.showAlert("Network Error", "Unable to connect to the email server. " +
                                 "Please check your " +
                                 "network connection and try again.", Alert.AlertType.ERROR);
+                        log.error("Unable to connect to the email server. Please check your network connection and try again.", e);
                     } else if (e.getCause() instanceof UnknownHostException) {
                         customAlert.showAlert("Network Error", "Unable to connect to the email server. Please contact the developer to fix the server address.", Alert.AlertType.ERROR);
+                        log.error("Unable to connect to the email server. Please contact the developer to fix the server address.", e);
                     } else if (e instanceof AuthenticationFailedException) {
                         customAlert.showAlert("Authentication Error", "Invalid email username or password. Please contact Developer.", Alert.AlertType.ERROR);
+                        log.error("Invalid email username or password. Please contact Developer.", e);
                     } else {
                         customAlert.showAlert("Email Error", "An error occurred while sending the email. Please try again later.", Alert.AlertType.ERROR);
+                        log.error("An error occurred while sending the email. Please try again later.", e);
                     }
                 } catch (Exception e) {
                     getCodeButton.setDisable(false);
                     customAlert.showAlert("Unexpected Error", "An unexpected error occurred while processing your request. Please try again.", Alert.AlertType.ERROR);
+                    log.error("An unexpected error occurred while processing your request. Please try again.", e);
                 }
             }
         } catch (Exception e) {
@@ -187,12 +242,11 @@ public class SignUpController {
         log.info("randomCode{}", randomCode);
         //verify the code
         if (!code.equals(randomCode)) {
-            if (!code.equals("L@rrykin2547")) {
                 codeAlert.setText("Invalid code");
                 codeAlert.setVisible(true);
                 saveUser.setDisable(false);
                 return;
-            }
+
         }
 
         //confirm passwords
@@ -229,6 +283,7 @@ public class SignUpController {
         } catch (Exception e) {
             saveUser.setDisable(false);
             customAlert.showAlert("ERROR", "Error in creating Admin :: " + e.getMessage(), Alert.AlertType.ERROR);
+            log.error("Error in creating Admin", e);
         }
     }
 

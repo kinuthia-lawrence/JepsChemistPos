@@ -528,12 +528,12 @@ public class StockController {
     }
 
     private void saveCategory(String categoryValue) {
+            String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
         try (
                 Connection connection = conn.getConnection();
-        ) {
             // Check if the category already exists
-            String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
             PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+        ) {
             checkStatement.setString(1, categoryValue);
             ResultSet resultSet = checkStatement.executeQuery();
             resultSet.next();
@@ -575,13 +575,12 @@ public class StockController {
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
-        try (
-                Connection connection = conn.getConnection();
-        ) {
             Double totalStock = quantityValue * buyingPriceValue;
             String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
-
+        try (
+                Connection connection = conn.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
+        ) {
             statement.setDouble(1, totalStock);
             int resultSet = statement.executeUpdate();
             connection.close();
