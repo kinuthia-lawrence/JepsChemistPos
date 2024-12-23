@@ -262,43 +262,6 @@ public class HomeController {
     //? get data from the database
     private List<UtilsData> getUtilsDataFromDatabase() {
         List<UtilsData> utilsData = new ArrayList<>();
-
-        /*boolean isUtilsEmpty = false;
-
-        //? check if utils is empty
-        try (
-                Connection conn = databaseConn.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM utils WHERE id = 1");
-        ) {
-            rs.next();
-            int count = rs.getInt(1);
-
-            if (count == 0) {
-                isUtilsEmpty = true;
-            }
-        } catch (Exception e) {
-            log.error("Error getting utils data from database: {}", e.getMessage());
-            e.printStackTrace();
-        }
-
-        //? if the utils table is empty, insert the default values
-        try (
-                Connection conn = databaseConn.getConnection();
-                Statement stmt = conn.createStatement();
-        ) {
-            // Insert only if the row does not exist
-            if (isUtilsEmpty)  stmt.execute(
-                    "INSERT INTO utils (id, dark_theme, current_cash, current_mpesa, current_stock_value, " +
-                            "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
-                            "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
-                            "VALUES (1, false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
-            );
-        } catch (Exception e) {
-            log.error("Error encountered inserting values to utils table.{}", e.getMessage());
-            e.printStackTrace();
-        }*/
-
         //? return the data
         try (
                 Connection conn = databaseConn.getConnection();

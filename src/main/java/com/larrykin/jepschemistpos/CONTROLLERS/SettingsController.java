@@ -279,14 +279,14 @@ public class SettingsController {
             //check if the new password and confirm password are the same
             if (newPassword.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                String sql = "SELECT * FROM users WHERE email = ? AND username = 'admin' AND password = ?";
+                String sql = "SELECT * FROM users WHERE  role = ? AND email = ? AND password = ?";
                 try (
-                        //check if the super admin email, username = admin and password are correct
                         Connection conn = databaseConn.getConnection();
                         PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 ) {
-                    preparedStatement.setString(1, superAdminEmail);
-                    preparedStatement.setString(2, superAdminPassword);
+                    preparedStatement.setString(1, ROLE.ADMIN.toString());
+                    preparedStatement.setString(2, superAdminEmail);
+                    preparedStatement.setString(3, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
                         conn.close();
@@ -296,7 +296,8 @@ public class SettingsController {
                         PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
                         preparedStatement2.setString(1, emailAccountToChangePassword);
                         ResultSet resultSet2 = preparedStatement2.executeQuery();
-                        if (resultSet2.next()) {
+                        if (resultSet2.next())
+                        {
                             conn2.close();
                             //check if the old password is correct
                             Connection conn3 = databaseConn.getConnection();
