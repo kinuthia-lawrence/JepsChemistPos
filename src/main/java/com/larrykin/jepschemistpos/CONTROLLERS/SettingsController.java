@@ -443,7 +443,7 @@ public class SettingsController {
                     alert.showAndWait();
                 }
             } catch (Exception e) {
-                System.out.println("Error(sql): " + e.getMessage());
+                log.error("Error Saving Supplier{}", e.getMessage());
                 e.printStackTrace();
             }
         } else {
@@ -566,7 +566,7 @@ public class SettingsController {
                                 alert.showAndWait();
                             }
                         } catch (Exception e) {
-                            System.out.println("Error(sql): " + e.getMessage());
+                            log.error("Error updateing supplier{}", e.getMessage());
                             e.printStackTrace();
                         }
                     } else {
@@ -578,7 +578,7 @@ public class SettingsController {
                 });
 
             } catch (Exception e) {
-                System.out.println("Error (sql): " + e.getMessage());
+                log.error("Error editing supplier::{}", e.getMessage());
                 e.printStackTrace();
             }
         }
