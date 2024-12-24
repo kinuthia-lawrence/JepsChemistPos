@@ -6,7 +6,7 @@ public enum DashboardOptions {
     STOCK,
     SERVICES,
     NOTIFICATIONS,
-    INVENTORY,
+    TODO,
     REPORTS,
     HELP,
     SETTINGS,

@@ -103,9 +103,9 @@
                     <Font name="System Italic" size="13.0" />
                 </font>
             </Button>
-            <Button fx:id="inventoryButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="360.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" styleClass="side-bar-button" text="Inventory">
+            <Button fx:id="todoButton" alignment="BOTTOM_LEFT" layoutX="30.0" layoutY="360.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="200.0" styleClass="side-bar-button" text="Todos">
                 <graphic>
-                    <ImageView fx:id="inventoryIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
+                    <ImageView fx:id="todoIcon" fitHeight="27.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" />
                 </graphic>
                 <font>
                     <Font name="System Italic" size="13.0" />

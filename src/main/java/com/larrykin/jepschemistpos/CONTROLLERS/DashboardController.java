@@ -8,9 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -59,10 +57,10 @@ public class DashboardController {
     private ImageView helpIcon;
 
     @FXML
-    private Button inventoryButton;
+    private Button todoButton;
 
     @FXML
-    private ImageView inventoryIcon;
+    private ImageView todoIcon;
 
     @FXML
     private ImageView logoImageView;
@@ -234,8 +232,8 @@ public class DashboardController {
             homeIcon.setImage(homeImage);
             Image salesImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/sales.png")));
             salesIcon.setImage(salesImage);
-            Image inventoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/inventory.png")));
-            inventoryIcon.setImage(inventoryImage);
+            Image inventoryImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/todo.png")));
+            todoIcon.setImage(inventoryImage);
             Image reportImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/reports.png")));
             reportIcon.setImage(reportImage);
 
@@ -322,7 +320,7 @@ public class DashboardController {
                     }
 
                 }
-                case INVENTORY -> borderPane.setCenter(Model.getInstance().getViewFactory().getInventoryAnchorPane());
+                case TODO -> borderPane.setCenter(Model.getInstance().getViewFactory().getTodoAnchorPane());
                 case REPORTS -> borderPane.setCenter(Model.getInstance().getViewFactory().getReportsAnchorPane());
                 case HELP -> borderPane.setCenter(Model.getInstance().getViewFactory().getHelpAnchorPane());
                 case SETTINGS -> borderPane.setCenter(Model.getInstance().getViewFactory().getSettingsAnchorPane());
@@ -336,7 +334,7 @@ public class DashboardController {
         stockButton.setOnAction(e -> setStock());
         servicesButton.setOnAction(e -> setServices());
         notificationButton.setOnAction(e -> setNotification());
-        inventoryButton.setOnAction(e -> setInventory());
+        todoButton.setOnAction(e -> setTodo());
         reportButton.setOnAction(e -> setReport());
         helpButton.setOnAction(e -> setHelp());
         logoutButton.setOnAction(e -> logout());
@@ -362,8 +360,8 @@ public class DashboardController {
         Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.NOTIFICATIONS);
     }
 
-    private void setInventory() {
-        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.INVENTORY);
+    private void setTodo() {
+        Model.getInstance().getViewFactory().getDashboardSelectedItem().set(DashboardOptions.TODO);
     }
 
     private void setReport() {
@@ -398,7 +396,7 @@ public class DashboardController {
         Tooltip stockTooltip = new Tooltip("Manage Stock");
         Tooltip servicesTooltip = new Tooltip("Manage Services");
         Tooltip notificationTooltip = new Tooltip("View Notifications");
-        Tooltip inventoryTooltip = new Tooltip("Manage Inventory");
+        Tooltip todoTooltip = new Tooltip("Manage Todo");
         Tooltip reportTooltip = new Tooltip("View Reports");
         Tooltip helpTooltip = new Tooltip("Get Help");
         Tooltip logoutTooltip = new Tooltip("Logout");
@@ -411,7 +409,7 @@ public class DashboardController {
         stockTooltip.setShowDelay(Duration.ZERO);
         servicesTooltip.setShowDelay(Duration.ZERO);
         notificationTooltip.setShowDelay(Duration.ZERO);
-        inventoryTooltip.setShowDelay(Duration.ZERO);
+        todoTooltip.setShowDelay(Duration.ZERO);
         reportTooltip.setShowDelay(Duration.ZERO);
         helpTooltip.setShowDelay(Duration.ZERO);
         logoutTooltip.setShowDelay(Duration.ZERO);
@@ -423,7 +421,7 @@ public class DashboardController {
         Tooltip.install(stockButton, stockTooltip);
         Tooltip.install(servicesButton, servicesTooltip);
         Tooltip.install(notificationButton, notificationTooltip);
-        Tooltip.install(inventoryButton, inventoryTooltip);
+        Tooltip.install(todoButton, todoTooltip);
         Tooltip.install(reportButton, reportTooltip);
         Tooltip.install(helpButton, helpTooltip);
         Tooltip.install(logoutButton, logoutTooltip);

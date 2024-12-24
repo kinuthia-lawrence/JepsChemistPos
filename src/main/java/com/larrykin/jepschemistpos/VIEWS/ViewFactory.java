@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 public class ViewFactory {
     //? Initializing the ObjectProperty and the panes
     private final ObjectProperty dashboardSelectedItem;
-    private AnchorPane homeAnchorPane, saleAnchorPane, inventoryAnchorPane, reportsAnchorPane, settingsAnchorPane, stockAnchorPane, servicesAnchorPane, helpAnchorPane, notificationAnchorPane;
+    private AnchorPane homeAnchorPane, saleAnchorPane, todoAnchorPane, reportsAnchorPane, settingsAnchorPane, stockAnchorPane, servicesAnchorPane, helpAnchorPane, notificationAnchorPane;
 
     //?Constructor
     public ViewFactory() {
@@ -51,16 +51,16 @@ public class ViewFactory {
         return saleAnchorPane;
     }
 
-    public AnchorPane getInventoryAnchorPane() {
-        if (inventoryAnchorPane == null) {
+    public AnchorPane getTodoAnchorPane() {
+        if (todoAnchorPane == null) {
             try {
-                inventoryAnchorPane = new FXMLLoader(getClass().getResource("/FXML/inventory.fxml")).load();
+                todoAnchorPane = new FXMLLoader(getClass().getResource("/FXML/todo.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the inventoryAnchorPane" + e.getMessage());
+                System.out.println("Error loading the todoAnchorPane" + e.getMessage());
                 e.printStackTrace();
             }
         }
-        return inventoryAnchorPane;
+        return todoAnchorPane;
     }
 
     public AnchorPane getReportsAnchorPane() {
