@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class StockController {
     private DatePicker expiryDatePicker;
 
     @FXML
+    private ImageView iconSearch;
+
+    @FXML
     private Spinner<Double> minQuantitySpinner;
 
     @FXML
@@ -60,6 +64,15 @@ public class StockController {
     private Button saveButton;
 
     @FXML
+    private Button searchButton;
+
+    @FXML
+    private HBox searchParent;
+
+    @FXML
+    private TextField searchTextField;
+
+    @FXML
     private Spinner<Double> sellingPriceSpinner;
 
     @FXML
@@ -70,22 +83,40 @@ public class StockController {
 
     @FXML
     public void initialize() {
+        initialieUiElements();
         initializeTable();
-        initializeButtons();
         loadFields();
         instantiateControllers();
         addStockButton.setOnAction(e -> saveProduct());
     }
 
-    private void initializeButtons() {
+    private void initialieUiElements() {
+        //? Search Button
+        Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/search.png"));
+        iconSearch.setImage(searchImage);
+
+        searchButton.setOnAction(event -> {
+            if (searchTextField.getText().isBlank()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Please enter a product name to search!");
+                alert.showAndWait();
+                return;
+            }
+            populateFilteredStockTable();
+        });
+
+        //? Refresh Button
         Image refreshImage = new Image(getClass().getResourceAsStream("/images/refresh.png"));
         refreshIcon.setImage(refreshImage);
 
         refreshButton.setOnAction(e -> {
             populateTable();
             loadFields();
+            searchTextField.setText("");
         });
     }
+
 
     //database instance
     DatabaseConn conn = new DatabaseConn();
@@ -717,6 +748,40 @@ public class StockController {
 
 
         }
+    }
+    
+    private void populateFilteredStockTable() {
+        stockTable.getItems().clear();
+        stockTable.getItems().addAll(getFilteredProductsFromDatabase());
+    }
+
+    private List<Products> getFilteredProductsFromDatabase() {
+        List<Products> products = new ArrayList<>();
+        try (
+                Connection connection = conn.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM products WHERE name LIKE '%" + searchTextField.getText() + "%'");
+        ) {
+            while (resultSet.next()) {
+                Products product = new Products();
+                product.setProductID(resultSet.getObject("id"));
+                product.setProductName(resultSet.getString("name"));
+                product.setProductCategory(resultSet.getString("category"));
+                product.setProductQuantity(resultSet.getDouble("quantity"));
+                product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
+                product.setBuyingPrice(resultSet.getDouble("buying_price"));
+                product.setSellingPrice(resultSet.getDouble("selling_price"));
+                product.setSupplierName(resultSet.getString("supplier_name"));
+                product.setDateAdded(resultSet.getString("date_added"));
+                product.setExpiryDate(resultSet.getString("expiry_date"));
+                product.setProductDescription(resultSet.getString("description"));
+                products.add(product);
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching product: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return products;
     }
 }
 

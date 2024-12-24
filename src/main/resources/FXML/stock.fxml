@@ -10,8 +10,10 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.StockController">
@@ -30,6 +32,16 @@
                         <Font name="System Bold Italic" size="14.0" />
                      </font>
                   </Label>
+                  <HBox fx:id="searchParent" layoutX="152.0" layoutY="4.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="266.0" promptText="Type name to search ..." />
+                        <Button fx:id="searchButton" mnemonicParsing="false">
+                           <graphic>
+                              <ImageView fx:id="iconSearch" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
                   <Button fx:id="refreshButton" layoutX="451.0" layoutY="3.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="1.0">
                      <graphic>
                         <ImageView fx:id="refreshIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
