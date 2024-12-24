@@ -104,7 +104,7 @@ public class ServicesController {
                         Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText());
                         Double cash = Double.parseDouble(cashPaymentTextField.getText());
                         Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText());
-                        updateStats(totalCashFromService, cash, mpesa);
+                        updateStats(totalCashFromService, cash, mpesa, true);
                         populateTable();
 
                         //clear fields
@@ -149,7 +149,7 @@ public class ServicesController {
         }
     }
 
-    private void updateStats(Double totalCashFromService, Double cash, Double mpesa) {
+    private void updateStats(Double totalCashFromService, Double cash, Double mpesa, Boolean isAddNew) {
         String query = "SELECT * FROM utils";
         try (
                 Connection conn = databaseConn.getConnection();
@@ -157,12 +157,12 @@ public class ServicesController {
                 ResultSet resultSet = stmt.executeQuery(query);
         ) {
 
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 double currentCash = resultSet.getDouble("services_revenue");
                 int numberOfServices = resultSet.getInt("services_number");
 
                 double newServicesRevenue = currentCash + totalCashFromService;
-                int newNumberOfServices = numberOfServices + 1;
+                int newNumberOfServices = isAddNew ? (numberOfServices + 1) : (numberOfServices);
                 conn.close();
                 stmt.close();
                 resultSet.close();
@@ -191,11 +191,11 @@ public class ServicesController {
 
                     }
                 } catch (Exception e) {
-                    log.error("Error updating stats: " + e.getMessage());
+                    log.error("Error updating stats -- Inner catch: {}", e.getMessage());
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error updating stats: " + e.getMessage());
+            log.error("Error fetching stats --Outer catch: {}", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -410,7 +410,7 @@ public class ServicesController {
                                     Double totalCashFromService = Double.parseDouble(cashPaymentTextField.getText()) + Double.parseDouble(mpesaPaymentTextField.getText()) - oldCashPayment - oldMpesaPayment;
                                     Double cash = Double.parseDouble(cashPaymentTextField.getText()) - oldCashPayment;
                                     Double mpesa = Double.parseDouble(mpesaPaymentTextField.getText()) - oldMpesaPayment;
-                                    updateStats(totalCashFromService, cash, mpesa);
+                                    updateStats(totalCashFromService, cash, mpesa, false);
                                     populateTable();
 
                                     //clear fields

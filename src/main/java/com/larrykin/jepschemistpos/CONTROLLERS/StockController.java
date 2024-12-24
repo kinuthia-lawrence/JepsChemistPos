@@ -484,8 +484,8 @@ public class StockController {
 
 
                         //clear fields
-                        nameComboBox.setValue(null);
-                        categoryCombobox.setValue(null);
+                        nameComboBox.setValue("");
+                        categoryCombobox.setValue("");
                         quantitySpinner.getValueFactory().setValue(0.0);
                         minQuantitySpinner.getValueFactory().setValue(0.0);
                         buyingPriceSpinner.getValueFactory().setValue(0.0);
@@ -674,8 +674,8 @@ public class StockController {
                                 loadFields();
 
                                 //clear fields
-                                nameComboBox.setValue(null);
-                                categoryCombobox.setValue(null);
+                                nameComboBox.setValue("");
+                                categoryCombobox.setValue("");
                                 quantitySpinner.getValueFactory().setValue(0.0);
                                 minQuantitySpinner.getValueFactory().setValue(0.0);
                                 buyingPriceSpinner.getValueFactory().setValue(0.0);
