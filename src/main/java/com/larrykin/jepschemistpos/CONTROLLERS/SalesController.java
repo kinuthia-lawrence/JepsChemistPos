@@ -810,7 +810,7 @@ public class SalesController {
         try (
                 Connection connection = databaseConn.getConnection();
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM sales");
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM sales ORDER BY date DESC");
         ) {
             while (resultSet.next()) {
                 Sales sale = new Sales();
