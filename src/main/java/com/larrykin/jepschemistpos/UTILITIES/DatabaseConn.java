@@ -174,6 +174,16 @@ public class DatabaseConn {
                 log.error("Error checking for existing record in utils table: {}", e.getMessage());
                 e.printStackTrace();
             }
+            connection.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS todo (\n" +
+                            "    id          INTEGER,\n" +
+                            "    title        TEXT,\n" +
+                            "    description TEXT,\n" +
+                            "    PRIMARY KEY (\n" +
+                            "        id AUTOINCREMENT\n" +
+                            "    )\n" +
+                            ");"
+            );
         } catch (SQLException e) {
             log.error("Error creating schemas:: ", e);
             throw new RuntimeException(e);
