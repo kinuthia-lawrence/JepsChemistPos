@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class LoginController implements Initializable {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
@@ -73,6 +74,7 @@ public class LoginController implements Initializable {
     @FXML
     private PasswordField passwordField;
     DatabaseConn connectNow = new DatabaseConn();
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -188,9 +190,10 @@ public class LoginController implements Initializable {
 
     public void loginOnAction(ActionEvent actionEvent) {
         if (!usernameTextField.getText().isBlank() && !passwordField.getText().isBlank()) {
+
             String usernameInput = usernameTextField.getText();
-            String passwordInput = passwordField.getText();
-            checkLoginCredentials(usernameInput, passwordInput);
+            String password = passwordField.getText();
+            checkLoginCredentials(usernameInput, password);
         } else {
             errorLabel.setText("Please enter your username and password !!!");
         }
@@ -201,14 +204,13 @@ public class LoginController implements Initializable {
     }
 
     private void checkLoginCredentials(String usernameInput, String passwordInput) {
-        String verifyLogin = "SELECT username, email, role FROM users WHERE (username = ? OR email = ?) AND password = ?";
+        String verifyLogin = "SELECT username, email, role, password FROM users WHERE username = ? OR email = ?";
         try (
                 Connection connectDB = connectNow.getConnection();
                 PreparedStatement preparedStatement = connectDB.prepareStatement(verifyLogin);
         ) {
             preparedStatement.setString(1, usernameInput);
             preparedStatement.setString(2, usernameInput);
-            preparedStatement.setString(3, passwordInput);
 
             ResultSet queryResult = preparedStatement.executeQuery();
 
@@ -216,9 +218,16 @@ public class LoginController implements Initializable {
                 String username = queryResult.getString("username");
                 String email = queryResult.getString("email");
                 String role = queryResult.getString("role");
-                User loggedInUser = new User(username, email, ROLE.valueOf(role));
-                loadDashboard(loggedInUser);
-                log.info("User: {} has logged in as {}", username, role);
+                String hashedPassword = queryResult.getString("password");
+                if (passwordEncoder.matches(passwordInput, hashedPassword)) {
+                    User loggedInUser = new User(username, email, ROLE.valueOf(role));
+                    loadDashboard(loggedInUser);
+                    log.info("User: {} has logged in as {}", username, role);
+                } else {
+                    passwordField.clear();
+                    usernameTextField.clear();
+                    errorLabel.setText("Invalid Login. Please try again.");
+                }
             } else {
                 passwordField.clear();
                 usernameTextField.clear();

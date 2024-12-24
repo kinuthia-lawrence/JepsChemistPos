@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -60,6 +61,8 @@ public class SignUpController {
     private final CustomAlert customAlert = new CustomAlert();
     DatabaseConn databaseConn = new DatabaseConn();
     private String randomCode;
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     @FXML
     public void initialize() {
@@ -180,6 +183,7 @@ public class SignUpController {
 
                     //set fields to enabled
                     codeTextField.setDisable(false);
+                    codeTextField.requestFocus();
                     adminEmail.setDisable(false);
                     adminUsername.setDisable(false);
                     enterPassword.setDisable(false);
@@ -229,6 +233,8 @@ public class SignUpController {
         String username = adminUsername.getText();
         String email = adminEmail.getText();
 
+        String hashedPassword = passwordEncoder.encode(password);
+
         // field validation
         if (code.isBlank() || password.isBlank() || passwordConfirm.isBlank() || username.isBlank() || email.isBlank()) {
             codeAlert.setText("Please fill in all fields");
@@ -250,6 +256,7 @@ public class SignUpController {
         //confirm passwords
         if (!password.equals(passwordConfirm)) {
             codeAlert.setText("Passwords do not match");
+            codeAlert.setStyle("-fx-text-fill: red");
             codeAlert.setVisible(true);
             saveUser.setDisable(false);
             return;
@@ -258,7 +265,7 @@ public class SignUpController {
         //create user query
         String insertUser =
                 "INSERT INTO users (username, email, role, password) VALUES ('" + username + "', '" + email + "', '" + ROLE.ADMIN + "', " +
-                        "'" + password + "')";
+                        "'" + hashedPassword + "')";
 
         try (Connection connection = databaseConn.getConnection();
              Statement statement = connection.createStatement();

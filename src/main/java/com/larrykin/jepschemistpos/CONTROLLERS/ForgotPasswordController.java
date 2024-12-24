@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -57,6 +58,7 @@ public class ForgotPasswordController implements Initializable {
 
     private final CustomAlert customAlert = new CustomAlert();
     DatabaseConn connectNow = new DatabaseConn();//Creating an instance of the DatabaseConn class
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,6 +82,7 @@ public class ForgotPasswordController implements Initializable {
             ) {
                 if (queryResult.next()) {
                     EmailAlert.setText("A password reset code has been sent to " + email);
+                    EmailAlert.setStyle("-fx-text-fill: green");
                     // Generate a random code
                     String randomCode = UUID.randomUUID().toString().substring(0, 6);
                     try {
@@ -131,10 +134,12 @@ public class ForgotPasswordController implements Initializable {
                     adminEmailTextField.setDisable(true);
                     getCodeButton.setDisable(true);
                     //? Display the password reset form
+                    emailToChangePassword.setDisable(false);
                     setNewPasswordButton.setDisable(false);
                     enterNewPassword.setDisable(false);
                     confirmNewPassword.setDisable(false);
                     emailCodeTextField.setDisable(false);
+                    emailCodeTextField.requestFocus();
                     connectDB.close();
                     setNewPasswordButton.setOnAction(event -> SetNewPassword(randomCode));
                 } else {
@@ -161,9 +166,10 @@ public class ForgotPasswordController implements Initializable {
         if (!emailToChangePassword.getText().isBlank() && !emailCodeTextField.getText().isBlank() && !enterNewPassword.getText().isBlank() && !confirmNewPassword.getText().isBlank()) {
             if (emailCodeTextField.getText().equals(randomCode)) {
                 if (enterNewPassword.getText().equals(confirmNewPassword.getText())) {
+                    String encodedPassword = passwordEncoder.encode(enterNewPassword.getText());
                     EmailAlert.setDisable(true);
                     //? Update the password in the database
-                    String updatePassword = "UPDATE users SET password = '" + enterNewPassword.getText() + "' WHERE email = '" + emailToChangePassword.getText() + "'";
+                    String updatePassword = "UPDATE users SET password = '" + encodedPassword + "' WHERE email = '" + emailToChangePassword.getText() + "'";
                     try (
                             Connection connectDB = new DatabaseConn().getConnection();
                             Statement statement = connectDB.createStatement();
@@ -182,11 +188,14 @@ public class ForgotPasswordController implements Initializable {
                         emailCodeTextField.clear();
                         enterNewPassword.clear();
                         confirmNewPassword.clear();
+                        emailToChangePassword.clear();
                         EmailAlert.setText("");
                         codeAlert.setText("");
+                        adminEmailTextField.setDisable(true);
                         EmailAlert.setDisable(true);
 
                         codeAlert.setDisable(true);
+                        emailToChangePassword.setDisable(true);
                         enterNewPassword.setDisable(true);
                         confirmNewPassword.setDisable(true);
                         emailCodeTextField.setDisable(true);

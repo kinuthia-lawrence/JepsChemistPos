@@ -19,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -104,6 +105,7 @@ public class SettingsController {
 
     //?instantiate database
     private DatabaseConn databaseConn = new DatabaseConn();
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @FXML
     public void initialize() {
@@ -170,40 +172,49 @@ public class SettingsController {
 
         //check if the fields are not empty
         if (!superAdminEmail.isBlank() && !superAdminPassword.isBlank() && !emailAccountToCreate.isBlank() && !usernameForTheAccount.isBlank() && !password.isBlank() && !confirmPassword.isBlank()) {
+
+
             //check if the new password and confirm password are the same
             if (password.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                String sql = "SELECT * FROM users WHERE email = ? AND role = '" + ROLE.ADMIN + "' AND password = ?";
+                String sql = "SELECT password FROM users WHERE email = ? AND role = '" + ROLE.ADMIN + "'";
                 try (
                         //check if the super admin email, username = admin and password are correct
                         Connection conn = databaseConn.getConnection();
                         PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 ) {
                     preparedStatement.setString(1, superAdminEmail);
-                    preparedStatement.setString(2, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-                        conn.close();
-                        //check if the email account to create does not exist
-                        Connection conn2 = databaseConn.getConnection();
-                        String sql2 = "SELECT * FROM users WHERE email = ?";
-                        PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
-                        preparedStatement2.setString(1, emailAccountToCreate);
-                        ResultSet resultSet2 = preparedStatement2.executeQuery();
-                        if (!resultSet2.next()) {
-                            conn2.close();
-                            //add the user
-                            addUserToDatabase(emailAccountToCreate, usernameForTheAccount, password);
+                        String hashedPassword = resultSet.getString("password");
+                        if (passwordEncoder.matches(superAdminPassword, hashedPassword)) {
+                            conn.close();
+                            //check if the email account to create does not exist
+                            Connection conn2 = databaseConn.getConnection();
+                            String sql2 = "SELECT * FROM users WHERE email = ?";
+                            PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
+                            preparedStatement2.setString(1, emailAccountToCreate);
+                            ResultSet resultSet2 = preparedStatement2.executeQuery();
+                            if (!resultSet2.next()) {
+                                conn2.close();
+                                //add the user
+                                addUserToDatabase(emailAccountToCreate, usernameForTheAccount, passwordEncoder.encode(password));
+                            } else {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Error Adding User");
+                                alert.setHeaderText("Email Account to create already exists");
+                                alert.showAndWait();
+                            }
                         } else {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error Adding User");
-                            alert.setHeaderText("Email Account to create already exists");
+                            alert.setHeaderText("Super Admin Password is incorrect");
                             alert.showAndWait();
                         }
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error Adding User");
-                        alert.setHeaderText("Super Admin Email or Password is incorrect");
+                        alert.setHeaderText("Super Admin Email is incorrect");
                         alert.showAndWait();
                     }
                 } catch (Exception e) {
@@ -279,53 +290,66 @@ public class SettingsController {
             //check if the new password and confirm password are the same
             if (newPassword.equals(confirmPassword)) {
                 //check if the super admin email and password are correct
-                String sql = "SELECT * FROM users WHERE  role = ? AND email = ? AND password = ?";
+                String sql = "SELECT password FROM users WHERE  role = ? AND email = ? ";
                 try (
                         Connection conn = databaseConn.getConnection();
                         PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 ) {
                     preparedStatement.setString(1, ROLE.ADMIN.toString());
                     preparedStatement.setString(2, superAdminEmail);
-                    preparedStatement.setString(3, superAdminPassword);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-                        conn.close();
-                        //check if the email account to change password exists
-                        Connection conn2 = databaseConn.getConnection();
-                        String sql2 = "SELECT * FROM users WHERE email = ?";
-                        PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
-                        preparedStatement2.setString(1, emailAccountToChangePassword);
-                        ResultSet resultSet2 = preparedStatement2.executeQuery();
-                        if (resultSet2.next())
-                        {
-                            conn2.close();
-                            //check if the old password is correct
-                            Connection conn3 = databaseConn.getConnection();
-                            String sql3 = "SELECT * FROM users WHERE email = ? AND password = ?";
-                            PreparedStatement preparedStatement3 = conn3.prepareStatement(sql3);
-                            preparedStatement3.setString(1, emailAccountToChangePassword);
-                            preparedStatement3.setString(2, oldPassword);
-                            ResultSet resultSet3 = preparedStatement3.executeQuery();
-                            if (resultSet3.next()) {
-                                conn3.close();
-                                //change the password
-                                changePasswordInDatabase(newPassword, emailAccountToChangePassword);
+                        String hashedPassword = resultSet.getString("password");
+                        if(passwordEncoder.matches(superAdminPassword, hashedPassword)) {
+                            conn.close();
+                            //check if the email account to change password exists
+                            Connection conn2 = databaseConn.getConnection();
+                            String sql2 = "SELECT * FROM users WHERE email = ?";
+                            PreparedStatement preparedStatement2 = conn2.prepareStatement(sql2);
+                            preparedStatement2.setString(1, emailAccountToChangePassword);
+                            ResultSet resultSet2 = preparedStatement2.executeQuery();
+                            if (resultSet2.next()) {
+                                conn2.close();
+                                //check if the old password is correct
+                                Connection conn3 = databaseConn.getConnection();
+                                String sql3 = "SELECT password FROM users WHERE email = ?";
+                                PreparedStatement preparedStatement3 = conn3.prepareStatement(sql3);
+                                preparedStatement3.setString(1, emailAccountToChangePassword);
+                                ResultSet resultSet3 = preparedStatement3.executeQuery();
+                                if (resultSet3.next()) {
+                                    String hashedPassword2 = resultSet3.getString("password");
+                                    if(passwordEncoder.matches(oldPassword, hashedPassword2)) {
+                                        conn3.close();
+                                        //change the password
+                                        changePasswordInDatabase(passwordEncoder.encode(newPassword), emailAccountToChangePassword);
+                                    }else {
+                                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                                        alert.setTitle("Error Changing Password");
+                                        alert.setHeaderText("Old Password is incorrect");
+                                        alert.showAndWait();
+                                    }
+                                } else {
+                                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                                    alert.setTitle("Error Changing Password");
+                                    alert.setHeaderText("No user with such account.");
+                                    alert.showAndWait();
+                                }
                             } else {
                                 Alert alert = new Alert(Alert.AlertType.ERROR);
                                 alert.setTitle("Error Changing Password");
-                                alert.setHeaderText("Old Password is incorrect");
+                                alert.setHeaderText("Email Account to change password does not exist");
                                 alert.showAndWait();
                             }
-                        } else {
+                        }else{
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error Changing Password");
-                            alert.setHeaderText("Email Account to change password does not exist");
+                            alert.setHeaderText("Super Admin Password is incorrect");
                             alert.showAndWait();
                         }
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error Changing Password");
-                        alert.setHeaderText("Super Admin Email or Password is incorrect");
+                        alert.setHeaderText("Super Admin Email is incorrect");
                         alert.showAndWait();
                     }
                 } catch (Exception e) {
