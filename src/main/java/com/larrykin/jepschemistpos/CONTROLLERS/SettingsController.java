@@ -19,6 +19,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Connection;
@@ -31,6 +33,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class SettingsController {
+    private static final Logger log = LoggerFactory.getLogger(SettingsController.class);
     @FXML
     private Button activateAddUser;
 
@@ -651,7 +654,7 @@ public class SettingsController {
             }
 
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            log.error("Error fetching Suppliers{}", e.getMessage());
             e.printStackTrace();
         }
         return supplierList;
