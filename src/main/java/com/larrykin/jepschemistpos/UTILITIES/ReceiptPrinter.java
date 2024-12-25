@@ -31,12 +31,22 @@ public class ReceiptPrinter implements Printable {
         Graphics2D g2d = (Graphics2D) g; //Graphics2D  is used to draw shapes and text on the printer
         g2d.translate(pf.getImageableX(), pf.getImageableY());  //? translate the graphics object to the imageable area of the page format
 
-        g.setFont(new Font("Monospaced", Font.PLAIN, 10));
-        int y = 100;
+        g.setFont(new Font("Monospaced", Font.PLAIN, 8));
+        int y = 10; //? start drawing text from y position 10
+
+        //Calculate the max width for the text
+        int maxWidth = (int) pf.getImageableWidth() - 20; //20 pixels padding
+
         // Split the receipt text into lines and render each line -- iterate through the receipt text and render each line(draw each line on the receipt)
         for (String line : receiptText.split("\n")) { //split on line break
-            g.drawString(line, 100, y); // draw the line on the printer
-            y += g.getFontMetrics().getHeight(); // increment the y position by the height of the font
+            //Wrap the text if it exceeds the max width
+            while (line.length() > 0) {
+                int breakIndex = g.getFontMetrics().stringWidth(line) > maxWidth ? line.lastIndexOf(' ', maxWidth / g.getFontMetrics().charWidth(' ')) : line.length(); //? calculate the break index for the line
+                if (breakIndex == -1) breakIndex = line.length(); //? if the break index is -1, then set it to the length of the line
+                g.drawString(line.substring(0, breakIndex), 10, y); //? draw the line on the graphics object
+                y += g.getFontMetrics().getHeight();//? increment the y position by the height of the font
+                line = line.substring(breakIndex).trim(); //? set the line to the remaining text
+            }
         }
 
         return PAGE_EXISTS; //? return page exists to indicate that the page has been rendered

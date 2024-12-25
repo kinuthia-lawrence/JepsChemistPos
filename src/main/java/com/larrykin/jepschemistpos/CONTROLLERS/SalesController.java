@@ -364,6 +364,7 @@ public class SalesController {
                             receiptText.append("--------------------------------------------\n");
                             receiptText.append("          ").append(chemistName).append("\n");
                             receiptText.append("          ").append(currentDate).append("\n");
+                            receiptText.append("          Sales by ").append(DashboardController.loggedInUserUsername).append("\n");
                             receiptText.append("--------------------------------------------\n");
                             receiptText.append("Goods:\n");
                             for (Products product : cartTableView.getItems()) {
@@ -381,7 +382,10 @@ public class SalesController {
                             receiptText.append("Description: ").append(description).append("\n");
                             receiptText.append("Paid Amount: ").append(paidAmount).append("\n");
                             receiptText.append("--------------------------------------------\n");
-                            receiptText.append("          Thank you for shopping!\n");
+                            receiptText.append("          Thank you\n");
+                            receiptText.append("             for\n");
+                            receiptText.append("          shopping!\n");
+                            receiptText.append("          with Jelps\n");
                             receiptText.append("--------------------------------------------\n");
 
                             ReceiptPrinter receiptPrinter = new ReceiptPrinter(receiptText.toString());
@@ -426,7 +430,6 @@ public class SalesController {
             alert.close();
         }
     }
-
 
     //? Update database after selling
     private void updateDatabase(TableView<Products> cartTableView) {
