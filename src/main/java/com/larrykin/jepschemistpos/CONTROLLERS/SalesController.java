@@ -3,6 +3,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import com.larrykin.jepschemistpos.UTILITIES.ReceiptPrinter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -16,16 +17,21 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteErrorCode;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SalesController {
 
 
+    private static final Logger log = LoggerFactory.getLogger(SalesController.class);
     @FXML
     private TableView<Products> cartTableView;
 
@@ -217,6 +223,7 @@ public class SalesController {
     //instantiate database
     DatabaseConn databaseConn = new DatabaseConn();
 
+
     TableView<Sales> salesTableView = new TableView<>();
     TableView<Products> stockTableView = new TableView<>();
 
@@ -344,6 +351,44 @@ public class SalesController {
                         updateDatabase(cartTableView);
                         updateCashAndMpesa(cash, mpesa);
                         populateSalesTable();
+
+                        Boolean isPrintEnabled = true;
+                        if (isPrintEnabled) {
+                            // Print the receipt
+
+                            String chemistName = "Jelps Chemist";
+                            String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+                            StringBuilder receiptText = new StringBuilder();
+                            receiptText.append("--------------------------------------------\n");
+                            receiptText.append("          ").append(chemistName).append("\n");
+                            receiptText.append("          ").append(currentDate).append("\n");
+                            receiptText.append("--------------------------------------------\n");
+                            receiptText.append("Goods:\n");
+                            for (Products product : cartTableView.getItems()) {
+                                receiptText.append(product.getProductName())
+                                        .append(" (")
+                                        .append(product.getSellingQuantity())
+                                        .append(")\n");
+                            }
+                            receiptText.append("--------------------------------------------\n");
+                            receiptText.append("Expected Amount: ").append(expectedAmount).append("\n");
+                            receiptText.append("Discount: ").append(discount).append("\n");
+                            receiptText.append("Cash: ").append(cash).append("\n");
+                            receiptText.append("Mpesa: ").append(mpesa).append("\n");
+                            receiptText.append("Credit: ").append(credit).append("\n");
+                            receiptText.append("Description: ").append(description).append("\n");
+                            receiptText.append("Paid Amount: ").append(paidAmount).append("\n");
+                            receiptText.append("--------------------------------------------\n");
+                            receiptText.append("          Thank you for shopping!\n");
+                            receiptText.append("--------------------------------------------\n");
+
+                            ReceiptPrinter receiptPrinter = new ReceiptPrinter(receiptText.toString());
+                            receiptPrinter.printReceipt();
+
+                            //?log the receipt in termimal
+                            log.info("Receipt: {}", receiptText.toString());
+                        }
 
                         // Clear carts, label, spinners, and textArea
                         cartTableView.getItems().clear();
