@@ -343,7 +343,7 @@ public class SalesController {
                         alert1.setTitle("Success");
                         alert1.setHeaderText("Sale success");
                         alert1.setContentText("Sale saved successfully");
-                        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert1.close()));
+                        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> alert1.close()));
                         timeline.setCycleCount(1);
                         timeline.play();
                         alert1.showAndWait();

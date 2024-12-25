@@ -132,6 +132,7 @@ public class DatabaseConn {
                             "    id                         INTEGER,\n" +
                             "    dark_theme                 BOOLEAN,\n" +
                             "    is_print_enabled                 BOOLEAN,\n" +
+                            "    is_auto_confirm                 BOOLEAN,\n" +
                             "    current_stock_value        REAL,\n" +
                             "    total_value_of_added_stock REAL,\n" +
                             "    total_cash_from_sales      REAL,\n" +
@@ -159,10 +160,10 @@ public class DatabaseConn {
                 if (count == 0) {
                     try (
                             PreparedStatement preparedStatement = connection.prepareStatement(
-                                    "INSERT INTO utils (id, dark_theme,is_print_enabled, current_cash, current_mpesa, current_stock_value, " +
+                                    "INSERT INTO utils (id, dark_theme,is_print_enabled, is_auto_confirm, current_cash, current_mpesa, current_stock_value, " +
                                             "services_number, total_cash_from_sales, services_revenue, total_value_of_added_stock, " +
                                             "total_mpesa_from_sales, services_total_cash, services_total_mpesa, expired_loss, refunded_expired) " +
-                                            "VALUES (1, false,false, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
+                                            "VALUES (1, false,false,true, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);"
                             );
                     ) {
                         preparedStatement.executeUpdate();

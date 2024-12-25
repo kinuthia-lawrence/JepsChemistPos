@@ -90,6 +90,9 @@ public class SettingsController {
     private PasswordField cpSuperAdminPassword;
 
     @FXML
+    private ToggleButton enableAutoConfirm;
+
+    @FXML
     private ToggleButton enablePrintingToggle;
 
     @FXML
@@ -119,6 +122,30 @@ public class SettingsController {
         initializeTable();
         initializeButtons();
         setIcon();
+        updatePrintingToggleText();
+        updateAutoConfirmText();
+    }
+
+    //?update printing enabled toggle
+    private void updatePrintingToggleText() {
+        boolean isPrintEnabled = PrintingManager.loadPrinterState();
+        enablePrintingToggle.setSelected(isPrintEnabled);
+        if (isPrintEnabled) {
+            enablePrintingToggle.setText("Printing Enabled");
+        } else {
+            enablePrintingToggle.setText("Printing Disabled");
+        }
+    }
+
+    //?update auto confirm text
+    private void updateAutoConfirmText() {
+        boolean isAutoConfirmEnabled = PrintingManager.loadAutoConfirmState();
+        enableAutoConfirm.setSelected(isAutoConfirmEnabled);
+        if(isAutoConfirmEnabled) {
+            enableAutoConfirm.setText("Auto Confirm Enabled");
+        }else {
+            enableAutoConfirm.setText("Auto Confirm Disabled");
+        }
     }
 
     //?initialize buttons
@@ -137,12 +164,14 @@ public class SettingsController {
             boolean printState = !isPrintEnabled;
             PrintingManager.savePrinterState(printState);
             enablePrintingToggle.setSelected(printState);
-
-            if(isPrintEnabled){
-                enablePrintingToggle.setText("Enable Printing");
-            }else{
-                enablePrintingToggle.setText("Disable Printing");
-            }
+            updatePrintingToggleText();
+        });
+        enableAutoConfirm.setOnAction(event -> {
+            boolean isAutoConfirmEnabled = PrintingManager.loadAutoConfirmState();
+            boolean autoConfirmState = !isAutoConfirmEnabled;
+            PrintingManager.saveAutoConfirmState(autoConfirmState);
+            enableAutoConfirm.setSelected(autoConfirmState);
+            updateAutoConfirmText();
         });
 
         //activate change password
@@ -320,7 +349,7 @@ public class SettingsController {
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
                         String hashedPassword = resultSet.getString("password");
-                        if(passwordEncoder.matches(superAdminPassword, hashedPassword)) {
+                        if (passwordEncoder.matches(superAdminPassword, hashedPassword)) {
                             conn.close();
                             //check if the email account to change password exists
                             Connection conn2 = databaseConn.getConnection();
@@ -338,11 +367,11 @@ public class SettingsController {
                                 ResultSet resultSet3 = preparedStatement3.executeQuery();
                                 if (resultSet3.next()) {
                                     String hashedPassword2 = resultSet3.getString("password");
-                                    if(passwordEncoder.matches(oldPassword, hashedPassword2)) {
+                                    if (passwordEncoder.matches(oldPassword, hashedPassword2)) {
                                         conn3.close();
                                         //change the password
                                         changePasswordInDatabase(passwordEncoder.encode(newPassword), emailAccountToChangePassword);
-                                    }else {
+                                    } else {
                                         Alert alert = new Alert(Alert.AlertType.ERROR);
                                         alert.setTitle("Error Changing Password");
                                         alert.setHeaderText("Old Password is incorrect");
@@ -360,7 +389,7 @@ public class SettingsController {
                                 alert.setHeaderText("Email Account to change password does not exist");
                                 alert.showAndWait();
                             }
-                        }else{
+                        } else {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Error Changing Password");
                             alert.setHeaderText("Super Admin Password is incorrect");
