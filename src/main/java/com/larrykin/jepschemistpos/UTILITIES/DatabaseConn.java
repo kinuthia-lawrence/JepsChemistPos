@@ -186,6 +186,12 @@ public class DatabaseConn {
                             "    )\n" +
                             ");"
             );
+            connection.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS receipt_counter (\n" +
+                            "    date DATE PRIMARY KEY,\n" +
+                            "    receipt_number INT NOT NULL\n" +
+                            ");"
+            );
         } catch (SQLException e) {
             log.error("Error creating schemas:: ", e);
             throw new RuntimeException(e);

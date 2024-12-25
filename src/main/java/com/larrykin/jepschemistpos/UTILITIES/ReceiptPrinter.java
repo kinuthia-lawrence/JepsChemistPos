@@ -10,6 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.print.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,8 +24,51 @@ public class ReceiptPrinter implements Printable {
     private final String receiptText;
     private static final BlockingQueue<ReceiptPrinter> printQueue = new LinkedBlockingQueue<>();//? this is a blocking queue that will hold the receipt printer objects sequentially
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    DatabaseConn databaseConn = new DatabaseConn();
+
     public ReceiptPrinter(String receiptText) {
         this.receiptText = receiptText;
+    }
+
+    //? get the current date in the date format
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        return sdf.format(new Date());
+    }
+
+    //? get the current receipt number for the date
+    private int getCurrentReceiptNumber(String date) {
+        int receiptNumber = 1;
+        try (Connection connection = databaseConn.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT receipt_number FROM receipt_counter WHERE date = ?")) {
+            ps.setString(1, date);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                receiptNumber = rs.getInt("receipt_number");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return receiptNumber;
+    }
+
+    private void incrementReceiptNumber(String date) {
+        try (Connection connection = databaseConn.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "INSERT INTO receipt_counter (date, receipt_number) VALUES (?, 1) " +
+                             "ON CONFLICT(date) DO UPDATE SET " +
+                             "date = CASE WHEN receipt_counter.date = ? THEN receipt_counter.date ELSE ? END, " +
+                             "receipt_number = CASE WHEN receipt_counter.date = ? THEN receipt_counter.receipt_number + 1 ELSE 1 END"
+             )) {
+            ps.setString(1, date);
+            ps.setString(2, date);
+            ps.setString(3, date);
+            ps.setString(4, date);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override //? this method is responsible for rendering the receipt text on the printer
@@ -53,6 +102,11 @@ public class ReceiptPrinter implements Printable {
     }
 
     public void printReceipt() {
+        String currentDate = getCurrentDate();
+        int receiptNumber = getCurrentReceiptNumber(currentDate);
+        String receiptName = receiptNumber + "-of-" + currentDate;
+
+        incrementReceiptNumber(currentDate);
         printQueue.add(this); //? add the receipt printer object to the print queue
         new Thread(() -> {
             try {
@@ -70,12 +124,12 @@ public class ReceiptPrinter implements Printable {
                     }
                 }*/
 
+                //? Set Job Name
+                job.setJobName(receiptName);
                 //? Create a custom paper size
                 Paper paper = new Paper();
                 double paperWidth = 2.28 * 72.0; // 58mm in inches
                 double paperHeight = Double.MAX_VALUE; // Set to a very large value to let the height be determined by the content
-                paper.setSize(paperWidth, paperHeight);
-                paper.setImageableArea(0, 0, paperWidth, paperHeight);
                 paper.setSize(paperWidth, paperHeight);
                 paper.setImageableArea(0, 0, paperWidth, paperHeight);
 
@@ -90,7 +144,6 @@ public class ReceiptPrinter implements Printable {
                 if (PrintingManager.loadAutoConfirmState()) {
                     doPrint = true;
                 } else {
-
                     doPrint = job.printDialog(); //printer dialog to confirm
                 }
                 if (doPrint) {
