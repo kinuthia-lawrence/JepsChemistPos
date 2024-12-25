@@ -140,6 +140,12 @@ public class ReceiptPrinter implements Printable {
                 job.setPrintable(printer, pageFormat);
 
 
+              /*  // Set the destination to save as PDF
+                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                File pdfFile = new File(receiptName + ".pdf");
+                attr.add(new Destination(pdfFile.toURI()));*/
+
+
                 boolean doPrint;
                 if (PrintingManager.loadAutoConfirmState()) {
                     doPrint = true;
