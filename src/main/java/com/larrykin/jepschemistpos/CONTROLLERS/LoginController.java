@@ -149,7 +149,7 @@ public class LoginController implements Initializable {
     }
 
     private void openHelp() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/Help.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/FXML/help.fxml"));
         Stage helpStage = new Stage();
         try {
             Scene scene = new Scene(fxmlLoader.load());
@@ -161,7 +161,7 @@ public class LoginController implements Initializable {
             helpStage.setHeight(screenBounds.getHeight());
             helpStage.show();
         } catch (Exception e) {
-            System.out.println("Error loading help" + e.getMessage());
+            log.error("Error loading Help::{}", e.getMessage());
             e.printStackTrace();
         }
 
