@@ -599,7 +599,7 @@ public class StockController {
     }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
-        Double totalStock = quantityValue * buyingPriceValue;
+        double totalStock = quantityValue * buyingPriceValue;
         String sql = "UPDATE utils SET total_value_of_added_stock = total_value_of_added_stock + ?";
         try (
                 Connection connection = conn.getConnection();

@@ -17,102 +17,91 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.StockController">
-   <children>
-      <SplitPane dividerPositions="0.6705685618729097" layoutX="188.0" layoutY="86.0" styleClass="parent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <items>
-          <AnchorPane minWidth="500.0" styleClass="parent">
-               <children>
-                  <ScrollPane prefHeight="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
-                     <content>
-                        <TableView fx:id="stockTable" prefHeight="600.0" />
-                     </content>
-                  </ScrollPane>
-                  <Label layoutX="48.0" layoutY="14.0" styleClass="title" text="Available Stock" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
-                     <font>
-                        <Font name="System Bold Italic" size="14.0" />
-                     </font>
-                  </Label>
-                  <HBox fx:id="searchParent" layoutX="152.0" layoutY="4.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="266.0" promptText="Type name to search ..." />
-                        <Button fx:id="searchButton" mnemonicParsing="false">
-                           <graphic>
-                              <ImageView fx:id="iconSearch" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
-                           </graphic>
-                        </Button>
-                     </children>
-                  </HBox>
-                  <Button fx:id="refreshButton" layoutX="451.0" layoutY="3.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="1.0">
-                     <graphic>
-                        <ImageView fx:id="refreshIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
-                     </graphic>
-                  </Button>
-               </children>
-            </AnchorPane>
-          <AnchorPane maxWidth="350.0" minHeight="500.0" minWidth="350.0" prefWidth="350.0" styleClass="form">
-               <children>
-                  <Button fx:id="addStockButton" alignment="CENTER" layoutX="65.0" layoutY="7.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Add Stock" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="95.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="saveButton" alignment="CENTER" disable="true" layoutX="60.0" layoutY="591.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Save" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="100.0" />
-                  <Label layoutX="13.0" layoutY="45.0" text="Name" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="14.0" layoutY="97.0" text="Category" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="21.0" layoutY="148.0" text="Quantity (total number of minimum measure)" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="13.0" layoutY="261.0" text="Buying Price Per mininum quantity measure" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="16.0" layoutY="376.0" text="Supplie Name" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="21.0" layoutY="431.0" text="Expiry Date ( Use picker for accuracy)" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="15.0" layoutY="320.0" text="Selling Price Per minimum quatity measure" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <ComboBox fx:id="nameComboBox" layoutX="16.0" layoutY="62.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <ComboBox fx:id="categoryCombobox" layoutX="16.0" layoutY="114.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <ComboBox fx:id="supplierComboBox" layoutX="15.0" layoutY="401.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="55.0" />
-                  <Spinner fx:id="quantitySpinner" layoutX="17.0" layoutY="167.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <Spinner fx:id="buyingPriceSpinner" layoutX="20.0" layoutY="290.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <Spinner fx:id="sellingPriceSpinner" layoutX="15.0" layoutY="346.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="55.0" />
-                  <Label layoutX="22.0" layoutY="488.0" text="Description (Optional)" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-                  <TextArea fx:id="optionalDescription" layoutX="20.0" layoutY="514.0" maxHeight="104.0" minHeight="50.0" minWidth="200.0" prefHeight="71.0" prefWidth="270.0" wrapText="true" AnchorPane.leftAnchor="20.0" />
-                  <DatePicker fx:id="expiryDatePicker" layoutX="20.0" layoutY="458.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <Spinner fx:id="minQuantitySpinner" layoutX="21.0" layoutY="231.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-                  <Label layoutX="22.0" layoutY="204.0" text="Minimum Quantity  of stock" AnchorPane.leftAnchor="20.0">
-                     <font>
-                        <Font name="System Italic" size="13.0" />
-                     </font>
-                  </Label>
-               </children>
-            </AnchorPane>
-        </items>
-      </SplitPane>
-   </children>
    <opaqueInsets>
-      <Insets bottom="5.0" />
+      <Insets bottom="5.0"/>
    </opaqueInsets>
+   <SplitPane dividerPositions="0.6705685618729097" layoutX="188.0" layoutY="86.0" styleClass="parent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane minWidth="500.0" styleClass="parent">
+         <ScrollPane prefHeight="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+            <TableView fx:id="stockTable" prefHeight="600.0"/>
+         </ScrollPane>
+         <Label layoutX="48.0" layoutY="14.0" styleClass="title" text="Available Stock" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="10.0">
+            <font>
+               <Font name="System Bold Italic" size="14.0"/>
+            </font>
+         </Label>
+         <HBox fx:id="searchParent" layoutX="152.0" layoutY="4.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="0.0">
+            <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="266.0" promptText="Type name to search ..."/>
+            <Button fx:id="searchButton" mnemonicParsing="false">
+               <graphic>
+                  <ImageView fx:id="iconSearch" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"/>
+               </graphic>
+            </Button>
+         </HBox>
+         <Button fx:id="refreshButton" layoutX="451.0" layoutY="3.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="1.0">
+            <graphic>
+               <ImageView fx:id="refreshIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"/>
+            </graphic>
+         </Button>
+      </AnchorPane>
+      <AnchorPane maxWidth="350.0" minHeight="500.0" minWidth="350.0" prefWidth="350.0" styleClass="form">
+         <Button fx:id="addStockButton" alignment="CENTER" layoutX="65.0" layoutY="7.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Add Stock" AnchorPane.leftAnchor="65.0" AnchorPane.rightAnchor="95.0"
+                 AnchorPane.topAnchor="5.0"/>
+         <Button fx:id="saveButton" alignment="CENTER" disable="true" layoutX="60.0" layoutY="591.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Save" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="100.0"/>
+         <Label layoutX="13.0" layoutY="45.0" text="Name" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="14.0" layoutY="97.0" text="Category" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="21.0" layoutY="148.0" text="Quantity (total number of minimum measure)" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="13.0" layoutY="261.0" text="Buying Price Per mininum quantity measure" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="16.0" layoutY="376.0" text="Supplie Name" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="21.0" layoutY="431.0" text="Expiry Date ( Use picker for accuracy)" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <Label layoutX="15.0" layoutY="320.0" text="Selling Price Per minimum quatity measure" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <ComboBox fx:id="nameComboBox" layoutX="16.0" layoutY="62.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <ComboBox fx:id="categoryCombobox" layoutX="16.0" layoutY="114.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <ComboBox fx:id="supplierComboBox" layoutX="15.0" layoutY="401.0" maxHeight="40.0" minHeight="30.0" prefWidth="150.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="55.0"/>
+         <Spinner fx:id="quantitySpinner" layoutX="17.0" layoutY="167.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <Spinner fx:id="buyingPriceSpinner" layoutX="20.0" layoutY="290.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <Spinner fx:id="sellingPriceSpinner" layoutX="15.0" layoutY="346.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="55.0"/>
+         <Label layoutX="22.0" layoutY="488.0" text="Description (Optional)" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+         <TextArea fx:id="optionalDescription" layoutX="20.0" layoutY="514.0" maxHeight="104.0" minHeight="50.0" minWidth="200.0" prefHeight="71.0" prefWidth="270.0" wrapText="true" AnchorPane.leftAnchor="20.0"/>
+         <DatePicker fx:id="expiryDatePicker" layoutX="20.0" layoutY="458.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <Spinner fx:id="minQuantitySpinner" layoutX="21.0" layoutY="231.0" maxHeight="40.0" minHeight="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="50.0"/>
+         <Label layoutX="22.0" layoutY="204.0" text="Minimum Quantity  of stock" AnchorPane.leftAnchor="20.0">
+            <font>
+               <Font name="System Italic" size="13.0"/>
+            </font>
+         </Label>
+      </AnchorPane>
+   </SplitPane>
 </AnchorPane>

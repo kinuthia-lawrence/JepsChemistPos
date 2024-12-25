@@ -8,10 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ViewFactory {
+    private static final Logger log = LoggerFactory.getLogger(ViewFactory.class);
     //? Initializing the ObjectProperty and the panes
     private final ObjectProperty dashboardSelectedItem;
     private AnchorPane homeAnchorPane, saleAnchorPane, todoAnchorPane, reportsAnchorPane, settingsAnchorPane, stockAnchorPane, servicesAnchorPane, helpAnchorPane, notificationAnchorPane;
@@ -32,7 +34,7 @@ public class ViewFactory {
             try {
                 homeAnchorPane = new FXMLLoader(getClass().getResource("/FXML/home.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the homeAnchorPane" + e.getMessage());
+                log.error("Error loading the homeAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -44,7 +46,7 @@ public class ViewFactory {
             try {
                 saleAnchorPane = new FXMLLoader(getClass().getResource("/FXML/sale.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the saleAnchorPane" + e.getMessage());
+                log.error("Error loading the saleAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -56,7 +58,7 @@ public class ViewFactory {
             try {
                 todoAnchorPane = new FXMLLoader(getClass().getResource("/FXML/todo.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the todoAnchorPane" + e.getMessage());
+                log.error("Error loading the todoAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -68,7 +70,7 @@ public class ViewFactory {
             try {
                 reportsAnchorPane = new FXMLLoader(getClass().getResource("/FXML/reports.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the reportsAnchorPane" + e.getMessage());
+                log.error("Error loading the reportsAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -80,7 +82,7 @@ public class ViewFactory {
             try {
                 settingsAnchorPane = new FXMLLoader(getClass().getResource("/FXML/settings.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the settingsAnchorPane" + e.getMessage());
+                log.error("Error loading the settingAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -92,7 +94,7 @@ public class ViewFactory {
             try {
                 stockAnchorPane = new FXMLLoader(getClass().getResource("/FXML/stock.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the stockAnchorPane" + e.getMessage());
+                log.error("Error loading the stockAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -104,7 +106,7 @@ public class ViewFactory {
             try {
                 servicesAnchorPane = new FXMLLoader(getClass().getResource("/FXML/services.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the servicesAnchorPane" + e.getMessage());
+                log.error("Error loading the servicesAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -116,7 +118,7 @@ public class ViewFactory {
             try {
                 helpAnchorPane = new FXMLLoader(getClass().getResource("/FXML/help.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the helpAnchorPane" + e.getMessage());
+                log.error("Error loading the helpAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -128,7 +130,7 @@ public class ViewFactory {
             try {
                 notificationAnchorPane = new FXMLLoader(getClass().getResource("/FXML/notification.fxml")).load();
             } catch (Exception e) {
-                System.out.println("Error loading the notificationAnchorPane" + e.getMessage());
+                log.error("Error loading the notificationAnchorPane{}", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -150,7 +152,7 @@ public class ViewFactory {
             stage.getIcons().add(icon);
             stage.show();
         } catch (Exception e) {
-            System.out.println("Error loading the loginAnchorPane" + e.getMessage());
+            log.error("Error loading the login page{}", e.getMessage());
             e.printStackTrace();
         }
 
