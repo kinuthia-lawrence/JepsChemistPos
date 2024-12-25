@@ -22,6 +22,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class StockController {
@@ -83,16 +84,16 @@ public class StockController {
 
     @FXML
     public void initialize() {
-        initialieUiElements();
+        initializeUiElements();
         initializeTable();
         loadFields();
         instantiateControllers();
         addStockButton.setOnAction(e -> saveProduct());
     }
 
-    private void initialieUiElements() {
+    private void initializeUiElements() {
         //? Search Button
-        Image searchImage = new Image(getClass().getResourceAsStream("/IMAGES/search.png"));
+        Image searchImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/search.png")));
         iconSearch.setImage(searchImage);
 
         searchButton.setOnAction(event -> {
@@ -107,7 +108,7 @@ public class StockController {
         });
 
         //? Refresh Button
-        Image refreshImage = new Image(getClass().getResourceAsStream("/images/refresh.png"));
+        Image refreshImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/IMAGES/refresh.png")));
         refreshIcon.setImage(refreshImage);
 
         refreshButton.setOnAction(e -> {
