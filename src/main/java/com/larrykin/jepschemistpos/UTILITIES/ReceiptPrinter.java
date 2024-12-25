@@ -1,19 +1,22 @@
 package com.larrykin.jepschemistpos.UTILITIES;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
+import java.awt.print.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ReceiptPrinter implements Printable {
     private static final Logger log = LoggerFactory.getLogger(ReceiptPrinter.class);
     private final String receiptText;
+    private static final BlockingQueue<ReceiptPrinter> printQueue = new LinkedBlockingQueue<>();
 
     public ReceiptPrinter(String receiptText) {
         this.receiptText = receiptText;
@@ -39,31 +42,44 @@ public class ReceiptPrinter implements Printable {
     }
 
     public void printReceipt() {
-        PrinterJob job = PrinterJob.getPrinterJob();
-        job.setPrintable(this);
-
-        boolean doPrint = job.printDialog();
-        if (doPrint) {
+        printQueue.add(this);
+        new Thread(() -> {
             try {
-                job.print();
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Print Success");
-                    alert.setHeaderText("Receipt printed successfully");
-                    alert.setContentText("The receipt has been printed successfully.");
-                    alert.showAndWait();
-                });
-            } catch (Exception e) {
-                log.error("Failed to print receipt{}", e.getMessage());
-                e.printStackTrace();
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Print Error");
-                    alert.setHeaderText("Failed to print receipt");
-                    alert.setContentText("An error occurred while printing the receipt: " + e.getMessage());
-                    alert.showAndWait();
-                });
+                ReceiptPrinter printer = printQueue.take();
+                PrinterJob job = PrinterJob.getPrinterJob();
+                job.setPrintable(printer);
+
+                boolean doPrint = job.printDialog();
+                if (doPrint) {
+                    try {
+                        job.print();
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Print Success");
+                            alert.setHeaderText("Receipt printed successfully");
+                            alert.setContentText("The receipt has been printed successfully.");
+                            alert.show();
+
+                            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), ev -> alert.close()));
+                            timeline.setCycleCount(1);
+                            timeline.play();
+                        });
+                    } catch (Exception e) {
+                        log.error("Failed to print receipt{}", e.getMessage());
+                        e.printStackTrace();
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Print Error");
+                            alert.setHeaderText("Failed to print receipt");
+                            alert.setContentText("An error occurred while printing the receipt: " + e.getMessage());
+                            alert.showAndWait();
+                        });
+                    }
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Print queue interrupted", e);
             }
-        }
+        }).start();
     }
 }

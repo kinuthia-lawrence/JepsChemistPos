@@ -3,6 +3,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import com.larrykin.jepschemistpos.UTILITIES.PrintingManager;
 import com.larrykin.jepschemistpos.UTILITIES.ReceiptPrinter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -352,7 +353,7 @@ public class SalesController {
                         updateCashAndMpesa(cash, mpesa);
                         populateSalesTable();
 
-                        Boolean isPrintEnabled = true;
+                        boolean isPrintEnabled = PrintingManager.loadPrinterState();
                         if (isPrintEnabled) {
                             // Print the receipt
 
@@ -387,7 +388,7 @@ public class SalesController {
                             receiptPrinter.printReceipt();
 
                             //?log the receipt in termimal
-                            log.info("Receipt: {}", receiptText.toString());
+//                            log.info("Receipt: {}", receiptText.toString());
                         }
 
                         // Clear carts, label, spinners, and textArea

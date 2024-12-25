@@ -1,6 +1,8 @@
 package com.larrykin.jepschemistpos.UTILITIES;
 
 import javafx.scene.Scene;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +16,7 @@ public class ThemeManager {
 
 
     private static final DatabaseConn databaseConn = new DatabaseConn();
+    private static final Logger log = LoggerFactory.getLogger(ThemeManager.class);
 
     // Apply the theme to the scene
     public static void applyTheme(Scene scene, boolean isDarkMode) {
@@ -36,6 +39,7 @@ public class ThemeManager {
 
             connection.close();
         } catch (SQLException e) {
+            log.error("Error saving theme state{}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -52,6 +56,7 @@ public class ThemeManager {
                 return resultSet.getBoolean("dark_theme");
             }
         } catch (SQLException e) {
+            log.error("Error loading theme state{}", e.getMessage());
             e.printStackTrace();
         }
         return false; // Default to light mode if there's an error

@@ -3,6 +3,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Supplier;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import com.larrykin.jepschemistpos.UTILITIES.PrintingManager;
 import com.larrykin.jepschemistpos.UTILITIES.SceneManager;
 import com.larrykin.jepschemistpos.UTILITIES.ThemeManager;
 import javafx.animation.KeyFrame;
@@ -89,6 +90,9 @@ public class SettingsController {
     private PasswordField cpSuperAdminPassword;
 
     @FXML
+    private ToggleButton enablePrintingToggle;
+
+    @FXML
     private ImageView iconTheme;
 
     @FXML
@@ -126,6 +130,19 @@ public class SettingsController {
             applyThemeToAllScenes(isDarkMode);
             ThemeManager.saveThemeState(isDarkMode);
             setIcon();
+        });
+        // Toggle the printing state when the button is clicked
+        enablePrintingToggle.setOnAction(event -> {
+            boolean isPrintEnabled = PrintingManager.loadPrinterState();
+            boolean printState = !isPrintEnabled;
+            PrintingManager.savePrinterState(printState);
+            enablePrintingToggle.setSelected(printState);
+
+            if(isPrintEnabled){
+                enablePrintingToggle.setText("Enable Printing");
+            }else{
+                enablePrintingToggle.setText("Disable Printing");
+            }
         });
 
         //activate change password

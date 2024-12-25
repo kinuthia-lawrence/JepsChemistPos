@@ -135,6 +135,30 @@ body {
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 4);
 }
+#enablePrintingToggle {
+    -fx-background-color: AAAAAA;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-border-color: transparent;
+}
+
+#enablePrintingToggle:hover {
+    -fx-background-color: #4E8752;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 4);
+}
+
+#enablePrintingToggle:pressed {
+    -fx-background-color: #D3D3D3;
+    -fx-border-color: transparent;
+}
+
+#enablePrintingToggle:selected {
+    -fx-background-color: #00FF00;
+    -fx-border-color: transparent;
+
+}
 /*----------------------------------------------------------------------------------------HOME-----------------------------------------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------------------SALES-----------------------------------------------------------------------------------------------------------------------*/
 #searchParent {

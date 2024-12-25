@@ -104,6 +104,7 @@
                      <font>
                         <Font name="System Italic" size="12.0" />
                      </font></Label>
+                  <ToggleButton fx:id="enablePrintingToggle" layoutX="332.0" layoutY="32.0" mnemonicParsing="false" text="Enable Printing" AnchorPane.rightAnchor="118.0" AnchorPane.topAnchor="32.0" />
                </children>
             </AnchorPane>
             <AnchorPane fx:id="addSupplierPane" prefHeight="598.0" prefWidth="537.0" SplitPane.resizableWithParent="false">
