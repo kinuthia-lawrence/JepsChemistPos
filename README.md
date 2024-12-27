@@ -1,7 +1,7 @@
 # JelpsChemistPos
 
 ## Description
-JelpsChemistPos is a Point of Sale (POS) system designed for chemists. It helps manage inventory, sales, and customer interactions efficiently.
+JelpsChemistPos is desktop a Point of Sale (POS) system designed for chemists. It helps manage inventory, sales, and customer interactions efficiently.
 
 ## Features
 - Inventory management
