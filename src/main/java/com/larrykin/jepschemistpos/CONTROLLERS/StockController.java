@@ -35,9 +35,6 @@ public class StockController {
     private Spinner<Double> buyingPriceSpinner;
 
     @FXML
-    private ComboBox<String> categoryCombobox;
-
-    @FXML
     private DatePicker expiryDatePicker;
 
     @FXML
@@ -88,7 +85,8 @@ public class StockController {
         initializeTable();
         loadFields();
         instantiateControllers();
-        addStockButton.setOnAction(e -> saveProduct());
+        addStockButton.setOnAction(e -> receiveProducts());
+        saveButton.setOnAction(e -> saveProduct());
     }
 
     private void initializeUiElements() {
@@ -157,17 +155,11 @@ public class StockController {
         ) {
             //Clear existing items in the ComboBoxes
             nameComboBox.getItems().clear();
-            categoryCombobox.getItems().clear();
             supplierComboBox.getItems().clear();
 
             ResultSet resultSet = statement.executeQuery("SELECT * FROM suppliers");
             while (resultSet.next()) {
                 supplierComboBox.getItems().add(resultSet.getString("name"));
-            }
-
-            resultSet = statement.executeQuery("SELECT * FROM categories");
-            while (resultSet.next()) {
-                categories.add(resultSet.getString("category_name"));
             }
 
             // Load product names into the productNames list
@@ -182,7 +174,6 @@ public class StockController {
 
         // Call setupNameComboBox to set up the nameComboBox
         setupNameComboBox();
-        setupCategoryComboBox();
     }
 
     private void setupNameComboBox() {
@@ -229,50 +220,6 @@ public class StockController {
         });
     }
 
-    private void setupCategoryComboBox() {
-        categoryCombobox.setEditable(true); // Ensure the ComboBox is editable
-        categoryCombobox.setItems(categories);
-
-        // Create a FilteredList wrapping the categories list
-        FilteredList<String> filteredItems = new FilteredList<>(categories, p -> true);
-
-        // Add a listener to the ComboBox editor to filter the items
-        categoryCombobox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-            final TextField editor = categoryCombobox.getEditor();
-            final String selected = categoryCombobox.getSelectionModel().getSelectedItem();
-
-            // If no item in the ComboBox is selected or the editor's text is not equal to the selected item
-            if (selected == null || !selected.equals(editor.getText())) {
-                filteredItems.setPredicate(item -> {
-                    // If the filter text is empty, display all items
-                    if (newValue == null || newValue.isEmpty()) {
-                        return true;
-                    }
-                    // Compare item text with filter text
-                    String lowerCaseFilter = newValue.toLowerCase();
-                    return item.toLowerCase().contains(lowerCaseFilter);
-                });
-                categoryCombobox.setItems(filteredItems);
-            }
-        });
-
-        // Add a listener to update the ComboBox items when the editor loses focus
-        categoryCombobox.getEditor().focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) {
-                categoryCombobox.setItems(categories);
-                categoryCombobox.getSelectionModel().select(categoryCombobox.getEditor().getText());
-            }
-        });
-
-        // Ensure the ComboBox is always focusable and editable
-        categoryCombobox.setOnMouseClicked(event -> {
-            if (categories.isEmpty()) {
-                categoryCombobox.setItems(FXCollections.observableArrayList());
-            }
-            categoryCombobox.show();
-        });
-    }
-
     private void initializeTable() {
 //        stockTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -284,10 +231,6 @@ public class StockController {
         TableColumn<Products, String> productNameColumn = new TableColumn<>("Name");
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         productNameColumn.setPrefWidth(100);
-        //Category
-        TableColumn<Products, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
-        categoryColumn.setPrefWidth(100);
         //Quantity
         TableColumn<Products, Double> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
@@ -371,9 +314,17 @@ public class StockController {
             }
         });
 
-        stockTable.getColumns().addAll(serviceIDColumn, productNameColumn, categoryColumn, quantityColumn, minQuantityProductColumn, buyingPriceColumn, sellingPriceColumn, supplierNameColumn, dateAddedColumn, expiryDateColumn, descriptionColumn, editColumn, deleteColumn);
+        stockTable.getColumns().addAll(serviceIDColumn, productNameColumn, quantityColumn, minQuantityProductColumn, buyingPriceColumn, sellingPriceColumn, supplierNameColumn, dateAddedColumn, expiryDateColumn, descriptionColumn, editColumn, deleteColumn);
 
         populateTable();
+    }
+
+    private void receiveProducts(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Receive Products");
+        alert.setHeaderText("Receive Products");
+        alert.setContentText("This feature is not yet implemented");
+        alert.showAndWait();
     }
 
     private void populateTable() {
@@ -394,7 +345,6 @@ public class StockController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));
@@ -460,10 +410,7 @@ public class StockController {
     }
 
     private void saveProduct() {
-        saveButton.setDisable(false);
-        saveButton.setOnAction(e -> {
             String nameValue = nameComboBox.getValue();
-            String categoryValue = categoryCombobox.getValue();
             Double quantityValue = quantitySpinner.getValue();
             Double minQuantityValue = minQuantitySpinner.getValue();
             Double buyingPriceValue = buyingPriceSpinner.getValue();
@@ -473,7 +420,6 @@ public class StockController {
             String descriptionValue = optionalDescription.getText();
 
             if (nameValue != null && !nameValue.isBlank() &&
-                    categoryValue != null && !categoryValue.isBlank() &&
                     quantityValue != null && !quantityValue.isNaN() &&
                     minQuantityValue != null && !minQuantityValue.isNaN() &&
                     buyingPriceValue != null && !buyingPriceValue.isNaN() &&
@@ -481,20 +427,19 @@ public class StockController {
                     supplierNameValue != null && !supplierNameValue.isBlank() &&
                     expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                String sql = "INSERT INTO products (name, category, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
+                String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
                 try (
                         Connection connection = conn.getConnection();
                         PreparedStatement statement = connection.prepareStatement(sql);
                 ) {
                     statement.setString(1, nameValue);
-                    statement.setString(2, categoryValue);
-                    statement.setDouble(3, quantityValue);
-                    statement.setDouble(4, minQuantityValue);
-                    statement.setDouble(5, buyingPriceValue);
-                    statement.setDouble(6, sellingPriceValue);
-                    statement.setString(7, supplierNameValue);
-                    statement.setString(8, expiryDateValue.toString());
-                    statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
+                    statement.setDouble(2, quantityValue);
+                    statement.setDouble(3, minQuantityValue);
+                    statement.setDouble(4, buyingPriceValue);
+                    statement.setDouble(5, sellingPriceValue);
+                    statement.setString(6, supplierNameValue);
+                    statement.setString(7, expiryDateValue.toString());
+                    statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
 
                     int rowAffected = statement.executeUpdate();
                     if (rowAffected > 0) {
@@ -509,7 +454,6 @@ public class StockController {
 
                         connection.close();
                         populateTable();
-                        saveCategory(categoryValue);
                         loadFields();
                         salesController.updateCurrentStockWorth();
                         updateTotalStock(quantityValue, buyingPriceValue);
@@ -517,7 +461,7 @@ public class StockController {
 
                         //clear fields
                         nameComboBox.setValue("");
-                        categoryCombobox.setValue("");
+
                         quantitySpinner.getValueFactory().setValue(0.0);
                         minQuantitySpinner.getValueFactory().setValue(0.0);
                         buyingPriceSpinner.getValueFactory().setValue(0.0);
@@ -525,7 +469,6 @@ public class StockController {
                         supplierComboBox.setValue(null);
                         expiryDatePicker.setValue(null);
                         optionalDescription.clear();
-                        saveButton.setDisable(true);
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
@@ -550,54 +493,8 @@ public class StockController {
                 alert.setContentText("Please fill the fields correctly");
                 alert.showAndWait();
             }
-        });
     }
 
-    private void saveCategory(String categoryValue) {
-        String checkSql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
-        try (
-                Connection connection = conn.getConnection();
-                // Check if the category already exists
-                PreparedStatement checkStatement = connection.prepareStatement(checkSql);
-        ) {
-            checkStatement.setString(1, categoryValue);
-            ResultSet resultSet = checkStatement.executeQuery();
-            resultSet.next();
-            int count = resultSet.getInt(1);
-            if (count == 0) {
-                // Category does not exist, proceed with insertion
-                String insertSql = "INSERT INTO categories (category_name) VALUES (?)";
-                PreparedStatement insertStatement = connection.prepareStatement(insertSql);
-                insertStatement.setString(1, categoryValue);
-                int rowsAffected = insertStatement.executeUpdate();
-
-                if (rowsAffected > 0) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Success");
-                    alert.setHeaderText("Category saved successfully");
-                    alert.setContentText("Category saved successfully");
-                    alert.showAndWait();
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error saving category");
-                    alert.setContentText("Error saving category");
-                    alert.showAndWait();
-                }
-            } else {
-                log.info("Category already exists");
-            }
-
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error saving category");
-            alert.setContentText("Error saving category: " + e.getMessage());
-            alert.showAndWait();
-
-            log.error("Error saving category: {}", e.getMessage());
-        }
-    }
 
     private void updateTotalStock(Double quantityValue, Double buyingPriceValue) {
         double totalStock = quantityValue * buyingPriceValue;
@@ -631,7 +528,6 @@ public class StockController {
             try {
                 //getting old values
                 String oldName = product.getProductName();
-                String oldCategory = product.getProductCategory();
                 Double oldQuantity = product.getProductQuantity();
                 Double oldMinQuantity = product.getMinProductQuantity();
                 Double oldBuyingPrice = product.getBuyingPrice();
@@ -642,7 +538,6 @@ public class StockController {
 
                 //setting old values to the fields
                 nameComboBox.setValue(oldName);
-                categoryCombobox.setValue(oldCategory);
                 quantitySpinner.getValueFactory().setValue(oldQuantity);
                 minQuantitySpinner.getValueFactory().setValue(oldMinQuantity);
                 buyingPriceSpinner.getValueFactory().setValue(oldBuyingPrice);
@@ -655,7 +550,6 @@ public class StockController {
                 saveButton.setText("UPDATE");
                 saveButton.setOnAction(event -> {
                     String nameValue = nameComboBox.getValue();
-                    String categoryValue = categoryCombobox.getValue();
                     Double quantityValue = quantitySpinner.getValue();
                     Double minQuantityValue = minQuantitySpinner.getValue();
                     Double buyingPriceValue = buyingPriceSpinner.getValue();
@@ -665,7 +559,6 @@ public class StockController {
                     String descriptionValue = optionalDescription.getText();
 
                     if (nameValue != null && !nameValue.isBlank() &&
-                            categoryValue != null && !categoryValue.isBlank() &&
                             quantityValue != null && !quantityValue.isNaN() &&
                             minQuantityValue != null && !minQuantityValue.isNaN() &&
                             buyingPriceValue != null && !buyingPriceValue.isNaN() &&
@@ -673,21 +566,20 @@ public class StockController {
                             supplierNameValue != null && !supplierNameValue.isBlank() &&
                             expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                        String sql = "UPDATE products SET name = ?, category = ?, quantity = ?, min_quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
+                        String sql = "UPDATE products SET name = ?, quantity = ?, min_quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
                         try (
                                 Connection connection = conn.getConnection();
                                 PreparedStatement statement = connection.prepareStatement(sql);
                         ) {
                             statement.setString(1, nameValue);
-                            statement.setString(2, categoryValue);
-                            statement.setDouble(3, quantityValue);
-                            statement.setDouble(4, minQuantityValue);
-                            statement.setDouble(5, buyingPriceValue);
-                            statement.setDouble(6, sellingPriceValue);
-                            statement.setString(7, supplierNameValue);
-                            statement.setString(8, expiryDateValue.toString());
-                            statement.setString(9, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
-                            statement.setObject(10, product.getProductID());
+                            statement.setDouble(2, quantityValue);
+                            statement.setDouble(3, minQuantityValue);
+                            statement.setDouble(4, buyingPriceValue);
+                            statement.setDouble(5, sellingPriceValue);
+                            statement.setString(6, supplierNameValue);
+                            statement.setString(7, expiryDateValue.toString());
+                            statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
+                            statement.setObject(9, product.getProductID());
 
                             int rowAffected = statement.executeUpdate();
                             if (rowAffected > 0) {
@@ -702,12 +594,10 @@ public class StockController {
 
                                 connection.close();
                                 populateTable();
-                                saveCategory(categoryValue);
                                 loadFields();
 
                                 //clear fields
                                 nameComboBox.setValue("");
-                                categoryCombobox.setValue("");
                                 quantitySpinner.getValueFactory().setValue(0.0);
                                 minQuantitySpinner.getValueFactory().setValue(0.0);
                                 buyingPriceSpinner.getValueFactory().setValue(0.0);
@@ -767,7 +657,6 @@ public class StockController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));

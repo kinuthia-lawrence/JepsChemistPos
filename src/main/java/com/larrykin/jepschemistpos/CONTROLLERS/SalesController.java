@@ -570,10 +570,6 @@ public class SalesController {
         TableColumn<Products, String> productNameColumn = new TableColumn<>("Name");
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         productNameColumn.setPrefWidth(100);
-        //Category
-        TableColumn<Products, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
-        categoryColumn.setPrefWidth(65);
         //Quantity
         TableColumn<Products, Double> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
@@ -617,7 +613,7 @@ public class SalesController {
             }
         });
 
-        stockTableView.getColumns().addAll(productsObjectTableColumn, productNameColumn, categoryColumn, quantityColumn, sellingPriceColumn, expiryDateColumn, descriptionColumn, addToCartColumn);
+        stockTableView.getColumns().addAll(productsObjectTableColumn, productNameColumn, quantityColumn, sellingPriceColumn, expiryDateColumn, descriptionColumn, addToCartColumn);
         stockTableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         salesTableView.setMinWidth(Region.USE_COMPUTED_SIZE);
 //        Double height = tableScrollPane.heightProperty().subtract(10).doubleValue();
@@ -649,7 +645,6 @@ public class SalesController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setSellingPrice(resultSet.getDouble("selling_price"));
                 product.setExpiryDate(resultSet.getString("expiry_date"));
@@ -684,7 +679,6 @@ public class SalesController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setSellingPrice(resultSet.getDouble("selling_price"));
                 product.setExpiryDate(resultSet.getString("expiry_date"));

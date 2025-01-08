@@ -25,20 +25,9 @@ public class DatabaseConn {
     private void createSchemaIfNotExist(Connection connection) {
         try {
             connection.createStatement().execute(
-                    "CREATE TABLE IF NOT EXISTS categories (\n" +
-                            "    id                   INTEGER,\n" +
-                            "    category_name        TEXT    NOT NULL,\n" +
-                            "    category_description TEXT,\n" +
-                            "    PRIMARY KEY (\n" +
-                            "        id AUTOINCREMENT\n" +
-                            "    )\n" +
-                            ");"
-            );
-            connection.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS expired_goods (\n" +
                             "    id            INTEGER NOT NULL,\n" +
                             "    name          TEXT    NOT NULL,\n" +
-                            "    category      TEXT,\n" +
                             "    quantity      INTEGER,\n" +
                             "    buying_price  REAL,\n" +
                             "    supplier_name TEXT,\n" +
@@ -62,7 +51,6 @@ public class DatabaseConn {
                     "CREATE TABLE IF NOT EXISTS products (\n" +
                             "    id            INTEGER,\n" +
                             "    name          TEXT    NOT NULL,\n" +
-                            "    category      TEXT,\n" +
                             "    quantity      INTEGER,\n" +
                             "    min_quantity  INTEGER,\n" +
                             "    buying_price  REAL,\n" +

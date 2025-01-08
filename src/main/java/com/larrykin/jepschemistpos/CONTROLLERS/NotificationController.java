@@ -84,10 +84,6 @@ public class NotificationController {
         TableColumn<Products, String> expiredProductNameColumn = new TableColumn<>("Product Name");
         expiredProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         expiredProductNameColumn.setPrefWidth(150);
-        //product category column
-        TableColumn<Products, String> expiredProductCategoryColumn = new TableColumn<>("Product Category");
-        expiredProductCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
-        expiredProductCategoryColumn.setPrefWidth(110);
         //product quantity column
         TableColumn<Products, Double> expiredProductQuantityColumn = new TableColumn<>("Product Quantity");
         expiredProductQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
@@ -157,7 +153,7 @@ public class NotificationController {
             }
         });
 
-        expiredGoodsTableView.getColumns().addAll(expiredProductIDColumn, expiredProductNameColumn, expiredProductCategoryColumn, expiredProductQuantityColumn, expiredProductPriceColumn, expiredSupplierColumn, dateAddedColumn, expiryDateColumn, deleteColumn, deleteAsLossColumn);
+        expiredGoodsTableView.getColumns().addAll(expiredProductIDColumn, expiredProductNameColumn, expiredProductQuantityColumn, expiredProductPriceColumn, expiredSupplierColumn, dateAddedColumn, expiryDateColumn, deleteColumn, deleteAsLossColumn);
 
         checkExpiredGoods();
     }
@@ -229,7 +225,7 @@ public class NotificationController {
 
     private void checkExpiredGoods() {
         String selectExpiredGoodsSQL = "SELECT * FROM products WHERE expiry_date < CURRENT_DATE";
-        String insertExpiredGoodsSQL = "INSERT INTO expired_goods (id, name, category, quantity, buying_price, supplier_name, date_added, expiry_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertExpiredGoodsSQL = "INSERT INTO expired_goods (id, name, quantity, buying_price, supplier_name, date_added, expiry_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String deleteExpiredGoodsSQL = "DELETE FROM products WHERE id = ?";
 
         try (Connection connection = databaseConn.getConnection();
@@ -239,7 +235,6 @@ public class NotificationController {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String category = resultSet.getString("category");
                 int quantity = resultSet.getInt("quantity");
                 double buyingPrice = resultSet.getDouble("buying_price");
                 String supplierName = resultSet.getString("supplier_name");
@@ -252,12 +247,11 @@ public class NotificationController {
                     // Insert into expired_goods table
                     insertStatement.setInt(1, id);
                     insertStatement.setString(2, name);
-                    insertStatement.setString(3, category);
-                    insertStatement.setInt(4, quantity);
-                    insertStatement.setDouble(5, buyingPrice);
-                    insertStatement.setString(6, supplierName);
-                    insertStatement.setString(7, dateAdded);
-                    insertStatement.setString(8, expiryDate);
+                    insertStatement.setInt(3, quantity);
+                    insertStatement.setDouble(4, buyingPrice);
+                    insertStatement.setString(5, supplierName);
+                    insertStatement.setString(6, dateAdded);
+                    insertStatement.setString(7, expiryDate);
                     insertStatement.executeUpdate();
 
                     // Delete from products table
@@ -292,7 +286,6 @@ public class NotificationController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));
                 product.setSupplierName(resultSet.getString("supplier_name"));
@@ -324,10 +317,6 @@ public class NotificationController {
         TableColumn<Products, String> outOfStockProductNameColumn = new TableColumn<>("Product Name");
         outOfStockProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         outOfStockProductNameColumn.setPrefWidth(200);
-        //product category column
-        TableColumn<Products, String> outOfStockProductCategoryColumn = new TableColumn<>("Product Category");
-        outOfStockProductCategoryColumn.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
-        outOfStockProductCategoryColumn.setPrefWidth(200);
         //product quantity column
         TableColumn<Products, Double> outOfStockProductQuantityColumn = new TableColumn<>("Product Qty.");
         outOfStockProductQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
@@ -370,7 +359,7 @@ public class NotificationController {
             }
         });
 
-        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductCategoryColumn, outOfStockProductQuantityColumn, outOfStockMinProductQuantityColumn, outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
+        outOfStockTableView.getColumns().addAll(outOfStockProductIDColumn, outOfStockProductNameColumn, outOfStockProductQuantityColumn, outOfStockMinProductQuantityColumn, outOfStockProductPriceColumn, outOfStockSupplierColumn, deleteColumn);
 
         checkOutOfStock();
     }
@@ -389,7 +378,6 @@ public class NotificationController {
                 Products product = new Products();
                 product.setProductID(resultSet.getObject("id"));
                 product.setProductName(resultSet.getString("name"));
-                product.setProductCategory(resultSet.getString("category"));
                 product.setProductQuantity(resultSet.getDouble("quantity"));
                 product.setMinProductQuantity(resultSet.getDouble("min_quantity"));
                 product.setBuyingPrice(resultSet.getDouble("buying_price"));

@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleStringProperty;
 public class Products {
     private SimpleObjectProperty<Object> productID;
     private SimpleStringProperty productName;
-    private SimpleStringProperty productCategory;
     private SimpleDoubleProperty productQuantity;
     private SimpleDoubleProperty minProductQuantity;
     private SimpleDoubleProperty buyingPrice;
@@ -21,10 +20,9 @@ public class Products {
     private SimpleDoubleProperty sellingQuantity;
     private SimpleDoubleProperty total;
 
-    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleStringProperty productCategory, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
+    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
         this.productID = productID;
         this.productName = productName;
-        this.productCategory = productCategory;
         this.productQuantity = productQuantity;
         this.minProductQuantity = minProductQuantity;
         this.buyingPrice = buyingPrice;
@@ -40,7 +38,6 @@ public class Products {
     public Products() {
         this.productID = new SimpleObjectProperty<>();
         this.productName = new SimpleStringProperty("");
-        this.productCategory = new SimpleStringProperty("");
         this.productQuantity = new SimpleDoubleProperty(0.0);
         this.minProductQuantity = new SimpleDoubleProperty(0.0);
         this.buyingPrice = new SimpleDoubleProperty(0.0);
@@ -75,18 +72,6 @@ public class Products {
 
     public void setProductName(String productName) {
         this.productName.set(productName);
-    }
-
-    public String getProductCategory() {
-        return productCategory.get();
-    }
-
-    public SimpleStringProperty productCategoryProperty() {
-        return productCategory;
-    }
-
-    public void setProductCategory(String productCategory) {
-        this.productCategory.set(productCategory);
     }
 
     public double getProductQuantity() {
