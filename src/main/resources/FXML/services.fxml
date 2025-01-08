@@ -3,60 +3,78 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane styleClass="parent" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1133.0" styleClass="parent" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.larrykin.jepschemistpos.CONTROLLERS.ServicesController">
    <children>
-      <AnchorPane fx:id="tableAnchorPane" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="40.0">
+      <AnchorPane fx:id="tableAnchorPane" prefHeight="625.0" prefWidth="683.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="450.0" AnchorPane.topAnchor="40.0">
          <padding>
             <Insets left="10.0" />
          </padding>
          <children>
-            <ScrollPane fx:id="scrollPane" prefHeight="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <ScrollPane fx:id="scrollPane" layoutX="20.0" prefHeight="600.0" prefWidth="664.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="-10.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
-      <AnchorPane layoutY="10.0" minHeight="550.0" prefHeight="603.0" prefWidth="280.0" styleClass="form" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+      <AnchorPane layoutX="721.0" layoutY="10.0" minHeight="550.0" prefHeight="661.0" prefWidth="410.0" styleClass="form" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="721.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="5.0">
          <children>
-            <Label layoutX="11.0" layoutY="84.0" text="Service Name">
+            <Label layoutX="18.0" layoutY="28.0" prefHeight="27.0" prefWidth="54.0" text="OPD">
+               <font>
+                  <Font name="SansSerif Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="15.0" layoutY="339.0" text="Description" AnchorPane.leftAnchor="14.0">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="9.0" layoutY="141.0" text="Description">
+            <TextArea fx:id="descriptionTextArea" layoutX="104.0" layoutY="339.0" prefHeight="204.0" prefWidth="297.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
+            <Label layoutX="105.0" layoutY="543.0" text="Payment Options">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <TextArea fx:id="descriptionTextArea" layoutX="9.0" layoutY="181.0" prefHeight="221.0" prefWidth="265.0" promptText="Monitered the blood pressure of a patient and offered medication." wrapText="true" />
-            <Label layoutX="114.0" layoutY="409.0" text="Payment Options">
+            <TextField fx:id="cashPaymentTextField" layoutX="105.0" layoutY="562.0" prefHeight="25.0" prefWidth="260.0" promptText="0.00" />
+            <TextField fx:id="mpesaPaymentTextField" layoutX="105.0" layoutY="592.0" prefHeight="25.0" prefWidth="260.0" promptText="200" />
+            <Label layoutX="31.0" layoutY="565.0" text="Cash" AnchorPane.leftAnchor="14.0">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="cashPaymentTextField" layoutX="49.0" layoutY="450.0" prefHeight="25.0" prefWidth="160.0" promptText="0.00" />
-            <TextField fx:id="mpesaPaymentTextField" layoutX="49.0" layoutY="491.0" prefHeight="25.0" prefWidth="160.0" promptText="200" />
-            <Label layoutX="17.0" layoutY="453.0" text="Cash">
+            <Label layoutX="28.0" layoutY="595.0" text="Mpesa" AnchorPane.leftAnchor="14.0">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="12.0" layoutY="494.0" text="Mpesa">
-               <font>
-                  <Font name="System Italic" size="13.0" />
-               </font>
-            </Label>
-            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="94.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Save" />
-            <Label layoutX="214.0" layoutY="454.0" text="Ksh." />
-            <Label layoutX="214.0" layoutY="495.0" text="Ksh." />
-            <TextField fx:id="serviceNameTextField" layoutX="11.0" layoutY="116.0" prefHeight="25.0" prefWidth="265.0" promptText="Blood Pressure" />
-            <Label fx:id="title" layoutX="80.0" layoutY="20.0" styleClass="title" text="Record A Service" AnchorPane.topAnchor="20.0">
+            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="104.0" layoutY="620.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="260.0" text="Save" />
+            <Label layoutX="374.0" layoutY="566.0" text="Ksh." />
+            <Label layoutX="374.0" layoutY="596.0" text="Ksh." />
+            <TextField fx:id="patientName" layoutX="104.0" layoutY="64.0" prefHeight="25.0" prefWidth="297.0" promptText="John Doe" />
+            <Label fx:id="title" layoutX="123.0" layoutY="1.0" styleClass="title" text="Record A Service" AnchorPane.topAnchor="1.0">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+            <Label layoutX="17.0" layoutY="68.0" text="Patient Name" AnchorPane.leftAnchor="14.0" />
+            <Label layoutX="12.0" layoutY="128.0" text="Gender" AnchorPane.leftAnchor="14.0" />
+            <Label layoutX="15.0" layoutY="212.0" text="Residence" AnchorPane.leftAnchor="15.0" />
+            <Label layoutX="17.0" layoutY="244.0" text="Contact info." AnchorPane.leftAnchor="14.0" />
+            <TextField fx:id="residenceTextField" layoutX="104.0" layoutY="199.0" prefHeight="25.0" prefWidth="297.0" promptText="Residence" />
+            <TextArea fx:id="contactInfoTextArea" layoutX="105.0" layoutY="233.0" prefHeight="92.0" prefWidth="297.0" promptText="Patient's contact info." />
+            <RadioButton fx:id="maleRadioButton" layoutX="113.0" layoutY="128.0" mnemonicParsing="false" text="Male">
+               <toggleGroup>
+                  <ToggleGroup fx:id="genderToggleGroup" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="femaleRadioButton" layoutX="195.0" layoutY="128.0" mnemonicParsing="false" selected="true" text="Female" toggleGroup="$genderToggleGroup" />
+            <RadioButton fx:id="otherRadioButton" layoutX="292.0" layoutY="128.0" mnemonicParsing="false" text="Other" toggleGroup="$genderToggleGroup" />
+            <Label layoutX="14.0" layoutY="166.0" text="Age" />
+            <Spinner fx:id="ageSpinner" editable="true" layoutX="104.0" layoutY="162.0" prefHeight="25.0" prefWidth="297.0" />
          </children>
       </AnchorPane>
       <Label layoutX="57.0" layoutY="14.0" styleClass="title" text="Service History">

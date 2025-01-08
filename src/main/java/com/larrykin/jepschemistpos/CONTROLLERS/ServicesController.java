@@ -4,24 +4,17 @@ import com.larrykin.jepschemistpos.MODELS.Service;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +23,37 @@ public class ServicesController {
 
     private static final Logger log = LoggerFactory.getLogger(ServicesController.class);
     @FXML
+    private Spinner<Double> ageSpinner;
+
+    @FXML
     private TextField cashPaymentTextField;
+
+    @FXML
+    private TextArea contactInfoTextArea;
 
     @FXML
     private TextArea descriptionTextArea;
 
     @FXML
+    private RadioButton femaleRadioButton;
+
+    @FXML
+    private ToggleGroup genderToggleGroup;
+
+    @FXML
+    private RadioButton maleRadioButton;
+
+    @FXML
     private TextField mpesaPaymentTextField;
+
+    @FXML
+    private RadioButton otherRadioButton;
+
+    @FXML
+    private TextField patientName;
+
+    @FXML
+    private TextField residenceTextField;
 
     @FXML
     private Button saveButton;
@@ -45,10 +62,10 @@ public class ServicesController {
     private ScrollPane scrollPane;
 
     @FXML
-    private TextField serviceNameTextField;
+    private AnchorPane tableAnchorPane;
 
     @FXML
-    private AnchorPane tableAnchorPane;
+    private Label title;
 
 
     @FXML
@@ -66,7 +83,7 @@ public class ServicesController {
     TableView<Service> historyTableView = new TableView<>();
 
     private void saveService() {
-        if (!serviceNameTextField.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
+        if (!patientName.getText().isBlank() && !descriptionTextArea.getText().isBlank() && !ageSpinner.getEditor().getText().isBlank() && !residenceTextField.getText().isBlank() && !contactInfoTextArea.getText().isBlank()) {
             if (!cashPaymentTextField.getText().isBlank() || !mpesaPaymentTextField.getText().isBlank()) {
                 if (cashPaymentTextField.getText().isBlank()) {
                     cashPaymentTextField.setText("0");
@@ -75,15 +92,22 @@ public class ServicesController {
                     mpesaPaymentTextField.setText("0");
                 }
 
-                String sql = "INSERT INTO service_history (date, service_name, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?)";
+                RadioButton selectedRadioButton = (RadioButton) genderToggleGroup.getSelectedToggle();
+
+
+                String sql = "INSERT INTO service_history (date, patient_name,age,gender,residence,contact_info, description, cash_payment, mpesa_payment) VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)";
                 try (
                         Connection conn = databaseConn.getConnection();
                         PreparedStatement pstmt = conn.prepareStatement(sql);
                 ) {
-                    pstmt.setString(1, serviceNameTextField.getText());
-                    pstmt.setString(2, descriptionTextArea.getText());
-                    pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
-                    pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
+                    pstmt.setString(1, patientName.getText());
+                    pstmt.setString(2, ageSpinner.getEditor().getText());
+                    pstmt.setString(3, selectedRadioButton.getText());
+                    pstmt.setString(4, residenceTextField.getText());
+                    pstmt.setString(5, contactInfoTextArea.getText());
+                    pstmt.setString(6, descriptionTextArea.getText());
+                    pstmt.setDouble(7, Double.parseDouble(cashPaymentTextField.getText()));
+                    pstmt.setDouble(8, Double.parseDouble(mpesaPaymentTextField.getText()));
 
                     int rowAffected = pstmt.executeUpdate();
 
@@ -108,7 +132,10 @@ public class ServicesController {
                         populateTable();
 
                         //clear fields
-                        serviceNameTextField.clear();
+                        patientName.clear();
+                        ageSpinner.getEditor().setText("");
+                        residenceTextField.clear();
+                        contactInfoTextArea.clear();
                         descriptionTextArea.clear();
                         cashPaymentTextField.clear();
                         mpesaPaymentTextField.clear();
@@ -144,7 +171,7 @@ public class ServicesController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error saving service");
-            alert.setContentText("Service name and description cannot be empty!. Please fill in the required fields.");
+            alert.setContentText("Fields cannot be empty!. Please fill in the required fields.");
             alert.showAndWait();
         }
     }
@@ -207,23 +234,62 @@ public class ServicesController {
         //id column
         TableColumn<Service, Object> serviceIDColumn = new TableColumn<>("ID");
         serviceIDColumn.setCellValueFactory(new PropertyValueFactory<>("serviceID"));
-        serviceIDColumn.setPrefWidth(30);  // Set a fixed width
+        serviceIDColumn.setPrefWidth(30);
 
         //date column
         TableColumn<Service, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        dateColumn.setPrefWidth(125);  // Set a fixed width
+        dateColumn.setPrefWidth(125);
 
-        //service name column
-        TableColumn<Service, String> serviceNameColumn = new TableColumn<>("Service Name");
-        serviceNameColumn.setCellValueFactory(new PropertyValueFactory<>("serviceName"));
-        serviceNameColumn.setPrefWidth(100);  // Set a fixed width
+        //patient name column
+        TableColumn<Service, String> patientNameColumn = new TableColumn<>("Patient Name");
+        patientNameColumn.setCellValueFactory(new PropertyValueFactory<>("patientName"));
+        patientNameColumn.setPrefWidth(150);
+
+        //age column
+        TableColumn<Service, Double> ageColumn = new TableColumn<>("Age");
+        ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
+        ageColumn.setPrefWidth(50);
+
+        //gender column
+        TableColumn<Service, String> genderColumn = new TableColumn<>("Gender");
+        genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
+        genderColumn.setPrefWidth(50);
+
+        //residence column
+        TableColumn<Service, String> residenceColumn = new TableColumn<>("Residence");
+        residenceColumn.setCellValueFactory(new PropertyValueFactory<>("residence"));
+        residenceColumn.setPrefWidth(100);
+
+        //contact info column
+        TableColumn<Service, String> contactInfoColumn = new TableColumn<>("Contact Info");
+        contactInfoColumn.setCellValueFactory(new PropertyValueFactory<>("contactInfo"));
+        contactInfoColumn.setPrefWidth(200);
+        contactInfoColumn.setMinWidth(150);
+        contactInfoColumn.setCellFactory(tc -> {
+            TableCell<Service, String> cell = new TableCell<>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(contactInfoColumn.widthProperty().subtract(5));  // Adjust wrapping width
+                        setGraphic(text);
+                    }
+                }
+            };
+            return cell;
+        });
 
         //description column
         TableColumn<Service, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        descriptionColumn.setPrefWidth(350);  // Set an initial preferred width, larger for text
-        descriptionColumn.setMinWidth(200);   // Set a minimum width
+        descriptionColumn.setPrefWidth(200);
+        descriptionColumn.setMinWidth(150);
         descriptionColumn.setCellFactory(tc -> {
             TableCell<Service, String> cell = new TableCell<>() {
                 private final Text text = new Text();
@@ -252,6 +318,31 @@ public class ServicesController {
         TableColumn<Service, Double> mpesaPaymentColumn = new TableColumn<>("Mpesa");
         mpesaPaymentColumn.setCellValueFactory(new PropertyValueFactory<>("mpesaPayment"));
         mpesaPaymentColumn.setPrefWidth(50);  // Set a fixed width
+
+        //print button column
+        TableColumn<Service, String> printColumn = new TableColumn<>("Print");
+        printColumn.setPrefWidth(50);  // Set a fixed width
+        printColumn.setCellFactory(param -> new TableCell<Service, String>() {
+            private final Button printButton = new Button("Print");
+
+            {
+                printButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+                printButton.setOnAction(event -> {
+                    Service service = getTableView().getItems().get(getIndex());
+                    printRow(service);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(printButton);
+                }
+            }
+        });
 
         //edit column
         TableColumn<Service, String> editColumn = new TableColumn<>("Edit");
@@ -303,7 +394,7 @@ public class ServicesController {
             }
         });
 
-        historyTableView.getColumns().addAll(serviceIDColumn, dateColumn, serviceNameColumn, descriptionColumn, cashPaymentColumn, mpesaPaymentColumn, editColumn, deleteColumn);
+        historyTableView.getColumns().addAll(serviceIDColumn, dateColumn, patientNameColumn, ageColumn, genderColumn, residenceColumn, contactInfoColumn, descriptionColumn, cashPaymentColumn, mpesaPaymentColumn, printColumn, editColumn, deleteColumn);
         historyTableView.setPrefHeight(600);
 
         scrollPane.setContent(historyTableView);
@@ -360,19 +451,33 @@ public class ServicesController {
     private void editRow(Service service) {
         if (service != null) {
             try {
-                String oldServiceName = service.getServiceName();
+                String oldPatientName = service.getPatientName();
+                double oldAge = service.getAge();
+                String oldGender = service.getGender();
+                String oldResidence = service.getResidence();
+                String oldContactInfo = service.getContactInfo();
                 String oldServiceDescription = service.getDescription();
                 double oldCashPayment = service.getCashPayment();
                 double oldMpesaPayment = service.getMpesaPayment();
 
-                serviceNameTextField.setText(oldServiceName);
+                patientName.setText(oldPatientName);
+                ageSpinner.getEditor().setText(String.valueOf(oldAge));
+                if (oldGender.equalsIgnoreCase("M")) {
+                    maleRadioButton.setSelected(true);
+                } else if (oldGender.equalsIgnoreCase("F")) {
+                    femaleRadioButton.setSelected(true);
+                } else {
+                    otherRadioButton.setSelected(true);
+                }
+                residenceTextField.setText(oldResidence);
+                contactInfoTextArea.setText(oldContactInfo);
                 descriptionTextArea.setText(oldServiceDescription);
                 cashPaymentTextField.setText(String.valueOf(oldCashPayment));
                 mpesaPaymentTextField.setText(String.valueOf(oldMpesaPayment));
 
                 saveButton.setText("UPDATE");
                 saveButton.setOnAction(event -> {
-                    if (!serviceNameTextField.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
+                    if (!patientName.getText().isBlank() && !ageSpinner.getEditor().getText().isBlank() && !residenceTextField.getText().isBlank() && !contactInfoTextArea.getText().isBlank() && !descriptionTextArea.getText().isBlank()) {
                         if (!cashPaymentTextField.getText().isBlank() || !mpesaPaymentTextField.getText().isBlank()) {
                             if (cashPaymentTextField.getText().isBlank()) {
                                 cashPaymentTextField.setText("0");
@@ -381,17 +486,23 @@ public class ServicesController {
                                 mpesaPaymentTextField.setText("0");
                             }
 
-                            String sql = "UPDATE service_history SET service_name = ?, description = ?, cash_payment = ?, mpesa_payment = ? WHERE id = ?";
+                            RadioButton selectedRadioButton = (RadioButton) genderToggleGroup.getSelectedToggle();
+
+                            String sql = "UPDATE service_history SET patient_name = ?, age = ?, gender = ?, residence = ?, contact_info = ?, description = ?, cash_payment = ?, mpesa_payment = ? WHERE id = ?";
                             try (
                                     Connection conn = databaseConn.getConnection();
                                     PreparedStatement pstmt = conn.prepareStatement(sql);
                             ) {
 
-                                pstmt.setString(1, serviceNameTextField.getText());
-                                pstmt.setString(2, descriptionTextArea.getText());
-                                pstmt.setDouble(3, Double.parseDouble(cashPaymentTextField.getText()));
-                                pstmt.setDouble(4, Double.parseDouble(mpesaPaymentTextField.getText()));
-                                pstmt.setObject(5, service.getServiceID());
+                                pstmt.setString(1, patientName.getText());
+                                pstmt.setString(2, ageSpinner.getEditor().getText());
+                                pstmt.setString(3, selectedRadioButton.getText());
+                                pstmt.setString(4, residenceTextField.getText());
+                                pstmt.setString(5, contactInfoTextArea.getText());
+                                pstmt.setString(6, descriptionTextArea.getText());
+                                pstmt.setDouble(7, Double.parseDouble(cashPaymentTextField.getText()));
+                                pstmt.setDouble(8, Double.parseDouble(mpesaPaymentTextField.getText()));
+                                pstmt.setObject(9, service.getServiceID());
 
                                 int rowAffected = pstmt.executeUpdate();
 
@@ -414,7 +525,10 @@ public class ServicesController {
                                     populateTable();
 
                                     //clear fields
-                                    serviceNameTextField.clear();
+                                    patientName.clear();
+                                    ageSpinner.getEditor().setText("");
+                                    residenceTextField.clear();
+                                    contactInfoTextArea.clear();
                                     descriptionTextArea.clear();
                                     cashPaymentTextField.clear();
                                     mpesaPaymentTextField.clear();
@@ -455,7 +569,7 @@ public class ServicesController {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
                         alert.setHeaderText("Error Updating service");
-                        alert.setContentText("Service name and description cannot be empty!. Please fill in the required fields.");
+                        alert.setContentText("Fields cannot be empty!. Please fill in the required fields.");
                         alert.showAndWait();
                     }
                 });
@@ -465,6 +579,14 @@ public class ServicesController {
             }
         }
 
+    }
+
+    private void printRow(Service service) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Print Service");
+        alert.setHeaderText("Printing service");
+        alert.setContentText("Printing service: " + service.getPatientName());
+        alert.showAndWait();
     }
 
     private void populateTable() {
@@ -484,7 +606,11 @@ public class ServicesController {
                 Service service = new Service();
                 service.setServiceID(resultSet.getObject("id"));
                 service.setDate(resultSet.getString("date"));
-                service.setServiceName(resultSet.getString("service_name"));
+                service.setPatientName(resultSet.getString("patient_name"));
+                service.setAge(resultSet.getDouble("age"));
+                service.setGender(resultSet.getString("gender"));
+                service.setResidence(resultSet.getString("residence"));
+                service.setContactInfo(resultSet.getString("contact_info"));
                 service.setDescription(resultSet.getString("description"));
                 service.setCashPayment(resultSet.getDouble("cash_payment"));
                 service.setMpesaPayment(resultSet.getDouble("mpesa_payment"));

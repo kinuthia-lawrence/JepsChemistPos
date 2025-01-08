@@ -97,7 +97,11 @@ public class DatabaseConn {
                     "CREATE TABLE IF NOT EXISTS service_history (\n" +
                             "    id            INTEGER,\n" +
                             "    date          TEXT,\n" +
-                            "    service_name  TEXT    NOT NULL,\n" +
+                            "    patient_name  TEXT    NOT NULL,\n" +
+                            "    age  DOUBLE    NOT NULL,\n" +
+                            "    gender  TEXT    NOT NULL,\n" +
+                            "    residence  TEXT    NOT NULL,\n" +
+                            "    contact_info  TEXT    NOT NULL,\n" +
                             "    description   TEXT    NOT NULL,\n" +
                             "    cash_payment  REAL,\n" +
                             "    mpesa_payment REAL,\n" +

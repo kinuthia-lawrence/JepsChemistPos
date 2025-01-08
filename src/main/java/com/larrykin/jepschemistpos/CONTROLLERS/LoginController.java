@@ -253,9 +253,9 @@ public class LoginController implements Initializable {
             dashboardStage.setScene(dashboardScene);
             dashboardStage.initStyle(StageStyle.DECORATED); // Ensure minimize and close buttons are visible
             // Get the width of the primary screen
-            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+          /*  Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             dashboardStage.setWidth(screenBounds.getWidth());
-            dashboardStage.setHeight(screenBounds.getHeight());
+            dashboardStage.setHeight(screenBounds.getHeight());*/
 
             Image icon = new Image(getClass().getResourceAsStream("/IMAGES/microscope.jpg"));
             dashboardStage.getIcons().add(icon);
