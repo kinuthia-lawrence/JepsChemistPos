@@ -2,6 +2,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import com.larrykin.jepschemistpos.MODELS.Service;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
+import com.larrykin.jepschemistpos.UTILITIES.ReceiptPrinter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -16,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ServicesController {
@@ -582,11 +585,33 @@ public class ServicesController {
     }
 
     private void printRow(Service service) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Print Service");
-        alert.setHeaderText("Printing service");
-        alert.setContentText("Printing service: " + service.getPatientName());
-        alert.showAndWait();
+        String chemistName = "Jelps Chemist Clinic and lab";
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        StringBuilder receiptText = new StringBuilder();
+        receiptText.append("--------------------------------------------\n");
+        receiptText.append(" ").append(chemistName).append("\n");
+        receiptText.append("      ").append(currentDate).append("\n");
+        receiptText.append("Service offered by ").append(DashboardController.loggedInUserUsername).append("\n");
+        receiptText.append("--------------------------------------------\n");
+        receiptText.append("OPD:\n");
+        receiptText.append("Patient Name: ").append(service.getPatientName()).append("\n");
+        receiptText.append("Age: ").append(service.getAge()).append("\n");
+        receiptText.append("Gender: ").append(service.getGender()).append("\n");
+        receiptText.append("Residence: ").append(service.getResidence()).append("\n");
+        receiptText.append("Contact Info: ").append(service.getContactInfo()).append("\n");
+        receiptText.append("Description: ").append(service.getDescription()).append("\n");
+        receiptText.append("Cash Payment: ").append(service.getCashPayment()).append("\n");
+        receiptText.append("Mpesa Payment: ").append(service.getMpesaPayment()).append("\n");
+        receiptText.append("--------------------------------------------\n");
+        receiptText.append("          Thank you\n");
+        receiptText.append("             for\n");
+        receiptText.append("          Choosing\n");
+        receiptText.append("           Jelps\n");
+        receiptText.append("--------------------------------------------\n");
+
+        ReceiptPrinter receiptPrinter = new ReceiptPrinter(receiptText.toString());
+        receiptPrinter.printReceipt();
     }
 
     private void populateTable() {

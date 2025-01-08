@@ -357,12 +357,12 @@ public class SalesController {
                         if (isPrintEnabled) {
                             // Print the receipt
 
-                            String chemistName = "Jelps Chemist";
+                            String chemistName = "Jelps Chemist Clinic and lab";
                             String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
                             StringBuilder receiptText = new StringBuilder();
                             receiptText.append("--------------------------------------------\n");
-                            receiptText.append("          ").append(chemistName).append("\n");
+                            receiptText.append("    ").append(chemistName).append("\n");
                             receiptText.append("          ").append(currentDate).append("\n");
                             receiptText.append("          Sales by ").append(DashboardController.loggedInUserUsername).append("\n");
                             receiptText.append("--------------------------------------------\n");
