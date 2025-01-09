@@ -9,15 +9,19 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -121,7 +125,6 @@ public class StockController {
     DatabaseConn conn = new DatabaseConn();
 
     private ObservableList<String> productNames = FXCollections.observableArrayList();
-    private ObservableList<String> categories = FXCollections.observableArrayList();
     private SalesController salesController;
 
     private void instantiateControllers() {
@@ -134,7 +137,6 @@ public class StockController {
             e.printStackTrace();
         }
     }
-
 
     private void loadFields() {
         buyingPriceSpinner.setEditable(true);
@@ -168,7 +170,7 @@ public class StockController {
                 productNames.add(resultSet.getString("name"));
             }
         } catch (Exception e) {
-            System.out.println("Error loading combo boxes: " + e.getMessage());
+            log.error("Error loading combo boxes: ", e);
             e.printStackTrace();
         }
 
@@ -319,12 +321,17 @@ public class StockController {
         populateTable();
     }
 
-    private void receiveProducts(){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Receive Products");
-        alert.setHeaderText("Receive Products");
-        alert.setContentText("This feature is not yet implemented");
-        alert.showAndWait();
+    private void receiveProducts() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/receive_products.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Receive Products");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void populateTable() {
@@ -410,89 +417,89 @@ public class StockController {
     }
 
     private void saveProduct() {
-            String nameValue = nameComboBox.getValue();
-            Double quantityValue = quantitySpinner.getValue();
-            Double minQuantityValue = minQuantitySpinner.getValue();
-            Double buyingPriceValue = buyingPriceSpinner.getValue();
-            Double sellingPriceValue = sellingPriceSpinner.getValue();
-            String supplierNameValue = supplierComboBox.getValue();
-            LocalDate expiryDateValue = expiryDatePicker.getValue();
-            String descriptionValue = optionalDescription.getText();
+        String nameValue = nameComboBox.getValue();
+        Double quantityValue = quantitySpinner.getValue();
+        Double minQuantityValue = minQuantitySpinner.getValue();
+        Double buyingPriceValue = buyingPriceSpinner.getValue();
+        Double sellingPriceValue = sellingPriceSpinner.getValue();
+        String supplierNameValue = supplierComboBox.getValue();
+        LocalDate expiryDateValue = expiryDatePicker.getValue();
+        String descriptionValue = optionalDescription.getText();
 
-            if (nameValue != null && !nameValue.isBlank() &&
-                    quantityValue != null && !quantityValue.isNaN() &&
-                    minQuantityValue != null && !minQuantityValue.isNaN() &&
-                    buyingPriceValue != null && !buyingPriceValue.isNaN() &&
-                    sellingPriceValue != null && !sellingPriceValue.isNaN() &&
-                    supplierNameValue != null && !supplierNameValue.isBlank() &&
-                    expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
+        if (nameValue != null && !nameValue.isBlank() &&
+                quantityValue != null && !quantityValue.isNaN() &&
+                minQuantityValue != null && !minQuantityValue.isNaN() &&
+                buyingPriceValue != null && !buyingPriceValue.isNaN() &&
+                sellingPriceValue != null && !sellingPriceValue.isNaN() &&
+                supplierNameValue != null && !supplierNameValue.isBlank() &&
+                expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
-                try (
-                        Connection connection = conn.getConnection();
-                        PreparedStatement statement = connection.prepareStatement(sql);
-                ) {
-                    statement.setString(1, nameValue);
-                    statement.setDouble(2, quantityValue);
-                    statement.setDouble(3, minQuantityValue);
-                    statement.setDouble(4, buyingPriceValue);
-                    statement.setDouble(5, sellingPriceValue);
-                    statement.setString(6, supplierNameValue);
-                    statement.setString(7, expiryDateValue.toString());
-                    statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
+            String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
+            try (
+                    Connection connection = conn.getConnection();
+                    PreparedStatement statement = connection.prepareStatement(sql);
+            ) {
+                statement.setString(1, nameValue);
+                statement.setDouble(2, quantityValue);
+                statement.setDouble(3, minQuantityValue);
+                statement.setDouble(4, buyingPriceValue);
+                statement.setDouble(5, sellingPriceValue);
+                statement.setString(6, supplierNameValue);
+                statement.setString(7, expiryDateValue.toString());
+                statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
 
-                    int rowAffected = statement.executeUpdate();
-                    if (rowAffected > 0) {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("Success");
-                        alert.setHeaderText("Product saved successfully");
-                        alert.setContentText("Product saved successfully");
-                        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
-                        timeline.setCycleCount(1);
-                        timeline.play();
-                        alert.showAndWait();
+                int rowAffected = statement.executeUpdate();
+                if (rowAffected > 0) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText("Product saved successfully");
+                    alert.setContentText("Product saved successfully");
+                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                    timeline.setCycleCount(1);
+                    timeline.play();
+                    alert.showAndWait();
 
-                        connection.close();
-                        populateTable();
-                        loadFields();
-                        salesController.updateCurrentStockWorth();
-                        updateTotalStock(quantityValue, buyingPriceValue);
+                    connection.close();
+                    populateTable();
+                    loadFields();
+                    salesController.updateCurrentStockWorth();
+                    updateTotalStock(quantityValue, buyingPriceValue);
 
 
-                        //clear fields
-                        nameComboBox.setValue("");
+                    //clear fields
+                    nameComboBox.setValue("");
 
-                        quantitySpinner.getValueFactory().setValue(0.0);
-                        minQuantitySpinner.getValueFactory().setValue(0.0);
-                        buyingPriceSpinner.getValueFactory().setValue(0.0);
-                        sellingPriceSpinner.getValueFactory().setValue(0.0);
-                        supplierComboBox.setValue(null);
-                        expiryDatePicker.setValue(null);
-                        optionalDescription.clear();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText("Error saving product");
-                        alert.setContentText("Error saving product");
-                        alert.showAndWait();
-                    }
-                } catch (SQLException ex) {
-                    System.out.println("Error(sql) saving product: " + ex.getMessage());
-                    ex.printStackTrace();
-                } catch (Exception ex) {
+                    quantitySpinner.getValueFactory().setValue(0.0);
+                    minQuantitySpinner.getValueFactory().setValue(0.0);
+                    buyingPriceSpinner.getValueFactory().setValue(0.0);
+                    sellingPriceSpinner.getValueFactory().setValue(0.0);
+                    supplierComboBox.setValue(null);
+                    expiryDatePicker.setValue(null);
+                    optionalDescription.clear();
+                } else {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error saving product");
-                    alert.setContentText("Error saving product: " + ex.getMessage());
+                    alert.setContentText("Error saving product");
                     alert.showAndWait();
-                    ex.printStackTrace();
                 }
-            } else {
+            } catch (SQLException ex) {
+                System.out.println("Error(sql) saving product: " + ex.getMessage());
+                ex.printStackTrace();
+            } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText("Error Saving the Product.");
-                alert.setContentText("Please fill the fields correctly");
+                alert.setTitle("Error");
+                alert.setHeaderText("Error saving product");
+                alert.setContentText("Error saving product: " + ex.getMessage());
                 alert.showAndWait();
+                ex.printStackTrace();
             }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("Error Saving the Product.");
+            alert.setContentText("Please fill the fields correctly");
+            alert.showAndWait();
+        }
     }
 
 
@@ -640,7 +647,7 @@ public class StockController {
 
         }
     }
-    
+
     private void populateFilteredStockTable() {
         stockTable.getItems().clear();
         stockTable.getItems().addAll(getFilteredProductsFromDatabase());

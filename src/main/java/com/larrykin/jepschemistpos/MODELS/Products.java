@@ -193,4 +193,15 @@ public class Products {
     public void setTotal(double total) {
         this.total.set(total);
     }
+
+/*    public Products(SimpleStringProperty productName, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty expiryDate, SimpleStringProperty productDescription) {
+        this.productName = productName;
+        this.productQuantity = productQuantity;
+        this.minProductQuantity = minProductQuantity;
+        this.buyingPrice = buyingPrice;
+        this.sellingPrice = sellingPrice;
+        this.supplierName = supplierName;
+        this.expiryDate = expiryDate;
+        this.productDescription = productDescription;
+    }*/
 }
