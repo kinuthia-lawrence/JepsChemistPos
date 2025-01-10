@@ -57,7 +57,7 @@
          <Spinner fx:id="mpesaSpinner" layoutX="101.0" layoutY="392.0" AnchorPane.leftAnchor="101.0" />
          <Spinner fx:id="cashSpinner" layoutX="101.0" layoutY="440.0" AnchorPane.leftAnchor="101.0" />
          <Spinner fx:id="creditSpinner" layoutX="108.0" layoutY="485.0" AnchorPane.leftAnchor="100.0" />
-         <Button fx:id="sellButton" layoutX="100.0" layoutY="596.0" mnemonicParsing="false" prefHeight="30.0" text="Sell and Print Receipt" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="130.0" />
+         <Button fx:id="sellButton" layoutX="100.0" layoutY="586.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="227.0" text="Sell and Print Receipt" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="173.0" />
          <Label layoutX="24.0" layoutY="394.0" text="Mpesa" AnchorPane.leftAnchor="24.0">
             <font>
                <Font name="System Italic" size="14.0" />
@@ -82,7 +82,7 @@
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
-         <TextArea fx:id="descriptionTextArea" layoutX="100.0" layoutY="515.0" prefHeight="73.0" prefWidth="281.0" promptText="credit to be paid on ...." wrapText="true" />
+         <TextArea fx:id="descriptionTextArea" layoutX="100.0" layoutY="515.0" prefHeight="66.0" prefWidth="281.0" promptText="credit to be paid on ...." wrapText="true" />
          <Label layoutX="7.0" layoutY="333.0" text="Expected Amout :" AnchorPane.leftAnchor="24.0">
             <font>
                <Font name="System Italic" size="14.0" />
@@ -97,6 +97,7 @@
             </font>
          </Label>
          <Label layoutX="260.0" layoutY="285.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
+         <Button fx:id="holdSaleButton" layoutX="337.0" layoutY="586.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="157.0" text="Hold Sale" />
       </AnchorPane>
    </SplitPane>
 </AnchorPane>

@@ -1,6 +1,7 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import com.larrykin.jepschemistpos.MODELS.Products;
+import com.larrykin.jepschemistpos.MODELS.SaleData;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import com.larrykin.jepschemistpos.UTILITIES.PrintingManager;
@@ -36,9 +37,8 @@ import org.sqlite.SQLiteErrorCode;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SalesController {
@@ -65,6 +65,9 @@ public class SalesController {
 
     @FXML
     private TextField extrasTextField;
+
+    @FXML
+    private Button holdSaleButton;
 
     @FXML
     private ImageView iconRefresh;
@@ -320,6 +323,8 @@ public class SalesController {
 
     TableView<Sales> salesTableView = new TableView<>();
     TableView<Products> stockTableView = new TableView<>();
+    private Map<String, SaleData> heldSales = new HashMap<>();
+    private String currentSaleId = "default";
 
     //? Initialize UI elements
     private void initializeUIElements() {
@@ -363,7 +368,18 @@ public class SalesController {
             // Sell the products in the cart
             sellProducts();
         });
+
+        holdSaleButton.setOnAction(event -> {
+            if (holdSaleButton.getText().equals("Hold Sale")) {
+                holdCurrentSale(currentSaleId);
+                holdSaleButton.setText("Unhold Sale");
+            } else {
+                loadHeldSale(currentSaleId);
+                holdSaleButton.setText("Hold Sale");
+            }
+        });
     }
+
 
     //? Sell products
     private void sellProducts() {
@@ -994,39 +1010,79 @@ public class SalesController {
     }
 
     //? Initialize spinners
-private void initializeSpinners() {
+    private void initializeSpinners() {
         // set initial values to 0.0
-    discoutTextField.setText(String.valueOf(0.0));
-    extrasTextField.setText(String.valueOf(0.0));
+        discoutTextField.setText(String.valueOf(0.0));
+        extrasTextField.setText(String.valueOf(0.0));
 
 
-    // Add listeners to the TextFields
-    discoutTextField.textProperty().addListener((obs, oldValue, newValue) -> {
-        try {
-            Double.parseDouble(newValue);
+        // Add listeners to the TextFields
+        discoutTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+            try {
+                Double.parseDouble(newValue);
+                updateExpectedAmount();
+            } catch (NumberFormatException e) {
+                log.error("Error parsing discount value: {}", e.getMessage());
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid discount value");
+                alert.setContentText("Please enter a valid discount value.");
+                alert.showAndWait();
+            }
+        });
+
+        extrasTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+            try {
+                Double.parseDouble(newValue);
+                updateExpectedAmount();
+            } catch (NumberFormatException e) {
+                log.error("Error parsing extras value: {}", e.getMessage());
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid extras value");
+                alert.setContentText("Please enter a valid extras value.");
+                alert.showAndWait();
+            }
+        });
+    }
+
+    //? Hold current sale
+    private void holdCurrentSale(String saleId) {
+        ObservableList<Products> currentCart = FXCollections.observableArrayList(cartTableView.getItems());
+        SaleData saleData = new SaleData(currentCart, discoutTextField.getText(), extrasTextField.getText(),
+                cashSpinner.getValue(), mpesaSpinner.getValue(), creditSpinner.getValue(), descriptionTextArea.getText());
+        heldSales.put(saleId, saleData);
+        cartTableView.getItems().clear();
+        discoutTextField.setText(String.valueOf(0.0));
+        extrasTextField.setText(String.valueOf(0.0));
+        cashSpinner.getValueFactory().setValue(0.0);
+        mpesaSpinner.getValueFactory().setValue(0.0);
+        creditSpinner.getValueFactory().setValue(0.0);
+        descriptionTextArea.clear();
+        updateExpectedAmount();
+    }
+
+    //? Load held sale
+    private void loadHeldSale(String saleId) {
+        SaleData saleData = heldSales.get(saleId);
+        if (saleData != null) {
+            cartTableView.setItems(saleData.getCartItems());
+            discoutTextField.setText(saleData.getDiscount());
+            extrasTextField.setText(saleData.getExtras());
+            cashSpinner.getValueFactory().setValue(saleData.getCash());
+            mpesaSpinner.getValueFactory().setValue(saleData.getMpesa());
+            creditSpinner.getValueFactory().setValue(saleData.getCredit());
+            descriptionTextArea.setText(saleData.getDescription());
             updateExpectedAmount();
-        } catch (NumberFormatException e) {
-            log.error("Error parsing discount value: {}", e.getMessage());
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Invalid discount value");
-            alert.setContentText("Please enter a valid discount value.");
-            alert.showAndWait();
-        }
-    });
-
-    extrasTextField.textProperty().addListener((obs, oldValue, newValue) -> {
-        try {
-            Double.parseDouble(newValue);
+        } else {
+            cartTableView.getItems().clear();
+            discoutTextField.setText("0.0");
+            extrasTextField.setText("0.0");
+            cashSpinner.getValueFactory().setValue(0.0);
+            mpesaSpinner.getValueFactory().setValue(0.0);
+            creditSpinner.getValueFactory().setValue(0.0);
+            descriptionTextArea.clear();
             updateExpectedAmount();
-        } catch (NumberFormatException e) {
-            log.error("Error parsing extras value: {}", e.getMessage());
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Invalid extras value");
-            alert.setContentText("Please enter a valid extras value.");
-            alert.showAndWait();
         }
-    });
-}
+    }
 }
