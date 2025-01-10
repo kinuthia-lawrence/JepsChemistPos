@@ -418,8 +418,7 @@ public class SalesController {
         if (description.isEmpty()) {
             description = "No description";
         }
-
-        // Print all the values in terminal (for text)
+//confirm sale
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Sale");
         alert.setHeaderText("Confirm the sale");
@@ -911,6 +910,30 @@ public class SalesController {
         TableColumn<Sales, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         descriptionColumn.setPrefWidth(150);
+        //print column
+        TableColumn<Sales, String> printColumn = new TableColumn<>("Print");
+        printColumn.setPrefWidth(65);  // Set a fixed width
+        printColumn.setCellFactory(param -> new TableCell<Sales, String>() {
+            private final Button printButton = new Button("Print");
+
+            {
+                printButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+                printButton.setOnAction(event -> {
+                    Sales record = getTableView().getItems().get(getIndex());
+                    printRow(record);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(printButton);
+                }
+            }
+        });
         //delete column
         TableColumn<Sales, String> deleteColumn = new TableColumn<>("Delete");
         deleteColumn.setPrefWidth(65);  // Set a fixed width
@@ -946,7 +969,7 @@ public class SalesController {
             }
         });
 
-        salesTableView.getColumns().addAll(salesIDColumn, dateColumn, goodsColumn, expectedAmountColumn, totalAmountColumn, discountAmountColumn, cashColumn, mpesaColumn, creditColumn, descriptionColumn, deleteColumn);
+        salesTableView.getColumns().addAll(salesIDColumn, dateColumn, goodsColumn, expectedAmountColumn, totalAmountColumn, discountAmountColumn, cashColumn, mpesaColumn, creditColumn, descriptionColumn, printColumn, deleteColumn);
         salesTableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         salesTableView.setPrefHeight(580);
 
@@ -1084,5 +1107,36 @@ public class SalesController {
             descriptionTextArea.clear();
             updateExpectedAmount();
         }
+    }
+
+    //? Print row
+    private void printRow(Sales record) {
+        String chemistName = "Jelps Chemist Clinic and lab";
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        String receiptText = "--------------------------------------------\n" +
+                "    " + chemistName + "\n" +
+                "          " + currentDate + "\n" +
+                "          Sales by " + DashboardController.loggedInUserUsername + "\n" +
+                "--------------------------------------------\n" +
+                "Goods:\n" +
+                record.getGoods().replace(", ", "\n") + "\n" +
+                "--------------------------------------------\n" +
+                "Expected Amount: " + record.getExpectedAmount() + "\n" +
+                "Discount: " + record.getDiscountAmount() + "\n" +
+                "Cash: " + record.getCash() + "\n" +
+                "Mpesa: " + record.getMpesa() + "\n" +
+                "Credit: " + record.getCredit() + "\n" +
+                "Description: " + record.getDescription() + "\n" +
+                "Paid Amount: " + record.getTotalAmount() + "\n" +
+                "--------------------------------------------\n" +
+                "          Thank you\n" +
+                "             for\n" +
+                "          shopping!\n" +
+                "          with Jelps\n" +
+                "--------------------------------------------\n";
+
+        ReceiptPrinter receiptPrinter = new ReceiptPrinter(receiptText);
+        receiptPrinter.printReceipt();
     }
 }
