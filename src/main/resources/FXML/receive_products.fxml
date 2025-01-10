@@ -16,19 +16,21 @@
     <Label layoutX="635.0" layoutY="130.0" text="Expiry Date:" />
     <Spinner fx:id="sellingPriceSpinner" layoutX="742.0" layoutY="78.0" prefHeight="32.0" prefWidth="274.0" />
     <Label layoutX="633.0" layoutY="88.0" text="Selling Price:" />
-    <Spinner fx:id="minQuantitySpinner" layoutX="139.0" layoutY="177.0" prefHeight="32.0" prefWidth="260.0" />
+    <Spinner fx:id="minQuantitySpinner" layoutX="139.0" layoutY="186.0" prefHeight="32.0" prefWidth="260.0" />
     <Label layoutX="21.0" layoutY="26.0" text="Supplier:" />
     <ComboBox fx:id="supplierComboBox" layoutX="139.0" layoutY="19.0" prefHeight="32.0" prefWidth="260.0" />
-    <Label layoutX="15.0" layoutY="88.0" text="Product Name:" AnchorPane.leftAnchor="20.0" />
-    <ComboBox fx:id="productNameComboBox" editable="true" layoutX="139.0" layoutY="78.0" prefHeight="32.0" prefWidth="260.0" />
-    <Label layoutX="20.0" layoutY="138.0" text="Quantity:" AnchorPane.leftAnchor="20.0" />
-    <Spinner fx:id="quantitySpinner" layoutX="139.0" layoutY="130.0" prefHeight="32.0" prefWidth="260.0" />
+    <Label layoutX="25.0" layoutY="70.0" text="Product Name:" AnchorPane.leftAnchor="25.0" />
+    <ComboBox fx:id="productNameComboBox" editable="true" layoutX="139.0" layoutY="62.0" prefHeight="32.0" prefWidth="260.0" />
+    <Label layoutX="20.0" layoutY="111.0" text="Buying Quantity:" AnchorPane.leftAnchor="20.0" />
+    <Spinner fx:id="buyingQuantitySpinner" layoutX="139.0" layoutY="103.0" prefHeight="32.0" prefWidth="260.0" />
     <Label layoutX="21.0" layoutY="228.0" text="Buying Price:" AnchorPane.leftAnchor="20.0" />
-    <Spinner fx:id="buyingPriceSpinner" layoutX="139.0" layoutY="220.0" prefHeight="32.0" prefWidth="260.0" />
-    <Label layoutX="21.0" layoutY="185.0" text="Minimum Quantity:" AnchorPane.leftAnchor="20.0" />
+    <Spinner fx:id="buyingPriceSpinner" layoutX="139.0" layoutY="226.0" prefHeight="32.0" prefWidth="260.0" />
+    <Label layoutX="21.0" layoutY="176.0" prefHeight="47.0" prefWidth="101.0" text="Minimum out of stock Quantity:" wrapText="true" AnchorPane.leftAnchor="20.0" />
     <Label layoutX="635.0" layoutY="177.0" text="Description:" />
     <TextArea fx:id="descriptionTextArea" layoutX="742.0" layoutY="159.0" prefHeight="83.0" prefWidth="274.0" promptText="Description" />
     <Button fx:id="addToTableButton" layoutX="375.0" layoutY="259.0" onAction="#addToTable" prefHeight="38.0" prefWidth="546.0" text="Add to Table" AnchorPane.leftAnchor="375.0" AnchorPane.rightAnchor="375.0" />
     <Label layoutX="15.0" layoutY="599.0" text="Total Buying Price(ksh):" AnchorPane.rightAnchor="200.0" />
     <Label fx:id="totalBuyingPriceLabel" layoutX="1108.0" layoutY="592.0" prefHeight="32.0" prefWidth="200.0" AnchorPane.rightAnchor="0.0" />
+   <Spinner fx:id="sellingQuantitySpinner" layoutX="139.0" layoutY="143.0" prefHeight="32.0" prefWidth="260.0" />
+   <Label layoutX="20.0" layoutY="151.0" text="Selling Quantity:" />
 </AnchorPane>

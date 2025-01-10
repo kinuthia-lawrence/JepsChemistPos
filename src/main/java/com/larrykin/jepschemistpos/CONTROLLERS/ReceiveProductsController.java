@@ -2,16 +2,15 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Duration;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +29,15 @@ public class ReceiveProductsController {
     @FXML
     private ComboBox<String> productNameComboBox;
     @FXML
-    private Spinner<Double> quantitySpinner;
+    private Spinner<Double> buyingQuantitySpinner;
     @FXML
     private Spinner<Double> buyingPriceSpinner;
     @FXML
     private Spinner<Double> minQuantitySpinner;
     @FXML
     private Spinner<Double> sellingPriceSpinner;
+    @FXML
+    private Spinner<Double> sellingQuantitySpinner;
     @FXML
     private DatePicker expiryDatePicker;
     @FXML
@@ -53,12 +54,26 @@ public class ReceiveProductsController {
     private ObservableList<Products> products = FXCollections.observableArrayList();
     private ObservableList<String> productNames = FXCollections.observableArrayList();
     private double totalBuyingPrice = 0.0;
+    private StockController stockController;
 
 
     @FXML
     public void initialize() {
         initializeTable();
         loadFields();
+        instantiateControllers();
+    }
+
+
+    private void instantiateControllers() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/stock.fxml"));
+            loader.load();
+            stockController = loader.getController();
+        } catch (Exception e) {
+            log.error("Error instantiating sales controllers: {}", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void loadFields() {
@@ -68,9 +83,13 @@ public class ReceiveProductsController {
         sellingPriceSpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory1 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         sellingPriceSpinner.setValueFactory(valueFactory1);
-        quantitySpinner.setEditable(true);
+        buyingQuantitySpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
-        quantitySpinner.setValueFactory(valueFactory2);
+        buyingQuantitySpinner.setValueFactory(valueFactory2);
+        sellingQuantitySpinner.setEditable(true);
+        SpinnerValueFactory<Double> valueFactory4 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
+        sellingQuantitySpinner.setValueFactory(valueFactory4);
+
         minQuantitySpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory3 = new SpinnerValueFactory.DoubleSpinnerValueFactory(1.0, 100000.0, 1.0);
         minQuantitySpinner.setValueFactory(valueFactory3);
@@ -159,9 +178,13 @@ public class ReceiveProductsController {
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
         productNameColumn.setPrefWidth(200);
         //Quantity
-        TableColumn<Products, Double> quantityColumn = new TableColumn<>("Quantity");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
+        TableColumn<Products, Double> quantityColumn = new TableColumn<>(" B. Quantity");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("minBuyingQuantity"));
         quantityColumn.setPrefWidth(80);
+        //Quantity
+        TableColumn<Products, Double> sellingQuantityColumn = new TableColumn<>(" S. Quantity");
+        sellingQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("productQuantity"));
+        sellingQuantityColumn.setPrefWidth(80);
         //Minimum Quantity
         TableColumn<Products, Double> minQuantityProductColumn = new TableColumn<>("Min Qty.");
         minQuantityProductColumn.setCellValueFactory(new PropertyValueFactory<>("minProductQuantity"));
@@ -177,12 +200,12 @@ public class ReceiveProductsController {
         //supplier name
         TableColumn<Products, String> supplierNameColumn = new TableColumn<>("Supplier");
         supplierNameColumn.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
-        supplierNameColumn.setPrefWidth(150);
+        supplierNameColumn.setPrefWidth(100);
 
         //expiry date
         TableColumn<Products, String> expiryDateColumn = new TableColumn<>("Expiry Date");
         expiryDateColumn.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
-        expiryDateColumn.setPrefWidth(150);
+        expiryDateColumn.setPrefWidth(100);
         //Description
         TableColumn<Products, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
@@ -199,7 +222,11 @@ public class ReceiveProductsController {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-//                    editRow(product);
+                    totalBuyingPrice -= product.getBuyingPrice() * product.getMinBuyingQuantity();
+                    totalBuyingPriceLabel.setText(" " + totalBuyingPrice);
+                    products.remove(product);
+                    productsTable.setItems(products);
+                    editRow(product);
                 });
             }
 
@@ -233,7 +260,7 @@ public class ReceiveProductsController {
                         deleteConfirmation.close();
                         return;
                     }
-                    totalBuyingPrice -= product.getBuyingPrice() * product.getProductQuantity();
+                    totalBuyingPrice -= product.getBuyingPrice() * product.getMinBuyingQuantity();
                     totalBuyingPriceLabel.setText(" " + totalBuyingPrice);
                     products.remove(product);
                     productsTable.setItems(products);
@@ -254,12 +281,13 @@ public class ReceiveProductsController {
         productsTable.getColumns().addAll(numberColumn, productNameColumn, quantityColumn, minQuantityProductColumn, buyingPriceColumn, sellingPriceColumn, supplierNameColumn, expiryDateColumn, descriptionColumn, editColumn, removeColumn);
     }
 
-    /*private void editRow(Products product) {
+    private void editRow(Products product) {
         if (product != null) {
             try {
                 //getting old values
                 String oldName = product.getProductName();
                 Double oldQuantity = product.getProductQuantity();
+                Double oldBuyingQuantity = product.getMinBuyingQuantity();
                 Double oldMinQuantity = product.getMinProductQuantity();
                 Double oldBuyingPrice = product.getBuyingPrice();
                 Double oldSellingPrice = product.getSellingPrice();
@@ -268,94 +296,64 @@ public class ReceiveProductsController {
                 String oldDescription = product.getProductDescription();
 
                 //setting old values to the fields
-                nameComboBox.setValue(oldName);
-                quantitySpinner.getValueFactory().setValue(oldQuantity);
+                productNameComboBox.setValue(oldName);
+                sellingQuantitySpinner.getValueFactory().setValue(oldQuantity);
+                buyingQuantitySpinner.getValueFactory().setValue(oldBuyingQuantity);
                 minQuantitySpinner.getValueFactory().setValue(oldMinQuantity);
                 buyingPriceSpinner.getValueFactory().setValue(oldBuyingPrice);
                 sellingPriceSpinner.getValueFactory().setValue(oldSellingPrice);
                 supplierComboBox.setValue(oldSupplierName);
                 expiryDatePicker.setValue(LocalDate.parse(oldExpiryDate));
-                optionalDescription.setText(oldDescription);
+                descriptionTextArea.setText(oldDescription);
 
-                saveButton.setDisable(false);
-                saveButton.setText("UPDATE");
-                saveButton.setOnAction(event -> {
-                    String nameValue = nameComboBox.getValue();
-                    Double quantityValue = quantitySpinner.getValue();
+
+                addToTableButton.setOnAction(event -> {
+                    String nameValue = productNameComboBox.getValue();
+                    Double quantityValue = sellingQuantitySpinner.getValue();
+                    Double buyingQuantityValue = buyingQuantitySpinner.getValue();
                     Double minQuantityValue = minQuantitySpinner.getValue();
                     Double buyingPriceValue = buyingPriceSpinner.getValue();
                     Double sellingPriceValue = sellingPriceSpinner.getValue();
                     String supplierNameValue = supplierComboBox.getValue();
                     LocalDate expiryDateValue = expiryDatePicker.getValue();
-                    String descriptionValue = optionalDescription.getText();
+                    String descriptionValue = descriptionTextArea.getText().isBlank() ?"description NULL": descriptionTextArea.getText();
 
                     if (nameValue != null && !nameValue.isBlank() &&
                             quantityValue != null && !quantityValue.isNaN() &&
+                            buyingQuantityValue != null && !buyingQuantityValue.isNaN() &&
                             minQuantityValue != null && !minQuantityValue.isNaN() &&
                             buyingPriceValue != null && !buyingPriceValue.isNaN() &&
                             sellingPriceValue != null && !sellingPriceValue.isNaN() &&
                             supplierNameValue != null && !supplierNameValue.isBlank() &&
                             expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-                        String sql = "UPDATE products SET name = ?, quantity = ?, min_quantity = ?, buying_price = ?, selling_price = ?, supplier_name = ?, expiry_date = ?, description = ? WHERE id = ?";
-                        try (
-                                Connection connection = conn.getConnection();
-                                PreparedStatement statement = connection.prepareStatement(sql);
-                        ) {
-                            statement.setString(1, nameValue);
-                            statement.setDouble(2, quantityValue);
-                            statement.setDouble(3, minQuantityValue);
-                            statement.setDouble(4, buyingPriceValue);
-                            statement.setDouble(5, sellingPriceValue);
-                            statement.setString(6, supplierNameValue);
-                            statement.setString(7, expiryDateValue.toString());
-                            statement.setString(8, descriptionValue != null && !descriptionValue.isBlank() ? descriptionValue : "description NULL");
-                            statement.setObject(9, product.getProductID());
+                        Products updatedProduct = new Products();
+                        updatedProduct.setProductName(nameValue);
+                        updatedProduct.setProductQuantity(quantityValue);
+                        updatedProduct.setMinBuyingQuantity(buyingQuantityValue);
+                        updatedProduct.setMinProductQuantity(minQuantityValue);
+                        updatedProduct.setBuyingPrice(buyingPriceValue);
+                        updatedProduct.setSellingPrice(sellingPriceValue);
+                        updatedProduct.setSupplierName(supplierNameValue);
+                        updatedProduct.setExpiryDate(expiryDateValue.toString());
+                        updatedProduct.setProductDescription(descriptionValue);
 
-                            int rowAffected = statement.executeUpdate();
-                            if (rowAffected > 0) {
-                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                alert.setTitle("Success");
-                                alert.setHeaderText("Product updated successfully");
-                                alert.setContentText("Product updated successfully");
-                                Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
-                                timeline.setCycleCount(1);
-                                timeline.play();
-                                alert.showAndWait();
 
-                                connection.close();
-                                populateTable();
-                                loadFields();
+                        products.add(updatedProduct);
 
-                                //clear fields
-                                nameComboBox.setValue("");
-                                quantitySpinner.getValueFactory().setValue(0.0);
-                                minQuantitySpinner.getValueFactory().setValue(0.0);
-                                buyingPriceSpinner.getValueFactory().setValue(0.0);
-                                sellingPriceSpinner.getValueFactory().setValue(0.0);
-                                supplierComboBox.setValue(null);
-                                expiryDatePicker.setValue(null);
-                                optionalDescription.clear();
-                                saveButton.setDisable(true);
-                                saveButton.setText("SAVE");
-                            } else {
-                                Alert alert = new Alert(Alert.AlertType.ERROR);
-                                alert.setTitle("Error");
-                                alert.setHeaderText("Error Updating product");
-                                alert.setContentText("Error Updating product");
-                                alert.showAndWait();
-                            }
-                        } catch (SQLException ex) {
-                            System.out.println("Error(sql) updating product: " + ex.getMessage());
-                            ex.printStackTrace();
-                        } catch (Exception e) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setHeaderText("Error Updating service");
-                            alert.setContentText("Error Updating service: " + e.getMessage());
-                            alert.showAndWait();
-                            e.printStackTrace();
-                        }
+                        productsTable.setItems(products);
+                        totalBuyingPrice += buyingPriceValue * buyingQuantityValue;
+                        totalBuyingPriceLabel.setText(" " + totalBuyingPrice);
+
+                        //clear fields
+                        productNameComboBox.setValue("");
+                        sellingQuantitySpinner.getValueFactory().setValue(0.0);
+                        buyingQuantitySpinner.getValueFactory().setValue(0.0);
+                        minQuantitySpinner.getValueFactory().setValue(0.0);
+                        buyingPriceSpinner.getValueFactory().setValue(0.0);
+                        sellingPriceSpinner.getValueFactory().setValue(0.0);
+                        expiryDatePicker.setValue(null);
+                        descriptionTextArea.clear();
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setHeaderText("Error Updating the Product.");
@@ -368,23 +366,24 @@ public class ReceiveProductsController {
                 ex.printStackTrace();
             }
 
-
         }
-    }*/
+    }
 
     @FXML
     private void addToTable() {
         String productName = productNameComboBox.getValue();
-        Double quantity = quantitySpinner.getValue();
+        Double buyingQuantity = buyingQuantitySpinner.getValue();
+        Double sellingQuantity = sellingQuantitySpinner.getValue();
         Double minQuantity = minQuantitySpinner.getValue();
         Double buyingPrice = buyingPriceSpinner.getValue();
         Double sellingPrice = sellingPriceSpinner.getValue();
         String supplierName = supplierComboBox.getValue();
         LocalDate expiryDate = expiryDatePicker.getValue();
-        String description = descriptionTextArea.getText();
+        String description = descriptionTextArea.getText().isBlank() ? "description NULL": descriptionTextArea.getText();
 
         if (productName != null && !productName.isBlank() &&
-                quantity != null && !quantity.isNaN() &&
+                buyingQuantity != null && !buyingQuantity.isNaN() &&
+                sellingQuantity != null && !sellingQuantity.isNaN() &&
                 minQuantity != null && !minQuantity.isNaN() &&
                 buyingPrice != null && !buyingPrice.isNaN() &&
                 sellingPrice != null && !sellingPrice.isNaN() &&
@@ -393,24 +392,26 @@ public class ReceiveProductsController {
 
             Products product = new Products();
             product.setProductName(productName);
-            product.setProductQuantity(quantity);
+            product.setProductQuantity(sellingQuantity);
             product.setMinProductQuantity(minQuantity);
             product.setBuyingPrice(buyingPrice);
             product.setSellingPrice(sellingPrice);
             product.setSupplierName(supplierName);
             product.setExpiryDate(expiryDate.toString());
             product.setProductDescription(description);
+            product.setMinBuyingQuantity(buyingQuantity);
 
 
             products.add(product);
 
             productsTable.setItems(products);
-            totalBuyingPrice += buyingPrice * quantity;
+            totalBuyingPrice += buyingPrice * buyingQuantity;
             totalBuyingPriceLabel.setText(" " + totalBuyingPrice);
 
             //clear fields
             productNameComboBox.setValue("");
-            quantitySpinner.getValueFactory().setValue(0.0);
+            buyingQuantitySpinner.getValueFactory().setValue(0.0);
+            sellingQuantitySpinner.getValueFactory().setValue(0.0);
             minQuantitySpinner.getValueFactory().setValue(0.0);
             buyingPriceSpinner.getValueFactory().setValue(0.0);
             sellingPriceSpinner.getValueFactory().setValue(0.0);
@@ -427,7 +428,64 @@ public class ReceiveProductsController {
 
     @FXML
     private void saveStock() {
-        // Implement the logic to save the stock to the database
+        String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) " +
+                "VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?, ?) " +
+                "ON CONFLICT(name) DO UPDATE SET " +
+                "quantity = quantity + excluded.quantity, " +
+                "min_quantity = excluded.min_quantity, " +
+                "buying_price = excluded.buying_price, " +
+                "selling_price = excluded.selling_price, " +
+                "supplier_name = excluded.supplier_name, " +
+                "date_added = datetime('now'), " +
+                "expiry_date = excluded.expiry_date, " +
+                "description = excluded.description";
+        try (Connection connection = databaseConn.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            for (Products product : products) {
+                statement.setString(1, product.getProductName());
+                statement.setDouble(2, product.getProductQuantity());
+                statement.setDouble(3, product.getMinProductQuantity());
+                statement.setDouble(4, product.getBuyingPrice());
+                statement.setDouble(5, product.getSellingPrice());
+                statement.setString(6, product.getSupplierName());
+                statement.setString(7, product.getExpiryDate());
+                statement.setString(8, product.getProductDescription());
+
+                statement.addBatch(); // Add the current set of parameters to the batch
+            }
+
+            int[] rowsAffected = statement.executeBatch(); // Execute the batch statements
+            if (rowsAffected.length == products.size()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("Products saved successfully");
+                alert.setContentText("All products have been saved to the database.");
+                alert.showAndWait();
+
+                stockController.populateTable();
+                stockController.loadFields();
+
+                products.clear();
+                Stage stage = (Stage) saveStockButton.getScene().getWindow();
+                stage.close();
+
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error saving products");
+                alert.setContentText("Some products were not saved to the database.");
+                alert.showAndWait();
+            }
+
+        } catch (SQLException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error saving products");
+            alert.setContentText("Error saving products: " + ex.getMessage());
+            alert.showAndWait();
+            ex.printStackTrace();
+        }
     }
 
 

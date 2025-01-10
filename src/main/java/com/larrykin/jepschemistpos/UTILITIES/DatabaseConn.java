@@ -50,7 +50,7 @@ public class DatabaseConn {
             connection.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS products (\n" +
                             "    id            INTEGER,\n" +
-                            "    name          TEXT    NOT NULL,\n" +
+                            "    name          TEXT    NOT NULL UNIQUE,\n" +
                             "    quantity      INTEGER,\n" +
                             "    min_quantity  INTEGER,\n" +
                             "    buying_price  REAL,\n" +

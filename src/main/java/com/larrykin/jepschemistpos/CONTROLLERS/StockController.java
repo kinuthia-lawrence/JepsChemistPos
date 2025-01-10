@@ -138,7 +138,7 @@ public class StockController {
         }
     }
 
-    private void loadFields() {
+    public void loadFields() {
         buyingPriceSpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         buyingPriceSpinner.setValueFactory(valueFactory);
@@ -334,7 +334,7 @@ public class StockController {
         }
     }
 
-    private void populateTable() {
+    public void populateTable() {
         ObservableList<Products> products = FXCollections.observableArrayList();
         products.addAll(getProductsFromDatabase());
         stockTable.setItems(products);
@@ -434,7 +434,17 @@ public class StockController {
                 supplierNameValue != null && !supplierNameValue.isBlank() &&
                 expiryDateValue != null && !expiryDateValue.isBefore(LocalDate.now())) {
 
-            String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) VALUES (?, ?, ?, ?, ?,?, datetime('now'), ?, ?)";
+            String sql = "INSERT INTO products (name, quantity, min_quantity, buying_price, selling_price, supplier_name, date_added, expiry_date, description) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?, ?) " +
+                    "ON CONFLICT(name) DO UPDATE SET " +
+                    "quantity = quantity + excluded.quantity, " +
+                    "min_quantity = excluded.min_quantity, " +
+                    "buying_price = excluded.buying_price, " +
+                    "selling_price = excluded.selling_price, " +
+                    "supplier_name = excluded.supplier_name, " +
+                    "date_added = datetime('now'), " +
+                    "expiry_date = excluded.expiry_date, " +
+                    "description = excluded.description";
             try (
                     Connection connection = conn.getConnection();
                     PreparedStatement statement = connection.prepareStatement(sql);
@@ -553,7 +563,7 @@ public class StockController {
                 expiryDatePicker.setValue(LocalDate.parse(oldExpiryDate));
                 optionalDescription.setText(oldDescription);
 
-                saveButton.setDisable(false);
+
                 saveButton.setText("UPDATE");
                 saveButton.setOnAction(event -> {
                     String nameValue = nameComboBox.getValue();
@@ -612,7 +622,6 @@ public class StockController {
                                 supplierComboBox.setValue(null);
                                 expiryDatePicker.setValue(null);
                                 optionalDescription.clear();
-                                saveButton.setDisable(true);
                                 saveButton.setText("SAVE");
                             } else {
                                 Alert alert = new Alert(Alert.AlertType.ERROR);

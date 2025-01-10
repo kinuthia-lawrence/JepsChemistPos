@@ -15,12 +15,14 @@ public class Products {
     private SimpleStringProperty dateAdded;
     private SimpleStringProperty expiryDate;
     private SimpleStringProperty productDescription;
+    private SimpleDoubleProperty minBuyingQuantity;
 
     //others
     private SimpleDoubleProperty sellingQuantity;
     private SimpleDoubleProperty total;
 
-    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total) {
+    public Products(SimpleObjectProperty<Object> productID, SimpleStringProperty productName, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice,
+                    SimpleStringProperty supplierName, SimpleStringProperty dateAdded, SimpleStringProperty expiryDate, SimpleStringProperty productDescription, SimpleDoubleProperty SellingQuantity, SimpleDoubleProperty total, SimpleDoubleProperty minBuyingQuantity) {
         this.productID = productID;
         this.productName = productName;
         this.productQuantity = productQuantity;
@@ -33,6 +35,7 @@ public class Products {
         this.productDescription = productDescription;
         this.sellingQuantity = SellingQuantity;
         this.total = total;
+        this.minBuyingQuantity = minBuyingQuantity;
     }
 
     public Products() {
@@ -48,6 +51,17 @@ public class Products {
         this.productDescription = new SimpleStringProperty("");
         this.sellingQuantity = new SimpleDoubleProperty(0.0);
         this.total = new SimpleDoubleProperty(0.0);
+        this.minBuyingQuantity = new SimpleDoubleProperty();
+    }
+
+    public double getMinBuyingQuantity() {
+        return minBuyingQuantity.get();
+    }
+    public SimpleDoubleProperty minBuyingQuantityProperty() {
+        return minBuyingQuantity;
+    }
+    public void setMinBuyingQuantity(double minBuyingQuantity) {
+        this.minBuyingQuantity.set(minBuyingQuantity);
     }
 
     public Object getProductID() {
@@ -193,15 +207,4 @@ public class Products {
     public void setTotal(double total) {
         this.total.set(total);
     }
-
-/*    public Products(SimpleStringProperty productName, SimpleDoubleProperty productQuantity, SimpleDoubleProperty minProductQuantity, SimpleDoubleProperty buyingPrice, SimpleDoubleProperty sellingPrice, SimpleStringProperty supplierName, SimpleStringProperty expiryDate, SimpleStringProperty productDescription) {
-        this.productName = productName;
-        this.productQuantity = productQuantity;
-        this.minProductQuantity = minProductQuantity;
-        this.buyingPrice = buyingPrice;
-        this.sellingPrice = sellingPrice;
-        this.supplierName = supplierName;
-        this.expiryDate = expiryDate;
-        this.productDescription = productDescription;
-    }*/
 }
