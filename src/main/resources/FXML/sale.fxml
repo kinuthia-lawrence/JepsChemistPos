@@ -18,16 +18,16 @@
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
-   <SplitPane fx:id="salesSplitPane" dividerPositions="0.29797979797979796" layoutX="100.0" layoutY="70.0" styleClass="parent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <AnchorPane minHeight="500.0" minWidth="450.0" styleClass="parent">
+   <SplitPane fx:id="salesSplitPane" dividerPositions="0.5875343721356554" layoutX="100.0" layoutY="70.0" styleClass="parent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane minHeight="500.0" minWidth="450.0" prefHeight="626.0" prefWidth="606.0" styleClass="parent">
          <Button fx:id="stockButton" layoutX="20.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Stock" AnchorPane.topAnchor="14.0" />
          <Button fx:id="refreshButton" layoutX="317.0" layoutY="17.0" mnemonicParsing="false" styleClass="side-bar-button" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0">
             <graphic>
                <ImageView fx:id="iconRefresh" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" />
             </graphic>
          </Button>
-         <Button fx:id="salesButton" layoutX="140.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Sales" AnchorPane.topAnchor="14.0" />
-         <ScrollPane fx:id="tableScrollPane" layoutX="14.0" layoutY="59.0" prefHeight="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+         <Button fx:id="salesButton" layoutX="129.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Sales" AnchorPane.topAnchor="14.0" />
+         <ScrollPane fx:id="tableScrollPane" layoutX="14.0" layoutY="59.0" prefHeight="580.0" prefWidth="585.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
          <HBox fx:id="searchParent" layoutX="240.0" layoutY="14.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="10.0">
             <TextField fx:id="searchTextField" prefHeight="35.0" prefWidth="266.0" promptText="Type name to search ..." />
             <Button fx:id="searchButton" mnemonicParsing="false">
@@ -37,9 +37,9 @@
             </Button>
          </HBox>
       </AnchorPane>
-      <AnchorPane maxWidth="400.0" minHeight="500.0" minWidth="400.0" prefWidth="400.0" styleClass="form">
+      <AnchorPane maxWidth="447.0" minHeight="500.0" minWidth="500.0" prefHeight="626.0" prefWidth="500.0" styleClass="form">
          <ScrollPane layoutX="14.0" layoutY="25.0" maxHeight="300.0" prefHeight="199.0" prefWidth="393.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="25.0">
-            <TableView fx:id="cartTableView" prefHeight="197.0" prefWidth="378.0" />
+            <TableView fx:id="cartTableView" prefHeight="197.0" prefWidth="490.0" />
          </ScrollPane>
          <Label layoutX="24.0" layoutY="6.0" text="Cart List" AnchorPane.topAnchor="6.0">
             <padding>
@@ -48,22 +48,22 @@
             <font>
                <Font name="System Bold Italic" size="12.0" />
             </font></Label>
-         <Label layoutX="26.0" layoutY="296.0" text="Discout" AnchorPane.leftAnchor="20.0">
+         <Label layoutX="25.0" layoutY="254.0" text="Discout" AnchorPane.leftAnchor="25.0">
             <font>
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
-         <Spinner fx:id="discoutSpinner" layoutX="108.0" layoutY="292.0" AnchorPane.leftAnchor="100.0" />
-         <Spinner fx:id="mpesaSpinner" layoutX="108.0" layoutY="355.0" AnchorPane.leftAnchor="100.0" />
-         <Spinner fx:id="cashSpinner" layoutX="108.0" layoutY="416.0" AnchorPane.leftAnchor="100.0" />
+         <TextField fx:id="discoutTextField" layoutX="101.0" layoutY="251.0" AnchorPane.leftAnchor="101.0" />
+         <Spinner fx:id="mpesaSpinner" layoutX="101.0" layoutY="392.0" AnchorPane.leftAnchor="101.0" />
+         <Spinner fx:id="cashSpinner" layoutX="101.0" layoutY="440.0" AnchorPane.leftAnchor="101.0" />
          <Spinner fx:id="creditSpinner" layoutX="108.0" layoutY="485.0" AnchorPane.leftAnchor="100.0" />
          <Button fx:id="sellButton" layoutX="100.0" layoutY="596.0" mnemonicParsing="false" prefHeight="30.0" text="Sell and Print Receipt" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="130.0" />
-         <Label layoutX="28.0" layoutY="359.0" text="Mpesa" AnchorPane.leftAnchor="20.0">
+         <Label layoutX="24.0" layoutY="394.0" text="Mpesa" AnchorPane.leftAnchor="24.0">
             <font>
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
-         <Label layoutX="33.0" layoutY="420.0" text="Cash" AnchorPane.leftAnchor="20.0">
+         <Label layoutX="24.0" layoutY="443.0" text="Cash" AnchorPane.leftAnchor="24.0">
             <font>
                <Font name="System Italic" size="14.0" />
             </font>
@@ -73,23 +73,30 @@
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
-         <Label layoutX="256.0" layoutY="296.0" text="Ksh" />
-         <Label layoutX="256.0" layoutY="359.0" text="Ksh" />
-         <Label layoutX="256.0" layoutY="422.0" text="Ksh" />
-         <Label layoutX="256.0" layoutY="489.0" text="Ksh" />
+         <Label layoutX="260.0" layoutY="255.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
+         <Label layoutX="256.0" layoutY="396.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
+         <Label layoutX="256.0" layoutY="445.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
+         <Label layoutX="256.0" layoutY="489.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
          <Label layoutX="21.0" layoutY="519.0" prefHeight="40.0" prefWidth="76.0" text="Description (optional)" wrapText="true">
             <font>
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
          <TextArea fx:id="descriptionTextArea" layoutX="100.0" layoutY="515.0" prefHeight="73.0" prefWidth="281.0" promptText="credit to be paid on ...." wrapText="true" />
-         <Label layoutX="18.0" layoutY="244.0" text="Expected Amout :">
+         <Label layoutX="7.0" layoutY="333.0" text="Expected Amout :" AnchorPane.leftAnchor="24.0">
             <font>
                <Font name="System Italic" size="14.0" />
             </font>
          </Label>
-         <Label fx:id="expectedAmountLabel" alignment="CENTER" layoutX="131.0" layoutY="246.0" prefHeight="17.0" prefWidth="89.0" text="0.00" />
-         <Label layoutX="222.0" layoutY="246.0" text="Ksh" />
+         <Label fx:id="expectedAmountLabel" alignment="CENTER" layoutX="131.0" layoutY="335.0" prefHeight="17.0" prefWidth="114.0" text="0.00" />
+         <Label layoutX="247.0" layoutY="335.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
+         <TextField fx:id="extrasTextField" layoutX="100.0" layoutY="280.0" AnchorPane.leftAnchor="100.0" />
+         <Label layoutX="26.0" layoutY="283.0" text="Extras" AnchorPane.leftAnchor="26.0">
+            <font>
+               <Font name="System Italic" size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="285.0" text="Ksh" AnchorPane.leftAnchor="260.0" />
       </AnchorPane>
    </SplitPane>
 </AnchorPane>

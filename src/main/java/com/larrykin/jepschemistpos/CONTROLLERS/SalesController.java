@@ -11,16 +11,28 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteErrorCode;
+
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -46,10 +58,13 @@ public class SalesController {
     private TextArea descriptionTextArea;
 
     @FXML
-    private Spinner<Double> discoutSpinner;
+    private TextField discoutTextField;
 
     @FXML
     public Label expectedAmountLabel;
+
+    @FXML
+    private TextField extrasTextField;
 
     @FXML
     private ImageView iconRefresh;
@@ -89,6 +104,7 @@ public class SalesController {
         initializeButtons();
         initializeUIElements();
         initializeCartTable();
+        initializeSpinners();
 
         // Pre-initialize the TableView by adding and removing a dummy item
         Products dummyProduct = new Products();
@@ -191,6 +207,32 @@ public class SalesController {
             Products sellingProduct = cellData.getValue();
             return new SimpleDoubleProperty(sellingProduct.getSellingPrice() * sellingProduct.getSellingQuantity()).asObject();
         });
+
+        //editButton
+        TableColumn<Products, String> editColumn = new TableColumn<>("Edit");
+        editColumn.setPrefWidth(45);  // Set a fixed width
+        editColumn.setCellFactory(param -> new TableCell<Products, String>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+                editButton.setOnAction(event -> {
+                    Products product = getTableView().getItems().get(getIndex());
+                    showEditPopup(product);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(editButton);
+                }
+            }
+        });
+
         //delete buttons column
         TableColumn<Products, String> deleteColumn = new TableColumn<>("Del.");
         deleteColumn.setPrefWidth(35);  // Set a fixed width
@@ -217,9 +259,60 @@ public class SalesController {
         });
 
         //Add columns to the table
-        cartTableView.getColumns().addAll(productIDColumn, productNameColumn, sellingPriceColumn, decrementColumn, quantityColumn, incrementColumn, totalColumn, deleteColumn);
+        cartTableView.getColumns().addAll(productIDColumn, productNameColumn, sellingPriceColumn, decrementColumn, quantityColumn, incrementColumn, totalColumn, editColumn, deleteColumn);
     }
 
+    // Method to show the popup window
+    private void showEditPopup(Products product) {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Edit Product");
+
+        Label quantityLabel = new Label("Selling Quantity:");
+        Spinner<Double> quantitySpinner = new Spinner<>(new SpinnerValueFactory.DoubleSpinnerValueFactory(1, product.getProductQuantity(), product.getSellingQuantity()));
+        quantitySpinner.setEditable(true);
+
+        Label totalLabel = new Label("Total:");
+        TextField totalField = new TextField(String.valueOf(product.getSellingPrice() * product.getSellingQuantity()));
+        totalField.setEditable(true);
+
+        quantitySpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (!totalField.isFocused()) {
+                double newTotal = newValue * product.getSellingPrice();
+                totalField.setText(String.valueOf(newTotal));
+            }
+        });
+
+        totalField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!quantitySpinner.isFocused()) {
+                try {
+                    double total = Double.parseDouble(newValue);
+                    double newQuantity = total / product.getSellingPrice();
+                    quantitySpinner.getValueFactory().setValue(newQuantity);
+                } catch (NumberFormatException e) {
+                    // Handle invalid input
+                    totalField.setText(oldValue);
+                }
+            }
+        });
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(event -> {
+            product.setSellingQuantity(quantitySpinner.getValue());
+            product.setTotal(Double.parseDouble(totalField.getText()));
+            cartTableView.refresh();
+            popupStage.close();
+        });
+
+        VBox layout = new VBox(10, quantityLabel, quantitySpinner, totalLabel, totalField, saveButton);
+        Insets insets = new Insets(10, 10, 10, 10);
+        layout.setPadding(insets);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(layout, 300, 200);
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
+    }
 
     //instantiate database
     DatabaseConn databaseConn = new DatabaseConn();
@@ -293,7 +386,7 @@ public class SalesController {
         }
 
         // Get values of the spinners
-        double discount = discoutSpinner.getValue();
+        double discount = Double.parseDouble(discoutTextField.getText());
         double mpesa = mpesaSpinner.getValue();
         double cash = cashSpinner.getValue();
         double credit = creditSpinner.getValue();
@@ -397,8 +490,9 @@ public class SalesController {
 
                         // Clear carts, label, spinners, and textArea
                         cartTableView.getItems().clear();
-                        expectedAmountLabel.setText("0.00");
-                        discoutSpinner.getValueFactory().setValue(0.0);
+                        expectedAmountLabel.setText(String.valueOf(0.0));
+                        discoutTextField.setText(String.valueOf(0.0));
+                        extrasTextField.setText(String.valueOf(0.0));
                         mpesaSpinner.getValueFactory().setValue(0.0);
                         cashSpinner.getValueFactory().setValue(0.0);
                         creditSpinner.getValueFactory().setValue(0.0);
@@ -735,6 +829,9 @@ public class SalesController {
         for (Products product : cartTableView.getItems()) {
             totalAmount += product.getSellingPrice() * product.getSellingQuantity();
         }
+        double discount = Double.parseDouble(discoutTextField.getText());
+        double extras = Double.parseDouble(extrasTextField.getText());
+        totalAmount = totalAmount - discount + extras;
         expectedAmountLabel.setText(String.format("%.2f", totalAmount));
     }
 
@@ -884,12 +981,10 @@ public class SalesController {
 
     //? Load spinners
     private void loadSpinners() {
-        discoutSpinner.setEditable(true);
-        SpinnerValueFactory<Double> valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
-        discoutSpinner.setValueFactory(valueFactory);
         mpesaSpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory1 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         mpesaSpinner.setValueFactory(valueFactory1);
+
         cashSpinner.setEditable(true);
         SpinnerValueFactory<Double> valueFactory2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         cashSpinner.setValueFactory(valueFactory2);
@@ -897,4 +992,41 @@ public class SalesController {
         SpinnerValueFactory<Double> valueFactory3 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100000.0, 0.0);
         creditSpinner.setValueFactory(valueFactory3);
     }
+
+    //? Initialize spinners
+private void initializeSpinners() {
+        // set initial values to 0.0
+    discoutTextField.setText(String.valueOf(0.0));
+    extrasTextField.setText(String.valueOf(0.0));
+
+
+    // Add listeners to the TextFields
+    discoutTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+        try {
+            Double.parseDouble(newValue);
+            updateExpectedAmount();
+        } catch (NumberFormatException e) {
+            log.error("Error parsing discount value: {}", e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Invalid discount value");
+            alert.setContentText("Please enter a valid discount value.");
+            alert.showAndWait();
+        }
+    });
+
+    extrasTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+        try {
+            Double.parseDouble(newValue);
+            updateExpectedAmount();
+        } catch (NumberFormatException e) {
+            log.error("Error parsing extras value: {}", e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Invalid extras value");
+            alert.setContentText("Please enter a valid extras value.");
+            alert.showAndWait();
+        }
+    });
+}
 }
