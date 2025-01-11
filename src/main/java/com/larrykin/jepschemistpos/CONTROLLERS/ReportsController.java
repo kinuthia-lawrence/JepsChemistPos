@@ -1,5 +1,10 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.larrykin.jepschemistpos.MODELS.Sales;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.collections.FXCollections;
@@ -12,11 +17,21 @@ import javafx.scene.Group;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ReportsController {
@@ -26,10 +41,12 @@ public class ReportsController {
 
 
     private DatabaseConn databaseConn = new DatabaseConn();
+//    private File saveLocation;
 
     @FXML
     public void initialize() {
         initializeCombinedChart();
+//        setDefaultSaveLocation();
     }
 
     private void initializeCombinedChart() {
@@ -130,4 +147,67 @@ public class ReportsController {
         AnchorPane.setLeftAnchor(chart, 0.0);
         AnchorPane.setRightAnchor(chart, 0.0);
     }
+
+    /*//! Sales Report SECTION
+    private void setDefaultSaveLocation() {
+        String userHome = System.getProperty("user.home");
+        Path defaultPath = Paths.get(userHome, "Desktop", "Sales Report");
+        if (!Files.exists(defaultPath)) {
+            try {
+                Files.createDirectories(defaultPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        saveLocation = defaultPath.toFile();
+    }
+
+    @FXML
+    private void chooseSaveLocation() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Save Location");
+        directoryChooser.setInitialDirectory(saveLocation);
+        File selectedDirectory = directoryChooser.showDialog(new Stage());
+        if (selectedDirectory != null) {
+            saveLocation = selectedDirectory;
+        }
+    }
+
+    public static void createPdfReport(String fileName, List<Sales> sales) {
+        try {
+            File file = new File(saveLocation, fileName + ".pdf");
+            PdfWriter writer = new PdfWriter(file.getAbsolutePath());
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            document.add(new Paragraph("Sales Report"));
+            document.add(new Paragraph("Generated on: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+
+            Table table = new Table(new float[]{1, 3, 2, 2, 2, 2, 2, 2});
+            table.addHeaderCell("ID");
+            table.addHeaderCell("Goods");
+            table.addHeaderCell("Expected Amount");
+            table.addHeaderCell("Paid Amount");
+            table.addHeaderCell("Discount");
+            table.addHeaderCell("Cash");
+            table.addHeaderCell("Mpesa");
+            table.addHeaderCell("Credit");
+
+            for (Sales sale : sales) {
+                table.addCell(sale.getSalesID().toString());
+                table.addCell(sale.getGoods());
+                table.addCell(String.valueOf(sale.getExpectedAmount()));
+                table.addCell(String.valueOf(sale.getTotalAmount()));
+                table.addCell(String.valueOf(sale.getDiscountAmount()));
+                table.addCell(String.valueOf(sale.getCash()));
+                table.addCell(String.valueOf(sale.getMpesa()));
+                table.addCell(String.valueOf(sale.getCredit()));
+            }
+
+            document.add(table);
+            document.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }*/
 }

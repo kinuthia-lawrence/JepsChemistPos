@@ -10,6 +10,8 @@ module com.larrykin.jepschemistpos {
     requires org.xerial.sqlitejdbc;
     requires org.slf4j;
     requires spring.security.crypto;
+    requires kernel;
+    requires layout;
 
 
     opens com.larrykin.jepschemistpos to javafx.fxml;

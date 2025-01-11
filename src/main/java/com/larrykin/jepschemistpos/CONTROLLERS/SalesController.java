@@ -1,5 +1,10 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.SaleData;
@@ -28,6 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -36,6 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteErrorCode;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -109,6 +120,7 @@ public class SalesController {
         initializeUIElements();
         initializeCartTable();
         initializeSpinners();
+        setDefaultSaveLocation();
 
         // Pre-initialize the TableView by adding and removing a dummy item
         Products dummyProduct = new Products();
@@ -326,6 +338,7 @@ public class SalesController {
     TableView<Products> stockTableView = new TableView<>();
     private Map<String, SaleData> heldSales = new HashMap<>();
     private String currentSaleId = "default";
+    private File saveLocation;
 
     //? Initialize UI elements
     private void initializeUIElements() {
@@ -952,10 +965,10 @@ public class SalesController {
                     alert.setContentText("This action cannot be undone.");
                     alert.showAndWait();
                     if (alert.getResult() == ButtonType.OK) {
-                        if(DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
                             salesTableView.getItems().remove(record);
-                        }else{
-                            Alert userAlert= new Alert(Alert.AlertType.ERROR);
+                        } else {
+                            Alert userAlert = new Alert(Alert.AlertType.ERROR);
                             userAlert.setTitle("Error");
                             userAlert.setHeaderText("You are not authorized to delete records");
                             userAlert.setContentText("Only Admins can delete records");
@@ -990,6 +1003,29 @@ public class SalesController {
         ObservableList<Sales> sales = FXCollections.observableArrayList();
         sales.addAll(getSalesFromDatabase());
         salesTableView.setItems(sales);
+
+
+        // Get the current date
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+// Filter sales that match the current date
+        List<Sales> salesList = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        try {
+            for (Sales sale : sales) {
+                String saleDate = dateFormat.format(dateFormat.parse(sale.getDate()));
+                if (saleDate.equals(currentDate)) {
+                    salesList.add(sale);
+                }
+            }
+
+// Generate the PDF report after populating the sales table
+            createPdfReport(currentDate, salesList);
+        } catch (Exception e) {
+            log.error("Error generating PDF report: {}", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     //? Get sales from database
@@ -1147,5 +1183,94 @@ public class SalesController {
 
         ReceiptPrinter receiptPrinter = new ReceiptPrinter(receiptText);
         receiptPrinter.printReceipt();
+    }
+
+    //! Sales Report SECTION
+    // create the Sales report directory if not exists in the user's Desktop
+    private void setDefaultSaveLocation() {
+        String userHome = System.getProperty("user.home");
+        Path defaultPath = Paths.get(userHome, "Desktop", "Sales Report");
+        if (!Files.exists(defaultPath)) {
+            try {
+                Files.createDirectories(defaultPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        saveLocation = defaultPath.toFile();
+    }
+
+    // explicitly choose the save location
+  /*  @FXML
+    private void chooseSaveLocation() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select Save Location");
+        directoryChooser.setInitialDirectory(saveLocation);
+        File selectedDirectory = directoryChooser.showDialog(new Stage());
+        if (selectedDirectory != null) {
+            saveLocation = selectedDirectory;
+        }
+    }*/
+
+    private void createPdfReport(String fileName, List<Sales> sales) {
+        try {
+            File file = new File(saveLocation, fileName + ".pdf");
+            PdfWriter writer = new PdfWriter(file.getAbsolutePath());
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            document.add(new Paragraph("Sales Report"));
+            document.add(new Paragraph("Generated on: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+
+            Table table = new Table(new float[]{1, 4, 2, 2, 2, 2, 2, 2});
+            table.addHeaderCell("ID");
+            table.addHeaderCell("Goods");
+            table.addHeaderCell("Expected Amount");
+            table.addHeaderCell("Paid Amount");
+            table.addHeaderCell("Discount");
+            table.addHeaderCell("Cash");
+            table.addHeaderCell("Mpesa");
+            table.addHeaderCell("Credit");
+
+            double totalExpectedAmount = 0;
+            double totalPaidAmount = 0;
+            double totalDiscount = 0;
+            double totalCash = 0;
+            double totalMpesa = 0;
+            double totalCredit = 0;
+
+            for (Sales sale : sales) {
+                table.addCell(sale.getSalesID().toString());
+                table.addCell(sale.getGoods());
+                table.addCell(String.valueOf(sale.getExpectedAmount()));
+                table.addCell(String.valueOf(sale.getTotalAmount()));
+                table.addCell(String.valueOf(sale.getDiscountAmount()));
+                table.addCell(String.valueOf(sale.getCash()));
+                table.addCell(String.valueOf(sale.getMpesa()));
+                table.addCell(String.valueOf(sale.getCredit()));
+
+                totalExpectedAmount += sale.getExpectedAmount();
+                totalPaidAmount += sale.getTotalAmount();
+                totalDiscount += sale.getDiscountAmount();
+                totalCash += sale.getCash();
+                totalMpesa += sale.getMpesa();
+                totalCredit += sale.getCredit();
+            }
+
+// Add totals row
+            table.addCell("Total");
+            table.addCell("");
+            table.addCell(String.valueOf(totalExpectedAmount));
+            table.addCell(String.valueOf(totalPaidAmount));
+            table.addCell(String.valueOf(totalDiscount));
+            table.addCell(String.valueOf(totalCash));
+            table.addCell(String.valueOf(totalMpesa));
+            table.addCell(String.valueOf(totalCredit));
+
+            document.add(table);
+            document.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

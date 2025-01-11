@@ -69,6 +69,14 @@
             <version>6.4.2</version>
         </dependency>
 
+        <!--        itextpdf-->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>9.0.0</version>
+            <type>pom</type>
+        </dependency>
+
     </dependencies>
 
     <build>
