@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.collections.FXCollections;
@@ -114,7 +115,15 @@ public class NotificationController {
                 deleteButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    deleteAsRefunded(product);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteAsRefunded(product);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -138,7 +147,15 @@ public class NotificationController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    deleteAsLoss(product);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteAsLoss(product);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -343,7 +360,15 @@ public class NotificationController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    stockController.deleteRow(product);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        stockController.deleteRow(product);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                     checkOutOfStock();
                 });
             }

@@ -2,6 +2,7 @@ package com.larrykin.jepschemistpos.CONTROLLERS;
 
 import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Supplier;
+import com.larrykin.jepschemistpos.MODELS.User;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import com.larrykin.jepschemistpos.UTILITIES.PrintingManager;
 import com.larrykin.jepschemistpos.UTILITIES.SceneManager;
@@ -18,6 +19,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
@@ -113,6 +115,9 @@ public class SettingsController {
     @FXML
     private ToggleButton themeToggleButton;
 
+    @FXML
+    private Button viewUsersButton;
+
     //?instantiate database
     private DatabaseConn databaseConn = new DatabaseConn();
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -141,9 +146,9 @@ public class SettingsController {
     private void updateAutoConfirmText() {
         boolean isAutoConfirmEnabled = PrintingManager.loadAutoConfirmState();
         enableAutoConfirm.setSelected(isAutoConfirmEnabled);
-        if(isAutoConfirmEnabled) {
+        if (isAutoConfirmEnabled) {
             enableAutoConfirm.setText("Auto Confirm Enabled");
-        }else {
+        } else {
             enableAutoConfirm.setText("Auto Confirm Disabled");
         }
     }
@@ -207,6 +212,8 @@ public class SettingsController {
         addUserButton.setOnAction(event -> {
             addUser();
         });
+        //view users
+        viewUsersButton.setOnAction(event -> showUserList());
     }
 
     //?Add a user
@@ -520,7 +527,15 @@ public class SettingsController {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Supplier supplier = getTableView().getItems().get(getIndex());
-                    editRow(supplier);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        editRow(supplier);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to Edit records");
+                        userAlert.setContentText("Only Admins can Edit records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -545,7 +560,15 @@ public class SettingsController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Supplier supplier = getTableView().getItems().get(getIndex());
-                    deleteRow(supplier);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteRow(supplier);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -734,5 +757,130 @@ public class SettingsController {
                 }
             }
         });
+    }
+
+    //?show user list
+
+    private void showUserList() {
+        Stage userStage = new Stage();
+        userStage.setTitle("User List");
+
+        TableView<User> userTableView = new TableView<>();
+        ObservableList<User> users = FXCollections.observableArrayList(getUsersFromDatabase());
+
+        TableColumn<User, String> emailColumn = new TableColumn<>("Email");
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        emailColumn.setPrefWidth(200);
+
+        TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        usernameColumn.setPrefWidth(100);
+
+        TableColumn<User, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        roleColumn.setPrefWidth(50);
+
+        //delete column
+        TableColumn<User, String> deleteColumn = new TableColumn<>("  Delete ");
+        deleteColumn.setPrefWidth(75);  // Set a fixed width
+        deleteColumn.setCellFactory(param -> new TableCell<User, String>() {
+            private final Button deleteButton = new Button("Delete");
+
+            {
+                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+                deleteButton.setOnAction(event -> {
+                    User user = getTableView().getItems().get(getIndex());
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteUser(user);
+                        //?refresh the table
+                        users.clear();
+                        users.addAll(getUsersFromDatabase());
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(deleteButton);
+                }
+            }
+        });
+
+
+        userTableView.getColumns().addAll(emailColumn, usernameColumn, roleColumn, deleteColumn);
+        userTableView.setItems(users);
+
+        VBox vbox = new VBox(userTableView);
+        Scene scene = new Scene(vbox, 425, 300);
+        userStage.setScene(scene);
+        userStage.show();
+    }
+
+    private List<User> getUsersFromDatabase() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT email, username, role FROM users";
+        try (Connection connection = databaseConn.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                User user = new User(resultSet.getString("username"), resultSet.getString("email"), ROLE.valueOf(resultSet.getString("role")));
+                users.add(user);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    private void deleteUser(User user) {
+        Alert deleteAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        deleteAlert.setTitle("Delete User");
+        deleteAlert.setHeaderText("Are you sure you want to delete " + user.getUsername());
+        deleteAlert.setContentText("This Action is irreversible!!");
+        deleteAlert.showAndWait();
+
+        if (deleteAlert.getResult() != ButtonType.OK) {
+            deleteAlert.close();
+            return;
+        }
+        String deleteQuery = "DELETE FROM users WHERE email=?";
+        try (
+                Connection connection = databaseConn.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery);
+        ) {
+            preparedStatement.setObject(1, user.getEmail()); // set the value of the first parameter to email
+            int rowAffected = preparedStatement.executeUpdate();
+            if (rowAffected > 0) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText("User deleted successfully");
+                alert.setContentText("User deleted successfully");
+                Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), ev -> alert.close()));
+                timeline.setCycleCount(1);
+                timeline.play();
+                alert.showAndWait();
+                //? On success Methods
+                connection.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error deleting User");
+                alert.setContentText("Error deleting User");
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            log.error("Error Deleting User{}", e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

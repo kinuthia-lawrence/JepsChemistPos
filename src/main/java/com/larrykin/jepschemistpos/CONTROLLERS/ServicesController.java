@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Service;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import com.larrykin.jepschemistpos.UTILITIES.ReceiptPrinter;
@@ -357,7 +358,15 @@ public class ServicesController {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Service service = getTableView().getItems().get(getIndex());
-                    editRow(service);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        editRow(service);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to edit records");
+                        userAlert.setContentText("Only Admins can edit records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -382,7 +391,15 @@ public class ServicesController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Service service = getTableView().getItems().get(getIndex());
-                    deleteRow(service);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteRow(service);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 

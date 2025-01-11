@@ -134,6 +134,7 @@ public class DashboardController {
     private NotificationController notificationController;
     DatabaseConn databaseConn = new DatabaseConn();
     public static String loggedInUserUsername;
+    public static User loggedInUser;
 
     private void initializeNotification() {
         try {
@@ -174,6 +175,7 @@ public class DashboardController {
             usernameLabel.setText(user.getUsername());
             emailLabel.setText(user.getEmail());
             loggedInUserUsername = user.getUsername();
+            loggedInUser = user;
         }
         // create the spacer
         Region spacer = new Region();

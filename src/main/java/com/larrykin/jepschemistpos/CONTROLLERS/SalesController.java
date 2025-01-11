@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.MODELS.SaleData;
 import com.larrykin.jepschemistpos.MODELS.Sales;
@@ -951,7 +952,15 @@ public class SalesController {
                     alert.setContentText("This action cannot be undone.");
                     alert.showAndWait();
                     if (alert.getResult() == ButtonType.OK) {
-                        salesTableView.getItems().remove(record);
+                        if(DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                            salesTableView.getItems().remove(record);
+                        }else{
+                            Alert userAlert= new Alert(Alert.AlertType.ERROR);
+                            userAlert.setTitle("Error");
+                            userAlert.setHeaderText("You are not authorized to delete records");
+                            userAlert.setContentText("Only Admins can delete records");
+                            userAlert.showAndWait();
+                        }
                     } else {
                         alert.close();
                     }

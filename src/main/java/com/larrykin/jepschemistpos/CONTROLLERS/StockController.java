@@ -1,5 +1,6 @@
 package com.larrykin.jepschemistpos.CONTROLLERS;
 
+import com.larrykin.jepschemistpos.ENUMS.ROLE;
 import com.larrykin.jepschemistpos.MODELS.Products;
 import com.larrykin.jepschemistpos.UTILITIES.DatabaseConn;
 import javafx.animation.KeyFrame;
@@ -277,7 +278,15 @@ public class StockController {
                 editButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 editButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    editRow(product);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        editRow(product);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to edit records");
+                        userAlert.setContentText("Only Admins can edit records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 
@@ -301,7 +310,15 @@ public class StockController {
                 deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
                 deleteButton.setOnAction(event -> {
                     Products product = getTableView().getItems().get(getIndex());
-                    deleteRow(product);
+                    if (DashboardController.loggedInUser.getRole() == ROLE.ADMIN) {
+                        deleteRow(product);
+                    } else {
+                        Alert userAlert = new Alert(Alert.AlertType.ERROR);
+                        userAlert.setTitle("Error");
+                        userAlert.setHeaderText("You are not authorized to delete records");
+                        userAlert.setContentText("Only Admins can delete records");
+                        userAlert.showAndWait();
+                    }
                 });
             }
 

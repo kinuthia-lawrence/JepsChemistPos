@@ -55,12 +55,12 @@
                   <TextField fx:id="auUsernameForTheAccount" disable="true" layoutX="288.0" layoutY="341.0" prefHeight="30.0" prefWidth="200.0" promptText="Username" />
                   <PasswordField fx:id="auPasswordField" disable="true" layoutX="289.0" layoutY="405.0" prefHeight="30.0" prefWidth="200.0" promptText="Password" />
                   <PasswordField fx:id="auConfirmPasswordField" disable="true" layoutX="288.0" layoutY="457.0" prefHeight="30.0" prefWidth="200.0" promptText="Password" />
-                  <Button fx:id="addUserButton" disable="true" layoutX="288.0" layoutY="511.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Add">
+                  <Button fx:id="addUserButton" disable="true" layoutX="288.0" layoutY="496.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" text="Add">
                      <font>
                         <Font name="System Bold Italic" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="changePasswordButton" disable="true" layoutX="49.0" layoutY="511.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Change">
+                  <Button fx:id="changePasswordButton" disable="true" layoutX="49.0" layoutY="495.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="200.0" text="Change">
                      <font>
                         <Font name="System Bold Italic" size="14.0" />
                      </font>
@@ -106,6 +106,7 @@
                      </font></Label>
                   <ToggleButton fx:id="enablePrintingToggle" layoutX="332.0" layoutY="32.0" mnemonicParsing="false" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="10.0" />
                   <ToggleButton fx:id="enableAutoConfirm" layoutX="342.0" layoutY="42.0" mnemonicParsing="false" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="40.0" />
+                  <Button fx:id="viewUsersButton" layoutX="288.0" layoutY="546.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="200.0" text="View Users" AnchorPane.bottomAnchor="20.0" />
                </children>
             </AnchorPane>
             <AnchorPane fx:id="addSupplierPane" prefHeight="598.0" prefWidth="537.0" SplitPane.resizableWithParent="false">
